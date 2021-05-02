@@ -11,6 +11,8 @@ namespace DefaultAPI.Domain
         public const string urlToGetStates = "https://servicodados.ibge.gov.br/api/v1/localidades/estados";
         public const string urlToGetCities = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/{0}/municipios";
 
+        public const string saveLog = @"insert into Log(Class,Method,Message_Error,Update_time,Object) values('{0}','{1}','{2}','{3}','{4}')";
+
         public const string ExceptionRequestAPI = "Erro ao efetuar request da Api externa: {0}";
         public const string ExceptionExcel = "Erro ao gerar o excel solicitado";
 

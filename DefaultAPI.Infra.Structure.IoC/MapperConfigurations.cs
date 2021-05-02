@@ -25,6 +25,22 @@ namespace DefaultAPI.Infra.Structure.IoC.MapEntitiesXDto
                 .ForMember(dest => dest.LastPassword, act => act.MapFrom(src => src.LastPassword))
                 .ForMember(dest => dest.Login, act => act.MapFrom(src => src.Login))
                 .ForMember(dest => dest.Password, act => act.MapFrom(src => src.Password));
+
+                cfg.CreateMap<Log, LogReturnedDto>()
+                .ForMember(dest => dest.Class, act => act.MapFrom(src => src.Class))
+                .ForMember(dest => dest.Method, act => act.MapFrom(src => src.Method))
+                .ForMember(dest => dest.MessageError, act => act.MapFrom(src => src.MessageError))
+                .ForMember(dest => dest.Object, act => act.MapFrom(src => src.Object))
+                .ForMember(dest => dest.UpdateTime, act => act.MapFrom(src => src.UpdateTime))
+                .ForMember(dest => dest.Id, act => act.MapFrom(src => src.Id));
+
+                cfg.CreateMap<Audit, AuditReturnedDto>()
+                .ForMember(dest => dest.TableName, act => act.MapFrom(src => src.TableName))
+                .ForMember(dest => dest.ActionName, act => act.MapFrom(src => src.ActionName))
+                .ForMember(dest => dest.Id, act => act.MapFrom(src => src.Id))
+                .ForMember(dest => dest.KeyValues, act => act.MapFrom(src => src.KeyValues))
+                .ForMember(dest => dest.NewValues, act => act.MapFrom(src => src.NewValues))
+                .ForMember(dest => dest.OldValues, act => act.MapFrom(src => src.OldValues));
             });
         }
     }
