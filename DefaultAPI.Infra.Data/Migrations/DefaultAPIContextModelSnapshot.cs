@@ -19,6 +19,64 @@ namespace DefaultAPI.Infra.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("DefaultAPI.Domain.Entities.Audit", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("Id")
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ActionName")
+                        .IsRequired()
+                        .HasColumnName("Action_Name")
+                        .HasColumnType("nvarchar(80)")
+                        .HasMaxLength(80);
+
+                    b.Property<DateTime?>("CreatedTime")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("Created_Time")
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(2021, 5, 2, 16, 42, 10, 118, DateTimeKind.Local).AddTicks(8929));
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("Is_Active")
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("KeyValues")
+                        .HasColumnName("Key_Values")
+                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(10000);
+
+                    b.Property<string>("NewValues")
+                        .HasColumnName("New_Values")
+                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(10000);
+
+                    b.Property<string>("OldValues")
+                        .HasColumnName("Old_Values")
+                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(10000);
+
+                    b.Property<string>("TableName")
+                        .IsRequired()
+                        .HasColumnName("Table_Name")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<DateTime?>("UpdateTime")
+                        .HasColumnName("Update_Time")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Audits");
+                });
+
             modelBuilder.Entity("DefaultAPI.Domain.Entities.Ceps", b =>
                 {
                     b.Property<long?>("Id")
@@ -49,7 +107,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 2, 14, 14, 10, 729, DateTimeKind.Local).AddTicks(6515));
+                        .HasDefaultValue(new DateTime(2021, 5, 2, 16, 42, 10, 118, DateTimeKind.Local).AddTicks(5555));
 
                     b.Property<string>("Ddd")
                         .HasColumnName("Ddd")
@@ -119,7 +177,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 2, 14, 14, 10, 710, DateTimeKind.Local).AddTicks(6542));
+                        .HasDefaultValue(new DateTime(2021, 5, 2, 16, 42, 10, 95, DateTimeKind.Local).AddTicks(1904));
 
                     b.Property<long?>("IBGE")
                         .IsRequired()
@@ -150,6 +208,47 @@ namespace DefaultAPI.Infra.Data.Migrations
                     b.HasIndex("IdState");
 
                     b.ToTable("Cities");
+                });
+
+            modelBuilder.Entity("DefaultAPI.Domain.Entities.Log", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("Id")
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:IdentityIncrement", 1)
+                        .HasAnnotation("SqlServer:IdentitySeed", 1)
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Class")
+                        .IsRequired()
+                        .HasColumnName("Class")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("MessageError")
+                        .HasColumnName("Message_Error")
+                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(10000);
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnName("Method")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Object")
+                        .HasColumnName("Object")
+                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(10000);
+
+                    b.Property<DateTime>("UpdateTime")
+                        .HasColumnName("Update_Time")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Logs");
                 });
 
             modelBuilder.Entity("DefaultAPI.Domain.Entities.Profile", b =>
@@ -203,7 +302,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         {
                             Id = 1L,
                             AccessGroup = (byte)0,
-                            CreatedTime = new DateTime(2021, 5, 2, 14, 14, 10, 730, DateTimeKind.Local).AddTicks(6084),
+                            CreatedTime = new DateTime(2021, 5, 2, 16, 42, 10, 119, DateTimeKind.Local).AddTicks(7267),
                             Description = "Perfil Usuário Tria",
                             IsActive = true,
                             LoginType = (byte)1,
@@ -213,7 +312,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         {
                             Id = 2L,
                             AccessGroup = (byte)0,
-                            CreatedTime = new DateTime(2021, 5, 2, 14, 14, 10, 730, DateTimeKind.Local).AddTicks(7454),
+                            CreatedTime = new DateTime(2021, 5, 2, 16, 42, 10, 119, DateTimeKind.Local).AddTicks(8944),
                             Description = "Perfil Administrador Tria",
                             IsActive = true,
                             LoginType = (byte)1,
@@ -223,7 +322,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         {
                             Id = 3L,
                             AccessGroup = (byte)0,
-                            CreatedTime = new DateTime(2021, 5, 2, 14, 14, 10, 730, DateTimeKind.Local).AddTicks(7517),
+                            CreatedTime = new DateTime(2021, 5, 2, 16, 42, 10, 119, DateTimeKind.Local).AddTicks(8968),
                             Description = "Perfil Manager Tria",
                             IsActive = true,
                             LoginType = (byte)1,
@@ -272,7 +371,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 2, 14, 14, 10, 729, DateTimeKind.Local).AddTicks(8484));
+                        .HasDefaultValue(new DateTime(2021, 5, 2, 16, 42, 10, 118, DateTimeKind.Local).AddTicks(7582));
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -345,7 +444,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedTime = new DateTime(2021, 5, 2, 14, 14, 10, 732, DateTimeKind.Local).AddTicks(1075),
+                            CreatedTime = new DateTime(2021, 5, 2, 16, 42, 10, 121, DateTimeKind.Local).AddTicks(2063),
                             Description = "Regra de acesso a tela de Auditoria",
                             IsActive = false,
                             RoleTag = "ROLE_AUDIT"
@@ -366,7 +465,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 5, 2, 14, 14, 10, 729, DateTimeKind.Local).AddTicks(4197));
+                        .HasDefaultValue(new DateTime(2021, 5, 2, 16, 42, 10, 118, DateTimeKind.Local).AddTicks(3228));
 
                     b.Property<long>("IdRegiao")
                         .HasColumnType("bigint");
@@ -458,13 +557,13 @@ namespace DefaultAPI.Infra.Data.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedTime = new DateTime(2021, 5, 2, 14, 14, 10, 733, DateTimeKind.Local).AddTicks(1824),
+                            CreatedTime = new DateTime(2021, 5, 2, 16, 42, 10, 122, DateTimeKind.Local).AddTicks(2393),
                             IdProfile = 1L,
                             IsActive = true,
                             IsAuthenticated = true,
                             LastPassword = "",
                             Login = "admin@DefaultAPI.com.br",
-                            Password = "AQAQJwAA6a59byh/7skPQnL/KIK+IxXoOfkWX/IgLjH4EIjqijE="
+                            Password = "AQAQJwAAaXwmQgSYz9wCpbKzgzG0Dk743NeCSrBeWx7coh2In6Y="
                         });
                 });
 

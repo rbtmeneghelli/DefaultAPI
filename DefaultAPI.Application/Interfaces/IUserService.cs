@@ -10,7 +10,7 @@ namespace DefaultAPI.Application.Interfaces
 {
     public interface IUserService
     {
-        Task<List<User>> GetAll();
+        Task<List<UserReturnedDto>> GetAll();
         Task<UserPaged> GetAllPaginate(UserFilter filter);
         Task<UserReturnedDto> GetById(long id);
         Task<UserReturnedDto> GetByLogin(string login);

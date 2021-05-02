@@ -16,8 +16,12 @@ namespace DefaultAPI.Domain.Dto
         [DisplayName("Autenticado")]
         public bool IsAuthenticated { get; set; }
         public long IdProfile { get; set; }
+
         [DisplayName("Perfil")]
         public string Profile { get; set; }
+
+        [DisplayName("Status")]
+        public string Status { get; set; }
 
         public override string ToString() => $"Login: {Login}";
     }

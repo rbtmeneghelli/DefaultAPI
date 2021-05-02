@@ -3,10 +3,47 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DefaultAPI.Infra.Data.Migrations
 {
-    public partial class Initial_Db : Migration
+    public partial class initial_db : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Audits",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Created_Time = table.Column<DateTime>(nullable: true, defaultValue: new DateTime(2021, 5, 2, 16, 42, 10, 118, DateTimeKind.Local).AddTicks(8929)),
+                    Update_Time = table.Column<DateTime>(nullable: true),
+                    Is_Active = table.Column<bool>(nullable: false, defaultValue: true),
+                    Table_Name = table.Column<string>(maxLength: 100, nullable: false),
+                    Action_Name = table.Column<string>(maxLength: 80, nullable: false),
+                    Key_Values = table.Column<string>(maxLength: 10000, nullable: true),
+                    Old_Values = table.Column<string>(maxLength: 10000, nullable: true),
+                    New_Values = table.Column<string>(maxLength: 10000, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Audits", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Logs",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Class = table.Column<string>(maxLength: 100, nullable: false),
+                    Method = table.Column<string>(maxLength: 100, nullable: false),
+                    Message_Error = table.Column<string>(maxLength: 10000, nullable: true),
+                    Update_Time = table.Column<DateTime>(nullable: false),
+                    Object = table.Column<string>(maxLength: 10000, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Logs", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Profiles",
                 columns: table => new
@@ -32,7 +69,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Created_Time = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2021, 5, 2, 0, 38, 9, 191, DateTimeKind.Local).AddTicks(3423)),
+                    Created_Time = table.Column<DateTime>(nullable: true, defaultValue: new DateTime(2021, 5, 2, 16, 42, 10, 118, DateTimeKind.Local).AddTicks(7582)),
                     Update_Time = table.Column<DateTime>(nullable: true),
                     Is_Active = table.Column<bool>(nullable: false, defaultValue: true),
                     Name = table.Column<string>(maxLength: 100, nullable: false),
@@ -92,7 +129,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Created_Time = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2021, 5, 2, 0, 38, 9, 190, DateTimeKind.Local).AddTicks(4765)),
+                    Created_Time = table.Column<DateTime>(nullable: true, defaultValue: new DateTime(2021, 5, 2, 16, 42, 10, 118, DateTimeKind.Local).AddTicks(3228)),
                     Update_Time = table.Column<DateTime>(nullable: true),
                     Is_Active = table.Column<bool>(nullable: false, defaultValue: true),
                     Initials = table.Column<string>(maxLength: 5, nullable: false),
@@ -140,7 +177,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                 {
                     Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Created_Time = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2021, 5, 2, 0, 38, 9, 191, DateTimeKind.Local).AddTicks(966)),
+                    Created_Time = table.Column<DateTime>(nullable: true, defaultValue: new DateTime(2021, 5, 2, 16, 42, 10, 118, DateTimeKind.Local).AddTicks(5555)),
                     Update_Time = table.Column<DateTime>(nullable: true),
                     Is_Active = table.Column<bool>(nullable: false, defaultValue: true),
                     Cep = table.Column<string>(maxLength: 255, nullable: false),
@@ -166,20 +203,44 @@ namespace DefaultAPI.Infra.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Cities",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Created_Time = table.Column<DateTime>(nullable: true, defaultValue: new DateTime(2021, 5, 2, 16, 42, 10, 95, DateTimeKind.Local).AddTicks(1904)),
+                    Update_Time = table.Column<DateTime>(nullable: true),
+                    Is_Active = table.Column<bool>(nullable: false, defaultValue: true),
+                    City = table.Column<string>(maxLength: 255, nullable: true),
+                    Ibge = table.Column<long>(maxLength: 255, nullable: false),
+                    IdState = table.Column<long>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cities", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Cities_States_IdState",
+                        column: x => x.IdState,
+                        principalTable: "States",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Profiles",
                 columns: new[] { "Id", "Access_Group", "Created_Time", "Description", "Is_Active", "Login_Type", "Profile_Type", "Update_Time" },
                 values: new object[,]
                 {
-                    { 1L, (byte)0, new DateTime(2021, 5, 2, 0, 38, 9, 192, DateTimeKind.Local).AddTicks(5724), "Perfil Usuário Tria", true, (byte)1, (byte)0, null },
-                    { 2L, (byte)0, new DateTime(2021, 5, 2, 0, 38, 9, 192, DateTimeKind.Local).AddTicks(8030), "Perfil Administrador Tria", true, (byte)1, (byte)1, null },
-                    { 3L, (byte)0, new DateTime(2021, 5, 2, 0, 38, 9, 192, DateTimeKind.Local).AddTicks(8108), "Perfil Manager Tria", true, (byte)1, (byte)2, null }
+                    { 1L, (byte)0, new DateTime(2021, 5, 2, 16, 42, 10, 119, DateTimeKind.Local).AddTicks(7267), "Perfil Usuário Tria", true, (byte)1, (byte)0, null },
+                    { 2L, (byte)0, new DateTime(2021, 5, 2, 16, 42, 10, 119, DateTimeKind.Local).AddTicks(8944), "Perfil Administrador Tria", true, (byte)1, (byte)1, null },
+                    { 3L, (byte)0, new DateTime(2021, 5, 2, 16, 42, 10, 119, DateTimeKind.Local).AddTicks(8968), "Perfil Manager Tria", true, (byte)1, (byte)2, null }
                 });
 
             migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "Created_Time", "Description", "Role", "Update_Time" },
-                values: new object[] { 1L, new DateTime(2021, 5, 2, 0, 38, 9, 195, DateTimeKind.Local).AddTicks(580), "Regra de acesso a tela de Auditoria", "ROLE_AUDIT", null });
+                values: new object[] { 1L, new DateTime(2021, 5, 2, 16, 42, 10, 121, DateTimeKind.Local).AddTicks(2063), "Regra de acesso a tela de Auditoria", "ROLE_AUDIT", null });
 
             migrationBuilder.InsertData(
                 table: "ProfileRoles",
@@ -189,12 +250,17 @@ namespace DefaultAPI.Infra.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "Created_Time", "IdProfile", "Is_Active", "Is_Authenticated", "Last_Password", "Login", "Password", "Update_Time" },
-                values: new object[] { 1L, new DateTime(2021, 5, 2, 0, 38, 9, 196, DateTimeKind.Local).AddTicks(6376), 1L, true, true, "", "admin@DefaultAPI.com.br", "AQAQJwAAl3Ft7BxAQ7czcfM2tYlhU/V+kddJG8mGGsUM/QSWomA=", null });
+                values: new object[] { 1L, new DateTime(2021, 5, 2, 16, 42, 10, 122, DateTimeKind.Local).AddTicks(2393), 1L, true, true, "", "admin@DefaultAPI.com.br", "AQAQJwAAaXwmQgSYz9wCpbKzgzG0Dk743NeCSrBeWx7coh2In6Y=", null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ceps_IdEstado",
                 table: "Ceps",
                 column: "IdEstado");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Cities_IdState",
+                table: "Cities",
+                column: "IdState");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProfileRoles_Id_Role",
@@ -221,7 +287,16 @@ namespace DefaultAPI.Infra.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Audits");
+
+            migrationBuilder.DropTable(
                 name: "Ceps");
+
+            migrationBuilder.DropTable(
+                name: "Cities");
+
+            migrationBuilder.DropTable(
+                name: "Logs");
 
             migrationBuilder.DropTable(
                 name: "ProfileRoles");

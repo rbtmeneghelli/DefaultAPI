@@ -24,8 +24,8 @@ namespace DefaultAPI.Infra.Data.Mapping
             _builder.Property(x => x.Id).ValueGeneratedOnAdd().UseIdentityColumn(1, 1).HasColumnName("Id");
             _builder.Property(x => x.Class).IsRequired().HasMaxLength(100).HasColumnName("Class");
             _builder.Property(x => x.Method).IsRequired().HasMaxLength(100).HasColumnName("Method");
-            _builder.Property(x => x.MessageError).IsRequired().HasMaxLength(-1).HasColumnName("Message_Error");
-            _builder.Property(x => x.Object).IsRequired().HasMaxLength(-1).HasColumnName("Object");
+            _builder.Property(x => x.MessageError).IsRequired(false).HasMaxLength(10000).HasColumnName("Message_Error");
+            _builder.Property(x => x.Object).IsRequired(false).HasMaxLength(10000).HasColumnName("Object");
             _builder.Property(x => x.UpdateTime).HasColumnName("Update_Time");
         }
     }

@@ -24,14 +24,27 @@ namespace DefaultAPI.Application.Services
             _userRepository = userRepository;
         }
 
-        public async Task<List<User>> GetAll()
+        public async Task<List<UserReturnedDto>> GetAll()
         {
-            return await _userRepository.GetAll().ToListAsync();
+            return await (from p in _userRepository.GetAll().Include(x => x.Profile)
+                          orderby p.Login ascending
+                          select new UserReturnedDto()
+                          {
+                              Id = p.Id,
+                              Login = p.Login,
+                              IsAuthenticated = p.IsAuthenticated,
+                              IsActive = p.IsActive,
+                              Password = "-",
+                              LastPassword = "-",
+                              Profile = p.Profile.ProfileType.GetDisplayName(),
+                              IdProfile = p.Profile.Id.Value,
+                              Status = p.IsActive ? "Ativo" : "Inativo"
+                          }).ToListAsync();
         }
 
         public async Task<UserPaged> GetAllPaginate(UserFilter filter)
         {
-            var query =  GetAllUsers(filter);
+            var query = GetAllUsers(filter);
 
             var queryResult = from p in query.AsQueryable()
                               orderby p.Login ascending
@@ -43,7 +56,8 @@ namespace DefaultAPI.Application.Services
                                   IsActive = p.IsActive,
                                   Password = "-",
                                   LastPassword = "-",
-                                  Profile = p.Profile.ProfileType.GetDisplayName()
+                                  Profile = p.Profile.ProfileType.GetDisplayName(),
+                                  Status = p.IsActive ? "Ativo" : "Inativo"
                               };
 
             return new UserPaged
@@ -66,7 +80,8 @@ namespace DefaultAPI.Application.Services
                               IsAuthenticated = p.IsAuthenticated,
                               IsActive = p.IsActive,
                               Password = "-",
-                              LastPassword = "-"
+                              LastPassword = "-",
+                              Status = p.IsActive ? "Ativo" : "Inativo"
                           }).FirstOrDefaultAsync();
         }
 
@@ -84,7 +99,8 @@ namespace DefaultAPI.Application.Services
                                   IsActive = p.IsActive,
                                   Password = "-",
                                   LastPassword = "-",
-                                  Profile = p.Profile.ProfileType.GetDisplayName()
+                                  Profile = p.Profile.ProfileType.GetDisplayName(),
+                                  Status = p.IsActive ? "Ativo" : "Inativo"
                               }).FirstOrDefaultAsync();
             }
 

@@ -206,7 +206,7 @@ namespace DefaultAPI.Application.Services
             SqlConnection sqlConnObj = GetSqlConnection();
             try
             {
-                string nomeArquivo = string.Format("{0}_{1}.{2}", "DbBackup", DateTime.Now.ToString("ddMMyyyy"), "bak");
+                string nomeArquivo = string.Format("{0}_{1}.{2}", "DefaultAPI", DateTime.Now.ToString("ddMMyyyy"), "bak");
                 if (File.Exists(Path.Combine(dir, nomeArquivo)))
                 {
                     File.Delete(Path.Combine(dir, nomeArquivo));

@@ -26,31 +26,31 @@ namespace DefaultAPI.Controllers.Base
         [HttpGet("v1/GetAll")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await Task.FromResult(_userService.GetAll()));
+            return Ok(await _userService.GetAll());
         }
 
         [HttpPost("v1/GetAllPaginate")]
         public async Task<IActionResult> GetAllPaginate([FromBody] UserFilter userFilter)
         {
-            return Ok(await Task.FromResult(_userService.GetAllPaginate(userFilter)));
+            return Ok(await _userService.GetAllPaginate(userFilter));
         }
 
         [HttpGet("v1/GetById/{id}")]
         public async Task<IActionResult> GetById(long id)
         {
-            return Ok(await Task.FromResult(_userService.GetById(id)));
+            return Ok(await _userService.GetById(id));
         }
 
         [HttpGet("v1/GetByLogin/{login}")]
         public async Task<IActionResult> GetByLogin(string login)
         {
-            return Ok(await Task.FromResult(_userService.GetByLogin(login)));
+            return Ok(await _userService.GetByLogin(login));
         }
 
         [HttpGet("v1/GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
-            return Ok(await Task.FromResult(_userService.GetUsers()));
+            return Ok(await _userService.GetUsers());
         }
 
         [HttpPost("v1/Add")]
