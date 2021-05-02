@@ -1,0 +1,963 @@
+﻿using DefaultAPI.Domain.Enums;
+using DefaultAPI.Domain.Models;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Runtime.Serialization.Json;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
+
+namespace DefaultAPI.Infra.CrossCutting
+{
+    public class ExtensionMethods
+    {
+        public string RemoveMimeType(string base64)
+        {
+            var keyValue = "base64,";
+            if (!base64.Contains(keyValue))
+                return base64;
+
+            var start = base64.LastIndexOf(keyValue);
+            return base64.Substring(start).Replace(keyValue, "");
+        }
+
+        public string BuildPassword(int length)
+        {
+            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            StringBuilder res = new StringBuilder();
+            Random rnd = new Random();
+            while (0 < length--)
+            {
+                res.Append(valid[rnd.Next(valid.Length)]);
+            }
+            return res.ToString();
+        }
+
+        public string ConvertObjectParaJSon<T>(T obj)
+        {
+            try
+            {
+                DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(T));
+                MemoryStream ms = new MemoryStream();
+                ser.WriteObject(ms, obj);
+                string jsonString = Encoding.UTF8.GetString(ms.ToArray());
+                ms.Close();
+                return jsonString;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public T ConvertJSonParaObject<T>(string jsonString)
+        {
+            try
+            {
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(T));
+                MemoryStream ms = new MemoryStream(Encoding.UTF8.GetBytes(jsonString));
+                T obj = (T)serializer.ReadObject(ms);
+                return obj;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public string ConvertDateToString(string value)
+        {
+            return DateTime.TryParse(value, out var date) ? date.ToString("yyyy-MM-dd") : value;
+        }
+
+        public string GetOnlyNumbers(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+
+            var numbers = text.Where(char.IsDigit).ToArray();
+            if (numbers == null || numbers.Length == 0)
+                return string.Empty;
+
+            return new string(numbers);
+        }
+        public string RemoveSpecialCharacters(string text)
+        {
+            string[] specialCharacters = { "=", ":", "%", "/" };
+            string result = string.Empty;
+            string partText = string.Empty;
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    partText = text.Substring(i, 1);
+                    if (!specialCharacters.Contains(partText))
+                        result += partText;
+                }
+                return result;
+            }
+            return text;
+        }
+
+        public string RemoveHtmlTags(string value)
+        {
+            var tagList = Regex.Matches(value, @"(?<=</?)([^ >/]+)")
+                               .Select(p => p.ToString())
+                               .Distinct()
+                               .ToArray();
+
+            var newText = value.Trim();
+
+            foreach (var tag in tagList)
+            {
+                var start = newText.IndexOf($"<{tag}");
+                var end = newText.IndexOf(">");
+
+                if (start >= 0 && end >= 0 && end < newText.Length)
+                {
+                    var lenght = end - start + 1;
+                    if (lenght > 0 && (start + lenght) < newText.Length)
+                    {
+                        var removed = newText.Substring(start, lenght);
+                        newText = newText.Replace(removed, "");
+                    }
+                }
+
+                newText = newText.Replace($"</{tag}>", "");
+            }
+
+            return newText;
+        }
+
+        public string StripHTML(string input)
+        {
+            return Regex.Replace(input, "<.*?>", String.Empty);
+        }
+
+        public string RemoveQuotationMarks(string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value) && value.EndsWith("\'") || value.EndsWith("\""))
+                return value.Replace("\'", "").Replace("\"", "").Trim();
+            return value;
+        }
+
+        public bool ValidEmail(string email)
+        {
+            bool isEmailValid = false;
+
+            string emailRegex = string.Format("{0}{1}",
+                @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))",
+                @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-\w]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$");
+
+            try
+            {
+                isEmailValid = Regex.IsMatch(email, emailRegex);
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                isEmailValid = false;
+            }
+
+            return isEmailValid;
+        }
+
+        public bool ValidCpf(string vrCPF)
+        {
+            bool equal = true;
+            string value = vrCPF.Replace(".", "").Replace("-", "");
+
+            if (value.Length != 11)
+                return false;
+
+            for (int i = 1; i < 11 && equal; i++)
+
+                if (value[i] != value[0])
+
+                    equal = false;
+
+            if (equal || value == "12345678909")
+                return false;
+
+            int[] numbers = new int[11];
+
+            for (int i = 0; i < 11; i++)
+
+                numbers[i] = int.Parse(value[i].ToString());
+
+            int sum = 0;
+
+            for (int i = 0; i < 9; i++)
+
+                sum += (10 - i) * numbers[i];
+
+            int result = sum % 11;
+
+            if (result == 1 || result == 0)
+            {
+                if (numbers[9] != 0)
+                    return false;
+            }
+
+            else if (numbers[9] != 11 - result)
+                return false;
+
+            sum = 0;
+
+            for (int i = 0; i < 10; i++)
+
+                sum += (11 - i) * numbers[i];
+
+            result = sum % 11;
+
+            if (result == 1 || result == 0)
+            {
+                if (numbers[10] != 0)
+                    return false;
+            }
+
+            else
+                if (numbers[10] != 11 - result)
+                return false;
+
+            return true;
+
+        }
+
+        public bool ValidCnpj(string vrCNPJ)
+        {
+
+            string CNPJ = vrCNPJ.Replace(".", "").Replace("/", "").Replace("-", "");
+
+            int[] digitos, soma, resultado;
+
+            int nrDig;
+
+            string ftmt;
+
+            bool[] CNPJOk;
+
+            ftmt = "6543298765432";
+
+            digitos = new int[14];
+
+            soma = new int[2];
+
+            soma[0] = 0;
+
+            soma[1] = 0;
+
+            resultado = new int[2];
+
+            resultado[0] = 0;
+
+            resultado[1] = 0;
+
+            CNPJOk = new bool[2];
+
+            CNPJOk[0] = false;
+
+            CNPJOk[1] = false;
+
+            try
+            {
+
+                for (nrDig = 0; nrDig < 14; nrDig++)
+                {
+
+                    digitos[nrDig] = int.Parse(
+
+                        CNPJ.Substring(nrDig, 1));
+
+                    if (nrDig <= 11)
+
+                        soma[0] += (digitos[nrDig] *
+
+                          int.Parse(ftmt.Substring(
+
+                          nrDig + 1, 1)));
+
+                    if (nrDig <= 12)
+
+                        soma[1] += (digitos[nrDig] *
+
+                          int.Parse(ftmt.Substring(
+
+                          nrDig, 1)));
+
+                }
+
+                for (nrDig = 0; nrDig < 2; nrDig++)
+                {
+
+                    resultado[nrDig] = (soma[nrDig] % 11);
+
+                    if ((resultado[nrDig] == 0) || (
+
+                         resultado[nrDig] == 1))
+
+                        CNPJOk[nrDig] = (
+
+                        digitos[12 + nrDig] == 0);
+
+                    else
+
+                        CNPJOk[nrDig] = (
+
+                        digitos[12 + nrDig] == (
+
+                        11 - resultado[nrDig]));
+
+                }
+
+                return (CNPJOk[0] && CNPJOk[1]);
+
+            }
+
+            catch
+            {
+                return false;
+            }
+
+        }
+
+        public string BuildPassword()
+        {
+            Random numbers = new Random();
+            string letters = "ABCDEFGHIJKLMNOPQRSTUVYWXZ";
+            return string.Format("{0}{1}{2}{3}{4}", letters.Substring(numbers.Next(0, 25), 1), numbers.Next(0, 9), letters.Substring(numbers.Next(0, 25), 1), numbers.Next(0, 9), letters.Substring(numbers.Next(0, 25), 1));
+        }
+
+        public void ValidItensList()
+        {
+            List<string> arrNames = new List<string>() { "Macoratti", "Visual C#", null, ".NET", "2017" };
+            string str = arrNames.TrueForAll(delegate (string val)
+            {
+                if (val == null)
+                    return false;
+                else
+                    return true;
+            }).ToString();
+            Console.WriteLine("Todos os valores da lista são diferentes de null ? Resposta = {0}", str);
+        }
+
+        public void ValidItensArray()
+        {
+            var list = new List<int>() { 4, 6, 7, 8, 34, 33, 11 };
+            //verifica se existe um valor menor ou igual a zero
+            var isTrue = list.TrueForAll(n => n > 0);
+            Console.WriteLine("Todos os valores da lista são diferentes de zero ? Resposta = {0}", isTrue);
+        }
+
+        public bool ValidTelAndCel(string pStNumeros)
+        {
+            string[] stDigitoMovel = new string[] { "6", "7", "8", "9" };
+            string[] stDigitosFixo = new string[] { "1", "2", "3", "4", "5" };
+
+            if (!string.IsNullOrWhiteSpace(pStNumeros) && pStNumeros.Length > 5)
+            {
+                if (pStNumeros.Length < 13 && stDigitoMovel.ToString().Contains(pStNumeros.Substring(5, 1)))
+                    return true;
+
+                else if (pStNumeros.Length < 14 && stDigitosFixo.ToString().Contains(pStNumeros.Substring(5, 1)))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public string ConvertImageToBase64(string pImage)
+        {
+            var imagePath = Path.GetFileName(pImage);
+            var imageArray = File.ReadAllBytes(imagePath);
+
+            return string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(imageArray));
+        }
+
+        public string GetColorHex(string[] arrColorUsed)
+        {
+            string color = string.Empty;
+            while (true)
+            {
+                color = GetColorHex();
+                if (arrColorUsed.Any(x => x != color))
+                    break;
+            }
+
+            return color;
+        }
+
+        public string GetColorHex()
+        {
+            Random random = new Random();
+            int r = random.Next(0, 255);
+            int g = random.Next(0, 255);
+            int b = random.Next(0, 255);
+            int a = random.Next(0, 255);
+            string cor = string.Format("#{0}", Color.FromArgb(a, r, g, b).Name.ToUpper().Substring(0, 6));
+            return cor;
+        }
+
+        public string GetColorRgb(string[] arrColorUsed)
+        {
+            string color = string.Empty;
+            while (true)
+            {
+                color = GetColorRgb().ToString();
+                if (arrColorUsed.Any(x => x != color))
+                    break;
+            }
+
+            return color;
+        }
+
+        public Color GetColorRgb()
+        {
+            Random rnd = new Random();
+            Color randomColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+            return randomColor;
+        }
+
+        public DateTime LastDayPreviousMonth(string currentMonth, string currentYear)
+        {
+            DateTime firstMonthDay = DateTime.Parse(string.Format("{0}/{1}/{2}", "01", currentMonth, currentYear));
+            DateTime lastMonthDay = firstMonthDay.AddDays(-1);
+            return lastMonthDay;
+        }
+
+        public DateTime LastDayCurrentMonth(string currentMonth, string currentYear)
+        {
+            DateTime firstMonthDay = DateTime.Parse(string.Format("{0}/{1}/{2}", "01", currentMonth, currentYear));
+            DateTime firstMonthNextDay = firstMonthDay.AddMonths(1);
+            DateTime lastMonthDay = firstMonthNextDay.AddDays(-1);
+            return lastMonthDay;
+        }
+
+        public DataTable ConvertDynamicListToDataTable(List<dynamic> list)
+        {
+            var json = JsonConvert.SerializeObject(list);
+            DataTable dt = (DataTable)JsonConvert.DeserializeObject(json, (typeof(DataTable)));
+            return dt;
+        }
+
+        public void CleanFiles(string rootFolder, string user)
+        {
+            string[] arrFiles = new string[] { "Arquivo1", "Arquivo2" };
+            foreach (var item in arrFiles)
+            {
+                string fileName = string.Format("{0}_{1}.xlsx", item, user);
+                FileInfo fullPath = new FileInfo(Path.Combine(rootFolder, fileName));
+                if (fullPath.Exists)
+                    fullPath.Delete();
+            }
+        }
+
+        public void ShowAllDrivers()
+        {
+            DriveInfo[] drives = DriveInfo.GetDrives();
+            Array.ForEach(drives, drive =>
+            {
+                if (drive.IsReady)
+                {
+                    Console.WriteLine($"Drive {drive.Name} esta pronto.");
+                    Console.WriteLine($"Espaço disponível livre: {drive.AvailableFreeSpace} " +
+                     $"bytes ou { FormatBytes(drive.AvailableFreeSpace)}");
+                    Console.WriteLine($"Formato : {drive.DriveFormat}");
+                    Console.WriteLine($"Tipo: {drive.DriveType}");
+                    Console.WriteLine($"Nome: {drive.Name}");
+                    Console.WriteLine("Nome Completo da Raiz : " + $"{drive.RootDirectory.FullName}");
+                    Console.WriteLine($"Espaço total Livre : {drive.TotalFreeSpace} bytes ou { FormatBytes(drive.TotalFreeSpace)}");
+                    Console.WriteLine($"Espaço Total : {drive.TotalSize} bytes ou {FormatBytes(drive.TotalSize)}");
+                    Console.WriteLine($"Volume Label: {drive.VolumeLabel}");
+                }
+                else
+                {
+                    Console.WriteLine($"Drive {drive.Name} não esta pronto.");
+                }
+                Console.WriteLine();
+            });
+        }
+
+        public void ShowAllAlternativeDrivers()
+        {
+            DriveInfo[] drives = DriveInfo.GetDrives();
+            foreach (DriveInfo drive in drives)
+            {
+                if (drive.IsReady)
+                {
+                    Console.WriteLine($"Nome do Drive: {drive.Name}");
+                    Console.WriteLine($"Formato: {drive.DriveFormat}");
+                    Console.WriteLine($"Tipo: {drive.DriveType}");
+                    Console.WriteLine($"Diretório Raiz : {drive.RootDirectory}");
+                    Console.WriteLine($"Volume label: {drive.VolumeLabel}");
+                    Console.WriteLine($"Espaço Livre: {drive.TotalFreeSpace}");
+                    Console.WriteLine($"Espaço disponível: {drive.AvailableFreeSpace}");
+                    Console.WriteLine($"Tamanho Total: {drive.TotalSize}");
+                    Console.WriteLine();
+                    Console.ReadLine();
+                }
+            }
+        }
+
+        private string FormatBytes(long bytes)
+        {
+            if (bytes >= 0x1000000000000000) { return ((double)(bytes >> 50) / 1024).ToString("0.### EB"); }
+            if (bytes >= 0x4000000000000) { return ((double)(bytes >> 40) / 1024).ToString("0.### PB"); }
+            if (bytes >= 0x10000000000) { return ((double)(bytes >> 30) / 1024).ToString("0.### TB"); }
+            if (bytes >= 0x40000000) { return ((double)(bytes >> 20) / 1024).ToString("0.### GB"); }
+            if (bytes >= 0x100000) { return ((double)(bytes >> 10) / 1024).ToString("0.### MB"); }
+            if (bytes >= 0x400) { return ((double)(bytes) / 1024).ToString("0.###") + " KB"; }
+            return bytes.ToString("0 Bytes");
+        }
+
+        public string GetUrlDetails(string url)
+        {
+            Uri uri = new Uri(url);
+            StringBuilder result = new StringBuilder();
+            result.Append($"AbsolutePath = {uri.AbsolutePath } || ");
+            result.Append($"AbsoluteUri = {uri.AbsoluteUri} || ");
+            result.Append($"Authority = {uri.Authority} || ");
+            result.Append($"DnsSafeHost = {uri.DnsSafeHost} || ");
+            result.Append($"Fragment = {uri.Fragment} || ");
+            result.Append($"Host = {uri.Host} || ");
+            result.Append($"HostNameType = {uri.HostNameType} || ");
+            result.Append($"IsAbsoluteUri = {uri.IsAbsoluteUri} || ");
+            result.Append($"IsDefaultPort = {uri.IsDefaultPort} || ");
+            result.Append($"IsFile = {uri.IsFile} || ");
+            result.Append($"IsLoopback = {uri.IsLoopback} || ");
+            result.Append($"IsUnc = {uri.IsUnc} || ");
+            result.Append($"LocalPath = {uri.LocalPath} || ");
+            result.Append($"OriginalString = {uri.OriginalString} || ");
+            result.Append($"PathAndQuery = {uri.PathAndQuery} || ");
+            result.Append($"Port = {uri.Port} || ");
+            result.Append($"Query = {uri.Query} || ");
+            result.Append($"Scheme = {uri.Scheme} || ");
+            result.Append($"UserEscaped = {uri.UserEscaped} || ");
+            result.Append($"UserInfo = {uri.UserInfo} || ");
+            result.Append(new string('-', 10));
+            return result.ToString();
+        }
+
+        private bool CheckUrlIsValid(string baseUrl, string url)
+        {
+            // Vale a pena destacar o método IsBaseOf que determina se a instância Uri atual é uma base da instância da Uri especificada, ou seja, ele permite determinar se uma Uri esta contida no início da segunda Uri.
+            Uri baseUri = new Uri(baseUrl);
+            Uri uriAddress = new Uri(url);
+            if (baseUri.IsBaseOf(uriAddress))
+                return true;
+            return false;
+        }
+
+        public string BuildUrlWithUriBuilder(int option)
+        {
+            UriBuilder uriBuilder = new UriBuilder();
+            string url = string.Empty;
+
+            switch (option)
+            {
+                case 1:
+                    uriBuilder.Scheme = "http";
+                    uriBuilder.Host = "site.net";
+                    uriBuilder.Path = "sistema";
+                    Uri uri = uriBuilder.Uri;
+                    url = uri.ToString();
+                    break;
+                case 2:
+                    uriBuilder.Scheme = "http";
+                    uriBuilder.Host = "site.net";
+                    uriBuilder.Path = "sistema";
+                    uriBuilder.Port = 8089;
+                    uriBuilder.UserName = "site";
+                    uriBuilder.Password = "numsey";
+                    uriBuilder.Query = "search=br";
+                    Uri uri2 = uriBuilder.Uri;
+                    url = uri2.ToString();
+                    break;
+            }
+
+            return url;
+        }
+
+        public bool CheckIpAddressIsValid(string ipAddress)
+        {
+            IPAddress IP;
+            bool flag = false;
+            try
+            {
+                flag = IPAddress.TryParse(ipAddress, out IP);
+                if (flag)
+                    return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Erro : " + ex.Message);
+            }
+            return false;
+        }
+
+        public IPAddress GetIPAddress(string hostName)
+        {
+            // A partir de um hostname, o metodo ira retornar o endereço de IP
+            Ping ping = new Ping();
+            try
+            {
+                var replay = ping.Send(hostName);
+                if (replay.Status == IPStatus.Success)
+                {
+                    return replay.Address;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public DataTable ConvertTo<T>(IList<T> list)
+        {
+            DataTable table = CreateTable<T>();
+            Type entityType = typeof(T);
+            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(entityType);
+            foreach (T item in list)
+            {
+                DataRow row = table.NewRow();
+                foreach (PropertyDescriptor prop in properties)
+                {
+                    row[prop.Name] = prop.GetValue(item);
+                }
+                table.Rows.Add(row);
+            }
+            return table;
+        }
+
+        private static DataTable CreateTable<T>()
+        {
+            Type entityType = typeof(T);
+            DataTable table = new DataTable(entityType.Name);
+            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(entityType);
+            foreach (PropertyDescriptor prop in properties)
+            {
+                table.Columns.Add(prop.Name, prop.PropertyType);
+            }
+            return table;
+        }
+
+        public List<string> CloneList(List<string> list)
+        {
+            return list.GetRange(0, list.Count);
+        }
+
+        public List<T> ConvertToList<T>(DataTable dt)
+        {
+            var columnNames = dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName.ToLower()).ToList();
+            var properties = typeof(T).GetProperties();
+            return dt.AsEnumerable().Select(row =>
+            {
+                var objT = Activator.CreateInstance<T>();
+                foreach (var pro in properties)
+                {
+                    if (columnNames.Contains(pro.Name.ToLower()))
+                    {
+                        try
+                        {
+                            pro.SetValue(objT, row[pro.Name]);
+                        }
+                        catch (Exception ex)
+                        { throw new Exception(ex.Message, ex.InnerException); }
+                    }
+                }
+                return objT;
+            }).ToList();
+        }
+
+        public string ConvertTimeSpanToString(TimeSpan hour)
+        {
+            if (hour != null)
+            {
+                if (hour.Hours < 10 && hour.Minutes < 10)
+                    return $"0{hour.Hours}:0{hour.Minutes}";
+                else if (hour.Hours >= 10 && hour.Minutes < 10)
+                    return $"{hour.Hours}:0{hour.Minutes}";
+                else if (hour.Hours < 10 && hour.Minutes >= 10)
+                    return $"0{hour.Hours}:0{hour.Minutes}";
+                else
+                    return $"{hour.Hours}:{hour.Minutes}";
+            }
+
+            return string.Empty;
+        }
+
+        public string AddZeroToLeftOrRight(string text, int qty = 8, bool isLeft = true)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+                return isLeft ? text.PadLeft(qty, '0') : text.PadRight(qty, '0');
+            return text;
+        }
+
+        public List<DropDownList> ConvertEnumToList<T>() where T : Enum
+        {
+            List<DropDownList> list = Enum.GetValues(typeof(EnumArquivo))
+              .Cast<EnumArquivo>()
+              .Select(x => new DropDownList
+              {
+                  Id = ((long)x),
+                  Description = x.ToString()
+              }).ToList();
+
+            return list;
+        }
+
+        public List<DropDownList> GetListDrivers()
+        {
+            int count = 0;
+            List<DropDownList> list = new List<DropDownList>();
+            foreach (var drive in DriveInfo.GetDrives())
+            {
+                if (((drive.TotalFreeSpace / drive.TotalSize) * 100) < 90)
+                {
+                    list.Add(new DropDownList() { Id = count, Description = drive.Name });
+                    count++;
+                }
+            }
+            return list;
+        }
+
+        public string RemoveFinalQuotationMarks(string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value) && (value.EndsWith("\'") || value.EndsWith("\"")))
+                return value.Replace("\'", "").Replace("\"", "").Trim();
+            return value;
+        }
+
+        public bool CheckIfStringIsEqual(string value, string word)
+        {
+            return value.Equals(word, StringComparison.OrdinalIgnoreCase) ? true : false;
+        }
+
+        public int getIndexPositionFromWord(string value, string valueToFind)
+        {
+            if (value.IndexOf(valueToFind) != -1)
+                return value.IndexOf(valueToFind);
+
+            else if (value.IndexOf(valueToFind) != -1)
+                return value.IndexOf(valueToFind, 10); // O 10 é o valor inicial do indice que vai começar a procurar a string
+
+            return -1;
+        }
+
+        public string[] getLocalDriversFromMachine()
+        {
+            return Environment.GetLogicalDrives();
+        }
+
+        public void BrokePassword(string password, int sizePassword, string keys)
+        {
+            // Exemplo: (123Abc, 8, "")
+
+            char firstChar = 'a';
+            char lastChar = 'z';
+            long retries = 0;
+            bool finish = false;
+
+            if (keys == password)
+            {
+                finish = true;
+            }
+
+            if (keys.Length == sizePassword || finish == true)
+            {
+                return;
+            }
+
+            for (char c = firstChar; c <= lastChar; c++)
+            {
+                retries++;
+                BrokePassword(password, sizePassword, keys + c);
+            }
+        }
+
+        public bool CheckPassword(string password)
+        {
+            if (password.Length < 6 || password.Length > 15)
+                return false;
+            else if (password.Contains(" "))
+                return false;
+            else if (!password.Any(char.IsUpper))
+                return false;
+            else if (!password.Any(char.IsLower))
+                return false;
+
+            for (int i = 0; i < password.Length - 1; i++)
+            {
+                if (password[i] == password[i + 1])
+                    return false;
+            }
+
+            string specialCharacters = @"%!@#$%^&*()?/>.<,:;'\|}]{[_~`+=-" + "\"";
+            char[] specialCharactersArray = specialCharacters.ToCharArray();
+            foreach (char c in specialCharactersArray)
+            {
+                if (password.Contains(c))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public string ConvertXmlToJson(string xml)
+        {
+            if (!string.IsNullOrWhiteSpace(xml))
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(xml);
+                doc = removeXmlDeclaration(doc);
+                var json = JsonConvert.SerializeXmlNode(doc, Newtonsoft.Json.Formatting.Indented, true);
+                return json.ToString();
+            }
+
+            return null;
+        }
+
+        private XmlDocument removeXmlDeclaration(XmlDocument doc)
+        {
+            var declarations = doc.ChildNodes.OfType<XmlNode>().Where(x => x.NodeType == XmlNodeType.XmlDeclaration).ToList();
+            declarations.ForEach(x => doc.RemoveChild(x));
+            return doc;
+        }
+
+        public string CreateCustomCpf()
+        {
+            int sum = 0, rest = 0;
+            int[] mult1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+            int[] mult2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+
+            Random rnd = new Random();
+            string result = rnd.Next(100000000, 999999999).ToString();
+
+            for (int i = 0; i < 9; i++)
+                sum += int.Parse(result[i].ToString()) * mult1[i];
+
+            rest = sum % 11;
+            if (rest < 2)
+                rest = 0;
+            else
+                rest = 11 - rest;
+
+            result = result + rest;
+            sum = 0;
+
+            for (int i = 0; i < 10; i++)
+                sum += int.Parse(result[i].ToString()) * mult2[i];
+
+            rest = sum % 11;
+
+            if (rest < 2)
+                rest = 0;
+            else
+                rest = 11 - rest;
+
+            result = result + rest;
+            return result;
+        }
+
+        public List<DropDownList> ReadCsvFile(string path)
+        {
+            return File.ReadAllLines(path)
+            .Skip(1)
+            .Where(row => row.Length > 0)
+            .Select(row => ParseRow(row)).ToList();
+        }
+
+        private DropDownList ParseRow(string row)
+        {
+            var columns = row.Split(',');
+            return new DropDownList()
+            {
+                Id = int.Parse(columns[0]),
+                Description = columns[1]
+            };
+        }
+
+        public string GetMemoryStreamType(int key)
+        {
+            Dictionary<int, string> dictionary = new Dictionary<int, string>();
+            dictionary.Add(1, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            dictionary.Add(2, "application/pdf");
+            dictionary.Add(3, "application/octet-stream");
+            dictionary.Add(4, "application/zip");
+            return dictionary[key];
+        }
+
+        public string GetMemoryStreamExtension(int key)
+        {
+            Dictionary<int, string> dictionary = new Dictionary<int, string>();
+            dictionary.Add(1, "xlsx");
+            dictionary.Add(2, "pdf");
+            dictionary.Add(3, "docx");
+            dictionary.Add(4, "zip");
+            return dictionary[key];
+        }
+
+        public string GetCron(EnumJobTypeExecution typeExecution)
+        {
+            Dictionary<EnumJobTypeExecution, string> dictionary = new Dictionary<EnumJobTypeExecution, string>();
+            dictionary.Add(EnumJobTypeExecution.Never, "0 0 31 2 *");
+            dictionary.Add(EnumJobTypeExecution.Daily, "0 0 * * *");
+            dictionary.Add(EnumJobTypeExecution.Weekly, "0 0 * * 1");
+            dictionary.Add(EnumJobTypeExecution.Monthly, "0 0 1 * *");
+            dictionary.Add(EnumJobTypeExecution.Yearly, "0 0 1 1 *");
+            return dictionary[typeExecution];
+        }
+
+        public string StartDateToJob(EnumJobTypeExecution key)
+        {
+            DateTime currentDate = DateTime.Now;
+            Dictionary<EnumJobTypeExecution, string> dictionary = new Dictionary<EnumJobTypeExecution, string>();
+            dictionary.Add(EnumJobTypeExecution.Daily, currentDate.ToString("yyyy-MM-dd"));
+            dictionary.Add(EnumJobTypeExecution.Weekly, GetFirstDayOfWeek(currentDate).ToString("yyyy-MM-dd"));
+            dictionary.Add(EnumJobTypeExecution.Monthly, new DateTime(currentDate.Year, currentDate.Month, 1).ToString("yyyy-MM-dd"));
+            dictionary.Add(EnumJobTypeExecution.Yearly, new DateTime(currentDate.Year, 1, 1).ToString("yyyy-MM-dd"));
+            dictionary.Add(EnumJobTypeExecution.Never, "");
+            return dictionary[key];
+        }
+
+        public string EndDateToJob(EnumJobTypeExecution key)
+        {
+            DateTime currentDate = DateTime.Now;
+            Dictionary<EnumJobTypeExecution, string> dictionary = new Dictionary<EnumJobTypeExecution, string>();
+            dictionary.Add(EnumJobTypeExecution.Daily, currentDate.ToString("yyyy-MM-dd"));
+            dictionary.Add(EnumJobTypeExecution.Weekly, GetLasttDayOfWeek(currentDate).ToString("yyyy-MM-dd"));
+            dictionary.Add(EnumJobTypeExecution.Monthly, new DateTime(currentDate.Year, currentDate.Month, 1).AddMonths(1).AddDays(-1).ToString("yyyy-MM-dd"));
+            dictionary.Add(EnumJobTypeExecution.Yearly, new DateTime(currentDate.Year, 12, 31).ToString("yyyy-MM-dd"));
+            dictionary.Add(EnumJobTypeExecution.Never, "");
+            return dictionary[key];
+        }
+
+        public DateTime GetFirstDayOfWeek(DateTime date)
+        {
+            var culture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            var diff = date.DayOfWeek - culture.DateTimeFormat.FirstDayOfWeek;
+            if (diff < 0)
+                diff += 7;
+            return date.AddDays(-diff).Date;
+        }
+
+        public DateTime GetLasttDayOfWeek(DateTime date)
+        {
+            var culture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            var diff = date.DayOfWeek - culture.DateTimeFormat.FirstDayOfWeek;
+            if (diff < 0)
+                diff += 7;
+            DateTime start = date.AddDays(-diff).Date;
+            return start.AddDays(6).Date;
+        }
+    }
+}
