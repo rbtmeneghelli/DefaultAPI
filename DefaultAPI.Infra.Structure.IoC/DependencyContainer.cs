@@ -20,6 +20,7 @@ namespace DefaultAPI.Infra.Structure.IoC
             services.AddScoped<ICepService, CepService>();
             services.AddScoped<IRegionService, RegionService>();
             services.AddScoped<IStatesService, StatesService>();
+            services.AddScoped<ICityService, CityService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             return services;
         }

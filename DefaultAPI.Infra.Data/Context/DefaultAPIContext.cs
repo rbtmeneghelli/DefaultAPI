@@ -46,5 +46,6 @@ namespace DefaultAPI.Infra.Data.Context
         public virtual DbSet<Region> Region { get; set; }
         public virtual DbSet<States> State { get; set; }
         public virtual DbSet<Ceps> Cep { get; set; }
+        public virtual DbSet<City> City { get; set; }
     }
 }

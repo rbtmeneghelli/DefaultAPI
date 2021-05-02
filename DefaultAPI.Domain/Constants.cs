@@ -9,6 +9,7 @@ namespace DefaultAPI.Domain
 
         public const string urlToGetCep = "http://viacep.com.br/ws/";
         public const string urlToGetStates = "https://servicodados.ibge.gov.br/api/v1/localidades/estados";
+        public const string urlToGetCities = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/{0}/municipios";
 
         public const string ExceptionRequestAPI = "Erro ao efetuar request da Api externa: {0}";
         public const string ExceptionExcel = "Erro ao gerar o excel solicitado";
@@ -22,8 +23,7 @@ namespace DefaultAPI.Domain
         public const string ErrorInResetPassword = "Ocorreu um erro ao efetuar o reset de senha";
         public const string ErrorInBackup = "Ocorreu um erro para efetuar a execução do backup";
         public const string ErrorInProcedure = "Ocorreu um erro para efetuar a execução da procedure {0}";
-
-
+        public const string ErrorInAddCity = "Ocorreu um erro para adicionar as cidades na base de dados";
 
         public const string SuccessInLogin = "A autenticação foi efetuada com sucesso";
         public const string SuccessInAdd = "O registro foi adicionado com sucesso";
@@ -34,5 +34,6 @@ namespace DefaultAPI.Domain
         public const string SuccessInResetPassword = "O reset de senha foi efetuado com sucesso";
         public const string SuccessInProcedure = "A procedure {0} foi executada com sucesso";
         public const string SuccessInBackup = "O backup foi executado com sucesso";
+        public const string SuccessInAddCity = "As cidades foram adicionadas com sucesso";
     }
 }

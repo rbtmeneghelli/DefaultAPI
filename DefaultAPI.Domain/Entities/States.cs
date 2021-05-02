@@ -10,6 +10,7 @@ namespace DefaultAPI.Domain.Entities
 
         public Region Regiao { get; set; }
         public long IdRegiao { get; set; }
-        public List<Ceps> Ceps { get; set; }
+        public virtual List<Ceps> Ceps { get; set; }
+        public virtual List<City> City { get; set; }
     }
 }

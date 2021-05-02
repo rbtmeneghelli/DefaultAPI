@@ -4,14 +4,16 @@ using DefaultAPI.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DefaultAPI.Infra.Data.Migrations
 {
     [DbContext(typeof(DefaultAPIContext))]
-    partial class DefaultAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20210502171411_new_table_city")]
+    partial class new_table_city
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

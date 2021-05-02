@@ -26,12 +26,14 @@ namespace DefaultAPI.Controllers
         private readonly ICepService _cepsService;
         private readonly IStatesService _statesService;
         private readonly IRegionService _regionService;
+        private readonly ICityService _cityService;
 
-        public GeneralController(IMapper mapper, IGeneralService generalService, ICepService cepsService, IStatesService statesService, IRegionService regionService) : base(mapper, generalService)
+        public GeneralController(IMapper mapper, IGeneralService generalService, ICepService cepsService, IStatesService statesService, IRegionService regionService, ICityService cityService) : base(mapper, generalService)
         {
             _cepsService = cepsService;
             _statesService = statesService;
             _regionService = regionService;
+            _cityService = cityService;
         }
 
         [HttpGet("v1/export2Zip/{directory}/{typeFile}")]
@@ -87,7 +89,7 @@ namespace DefaultAPI.Controllers
         }
 
         [HttpGet("v1/getStates/{refreshStates}")]
-        public async Task<IActionResult> RrefreshStates(bool refreshEstados)
+        public async Task<IActionResult> RefreshStates(bool refreshEstados)
         {
             try
             {
@@ -116,6 +118,55 @@ namespace DefaultAPI.Controllers
             {
                 return BadRequest(new ResultReturned(false, string.Format(Constants.ExceptionRequestAPI, Constants.urlToGetStates)));
             }
+        }
+
+        [HttpGet("v1/addCities")]
+        public async Task<ActionResult> getCities()
+        {
+            List<MesoRegion> mesoRegions = new List<MesoRegion>();
+            List<City> cities = new List<City>();
+            RequestData requestData = new RequestData();
+            try
+            {
+                List<States> listaEstados = await GetListStateWithoutCities();
+
+                if (listaEstados.Any(x => x.Sigla.ToUpper() == "DF"))
+                {
+                    cities.Add(new City() { IBGE = 5300108, Name = "DISTRITO FEDERAL", IdState = listaEstados.FirstOrDefault(x => x.Sigla.ToUpper() == "DF").Id.Value });
+                }
+
+                foreach (States state in listaEstados.Where(x => x.Sigla != "DF"))
+                {
+
+                    requestData = await _generalService.RequestDataToExternalAPI(string.Format(Constants.urlToGetCities, state.Sigla));
+                    
+                    if (requestData.IsSuccess)
+                    {
+                        mesoRegions = JsonConvert.DeserializeObject<List<MesoRegion>>(requestData.Data);
+
+                        if (mesoRegions is not null && mesoRegions.Count() > 0)
+                        {
+                            foreach (var item in mesoRegions)
+                            {
+                                cities.Add(new City() { 
+                                    IBGE = (long)item.Id, 
+                                    Name = item.Nome, 
+                                    IdState = state.Id.Value
+                                });
+                            }
+                        }
+                    }
+                }
+
+                if (cities.Count() > 0)
+                    await _cityService.AddOrUpdateCity(cities.OrderBy(x => x.Name).ToList());
+            }
+            catch (Exception ex)
+            {
+                
+            }
+
+            return Ok();
         }
 
         [HttpGet("v1/addRegions")]
@@ -186,6 +237,23 @@ namespace DefaultAPI.Controllers
             {
                 return BadRequest(new ResultReturned(false, string.Format(Constants.ExceptionRequestAPI, Constants.urlToGetStates)));
             }
+        }
+
+        private async Task<List<States>> GetListStateWithoutCities()
+        {
+            List<States> listState = await _statesService.GetAllStates();
+            if (listState is not null)
+            {
+                if (listState.Count() > 0)
+                {
+                    List<long> listIdState = await _cityService.GetIdStates();
+                    foreach (long idState in listIdState)
+                    {
+                        listState.RemoveAll(x => x.Id == idState);
+                    }
+                }
+            }
+            return listState;
         }
     }
 }
