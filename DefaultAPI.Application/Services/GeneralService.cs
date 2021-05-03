@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using MimeKit;
 using MimeKit.Text;
+using Newtonsoft.Json;
 using ServiceTria.Framework.DTO;
 using ServiceTria.Framework.Helpers.Excel;
 using System;
@@ -19,6 +20,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -253,6 +255,53 @@ namespace DefaultAPI.Application.Services
             }
         }
 
+        public async Task<bool> SendPushNotification(Notification notification, string tokenUser)
+        {
+             // Reference: http://codepickup.in/csharp/fcm-push-notification-in-csharp/
+             // Se nao gerar a chave web api, so ir na autentication
+
+            var postData = JsonConvert.SerializeObject(new
+            {
+                to = tokenUser,
+                notification,
+                // data = Algum dado em especial
+            });
+
+            Byte[] byteArray = Encoding.UTF8.GetBytes(postData.ToString());
+
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Constants.urlToGetFireBase);
+                request.Method = "post";
+                request.KeepAlive = false;
+                request.ContentType = "application/json";
+                request.Headers.Add(string.Format("Authorization: key={0}", Constants.serverApiKey));
+                request.Headers.Add(string.Format("Sender: id={0}", Constants.senderId));
+                request.ContentLength = byteArray.Length;
+
+                Stream dataStream = request.GetRequestStream();
+                dataStream.Write(byteArray, 0, byteArray.Length);
+                dataStream.Close();
+
+                WebResponse response = request.GetResponse();
+                HttpStatusCode responseCode = ((HttpWebResponse)response).StatusCode;
+
+                if (!responseCode.Equals(HttpStatusCode.OK))
+                    return false;
+
+                StreamReader reader = new StreamReader(response.GetResponseStream());
+                string responseLine = reader.ReadToEnd();
+                reader.Close();
+
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex.InnerException);
+            }
+        }
+
         private async Task ExecuteMailWithMailKit(EmailConfig emailConfig, MimeMessage email)
         {
             using (var client = new MailKit.Net.Smtp.SmtpClient())
@@ -276,6 +325,7 @@ namespace DefaultAPI.Application.Services
                 }
             }
         }
+
         private string GetEmailSubjectTemplate(EnumEmailDisplay enumEmailDisplay, EnumEmailTemplate enumEmailTemplate, string subject)
         {
             Dictionary<EnumEmailDisplay, string> dictionary = new Dictionary<EnumEmailDisplay, string>();
@@ -286,6 +336,7 @@ namespace DefaultAPI.Application.Services
             dictionary.Add(EnumEmailDisplay.ConfirmacaoSenha, $"{enumEmailTemplate.GetDisplayName()} - Confirmação de senha");
             return dictionary[enumEmailDisplay];
         }
+
         private string GetEmailBodyTemplate(EnumEmailDisplay enumEmailDisplay, EnumEmailTemplate enumEmailTemplate, string body, string userName)
         {
             switch (enumEmailDisplay)
@@ -312,6 +363,7 @@ namespace DefaultAPI.Application.Services
             }
             return body;
         }
+
         private async Task<MimeEntity> BuildMessage(EmailConfig emailConfig)
         {
             if (emailConfig.enumEmailDisplay == EnumEmailDisplay.Relatorio)
@@ -327,6 +379,7 @@ namespace DefaultAPI.Application.Services
                 Text = GetEmailBodyTemplate(emailConfig.enumEmailDisplay, emailConfig.enumEmailTemplate, emailConfig.emailBody, emailConfig.userName),
             };
         }
+
         private SqlConnection GetSqlConnection()
         {
             return null;

@@ -21,5 +21,6 @@ namespace DefaultAPI.Application.Interfaces
         Task<ResultReturned> RunSqlProcedure(string procName, string paramName, string paramValue);
         Task<ResultReturned> RunSqlBackup(string directory);
         Task<MemoryStream> Export2Zip(string directory, int typeFile = 2);
+        Task<bool> SendPushNotification(Notification notification, string tokenUser);
     }
 }
