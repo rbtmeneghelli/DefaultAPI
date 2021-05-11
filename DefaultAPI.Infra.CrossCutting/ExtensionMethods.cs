@@ -89,6 +89,7 @@ namespace DefaultAPI.Infra.CrossCutting
 
             return new string(numbers);
         }
+
         public string RemoveSpecialCharacters(string text)
         {
             string[] specialCharacters = { "=", ":", "%", "/" };
@@ -958,6 +959,18 @@ namespace DefaultAPI.Infra.CrossCutting
                 diff += 7;
             DateTime start = date.AddDays(-diff).Date;
             return start.AddDays(6).Date;
+        }
+
+        public string CreateStrongPassword(int numCharacters = 10, bool includeSpecialChars = true, bool onlyUpperCase = false)
+        {
+            const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+            const string special = "!@#$%ˆ&*(){}[];";
+            var chars = includeSpecialChars ? (valid + special) : valid;
+            var res = new StringBuilder();
+            var rnd = new Random();
+            while (0 < numCharacters--)
+                res.Append(chars[rnd.Next(chars.Length)]);
+            return onlyUpperCase ? res.ToString().ToUpper() : res.ToString();
         }
     }
 }
