@@ -15,10 +15,12 @@ namespace DefaultAPI.Application.Services
     public class AuditService : IAuditService
     {
         public readonly IRepository<Audit> _auditRepository;
+        public readonly IRepositoryDapper<Audit> _auditDapper;
 
-        public AuditService(IRepository<Audit> auditRepository)
+        public AuditService(IRepository<Audit> auditRepository, IRepositoryDapper<Audit> auditDapper)
         {
             _auditRepository = auditRepository;
+            _auditDapper = auditDapper;
         }
 
         public async Task<Audit> GetById(long id)
@@ -27,6 +29,36 @@ namespace DefaultAPI.Application.Services
         }
 
         public List<Audit> GetAllWithLike(string parametro) => _auditRepository.GetAll().Where(x => EF.Functions.Like(x.TableName, $"%{parametro}%")).ToList();
+
+        public async Task<AuditPagedReturned> GetAllDapper(AuditFilter filter)
+        {
+            string sql = @"select count(*) from audits " +
+            @"select Id = Id, TableName = Table_Name, ActionName = Action_Name from audits where (Table_Name = '" + filter.TableName + "')";
+            var reader = await _auditDapper.QueryMultiple(sql);
+
+            var queryResult = from x in reader.Result.AsQueryable()
+                              orderby x.UpdateTime descending
+                              select new AuditReturnedDto()
+                              {
+                                  Id = x.Id,
+                                  TableName = x.TableName,
+                                  ActionName = x.ActionName,
+                                  UpdateTime = x.UpdateTime,
+                                  KeyValues = x.KeyValues,
+                                  OldValues = x.OldValues,
+                                  NewValues = x.NewValues
+                              };
+
+            filter.pageIndex++;
+            return new AuditPagedReturned
+            {
+                Audits = queryResult.Skip((filter.pageIndex - 1) * filter.pageSize).Take(filter.pageSize).ToList(),
+                NextPage = (filter.pageSize * filter.pageIndex) >= reader.Count ? null : (int?)filter.pageIndex + 1,
+                Page = filter.pageIndex,
+                Total = (int)Math.Ceiling((decimal)reader.Count / filter.pageSize),
+            };
+
+        }
 
         public async Task<AuditPagedReturned> GetAllWithPaginate(AuditFilter filter)
         {

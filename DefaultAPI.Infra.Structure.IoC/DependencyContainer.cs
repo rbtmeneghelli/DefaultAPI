@@ -24,6 +24,7 @@ namespace DefaultAPI.Infra.Structure.IoC
             services.AddScoped<ILogService, LogService>();
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(IRepositoryDapper<>), typeof(RepositoryDapper<>));
             return services;
         }
 
