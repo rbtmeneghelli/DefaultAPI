@@ -972,5 +972,11 @@ namespace DefaultAPI.Infra.CrossCutting
                 res.Append(chars[rnd.Next(chars.Length)]);
             return onlyUpperCase ? res.ToString().ToUpper() : res.ToString();
         }
+
+        public DropDownList ConvertObjectToClass(object obj)
+        {
+            DropDownList model = obj as DropDownList;
+            return model;
+        }
     }
 }
