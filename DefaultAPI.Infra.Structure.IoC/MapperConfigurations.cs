@@ -32,7 +32,7 @@ namespace DefaultAPI.Infra.Structure.IoC.MapEntitiesXDto
                 .ForMember(dest => dest.MessageError, act => act.MapFrom(src => src.MessageError))
                 .ForMember(dest => dest.Object, act => act.MapFrom(src => src.Object))
                 .ForMember(dest => dest.UpdateTime, act => act.MapFrom(src => src.UpdateTime))
-                .ForMember(dest => dest.Id, act => act.MapFrom(src => src.Id));
+                .ForMember(dest => dest.Id, act => act.MapFrom(src => src.Id)).ReverseMap();
 
                 cfg.CreateMap<Audit, AuditReturnedDto>()
                 .ForMember(dest => dest.TableName, act => act.MapFrom(src => src.TableName))
@@ -40,7 +40,7 @@ namespace DefaultAPI.Infra.Structure.IoC.MapEntitiesXDto
                 .ForMember(dest => dest.Id, act => act.MapFrom(src => src.Id))
                 .ForMember(dest => dest.KeyValues, act => act.MapFrom(src => src.KeyValues))
                 .ForMember(dest => dest.NewValues, act => act.MapFrom(src => src.NewValues))
-                .ForMember(dest => dest.OldValues, act => act.MapFrom(src => src.OldValues));
+                .ForMember(dest => dest.OldValues, act => act.MapFrom(src => src.OldValues)).ReverseMap();
             });
         }
     }
