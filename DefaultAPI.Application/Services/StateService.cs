@@ -118,6 +118,7 @@ namespace DefaultAPI.Application.Services
                     NextPage = (filter.pageSize * filter.pageIndex) >= queryCount ? null : (int?)filter.pageIndex + 1,
                     Page = filter.pageIndex,
                     Total = (int)Math.Ceiling((decimal)queryCount / filter.pageSize),
+                    TotalRecords = queryCount
                 };
             }
             catch (Exception ex)

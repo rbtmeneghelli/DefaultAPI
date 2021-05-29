@@ -51,7 +51,8 @@ namespace DefaultAPI.Application.Services
                 Cities = set,
                 NextPage = (page.Value * limit.Value) >= total ? null : (int?)page.Value + 1,
                 Page = page.Value,
-                Total = (int)Math.Ceiling((decimal)total / limit.Value)
+                Total = (int)Math.Ceiling((decimal)total / limit.Value),
+                TotalRecords = total
             };
         }
 

@@ -65,7 +65,8 @@ namespace DefaultAPI.Application.Services
                 UserReturnedSet = await queryResult.Skip((filter.pageIndex - 1) * filter.pageSize).Take(filter.pageSize).ToListAsync(),
                 NextPage = (filter.pageSize * filter.pageIndex) >= queryResult.Count() ? null : (int?)filter.pageIndex + 1,
                 Page = filter.pageIndex,
-                Total = (int)Math.Ceiling((decimal)queryResult.Count() / filter.pageSize)
+                Total = (int)Math.Ceiling((decimal)queryResult.Count() / filter.pageSize),
+                TotalRecords = queryResult.Count()
             };
         }
 

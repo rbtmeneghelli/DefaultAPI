@@ -117,7 +117,8 @@ namespace DefaultAPI.Application.Services
                     Regions = queryResult.Skip((filter.pageIndex - 1) * filter.pageSize).Take(filter.pageSize).ToList(),
                     NextPage = (filter.pageSize * filter.pageIndex) >= queryCount ? null : (int?)filter.pageIndex + 1,
                     Page = filter.pageIndex,
-                    Total = (int)Math.Ceiling((decimal)queryCount / filter.pageSize)
+                    Total = (int)Math.Ceiling((decimal)queryCount / filter.pageSize),
+                    TotalRecords = queryCount
                 };
             }
             catch (Exception ex)

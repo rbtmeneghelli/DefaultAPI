@@ -56,6 +56,7 @@ namespace DefaultAPI.Application.Services
                 NextPage = (filter.pageSize * filter.pageIndex) >= reader.Count ? null : (int?)filter.pageIndex + 1,
                 Page = filter.pageIndex,
                 Total = (int)Math.Ceiling((decimal)reader.Count / filter.pageSize),
+                TotalRecords = reader.Count
             };
 
         }
@@ -87,6 +88,7 @@ namespace DefaultAPI.Application.Services
                     NextPage = (filter.pageSize * filter.pageIndex) >= queryCount ? null : (int?)filter.pageIndex + 1,
                     Page = filter.pageIndex,
                     Total = (int)Math.Ceiling((decimal)queryCount / filter.pageSize),
+                    TotalRecords = queryCount
                 };
             }
             catch (Exception ex)

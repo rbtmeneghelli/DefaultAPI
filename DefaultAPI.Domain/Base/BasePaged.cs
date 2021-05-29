@@ -9,5 +9,7 @@ namespace DefaultAPI.Domain.Base
         public int? NextPage { get; set; }
         public int Page { get; set; }
         public int Total { get; set; }
+
+        public int TotalRecords { get; set; }
     }
 }
