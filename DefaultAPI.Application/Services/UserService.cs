@@ -184,6 +184,9 @@ namespace DefaultAPI.Application.Services
 
         private IQueryable<User> GetAllUsers(UserFilter filter)
         {
+            // Exemplo Utilizando SimpleFactory
+            // var obj = UserFactory.GetData(EnumProfileType.Admin);
+            // return _userRepository.GetAllTracking().Include(x => x.Profile).Where(obj.GetPredicate(filter)).AsQueryable();
             return _userRepository.GetAllTracking().Include(x => x.Profile).Where(GetPredicate(filter)).AsQueryable();
         }
 

@@ -16,8 +16,7 @@ namespace DefaultAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize("Bearer")]
-    [AllowAnonymous]
+    [Authorize("Bearer")]
     public class AuditController : BaseController
     {
         private readonly IAuditService _auditService;

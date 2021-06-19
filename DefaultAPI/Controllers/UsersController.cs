@@ -12,7 +12,7 @@ namespace DefaultAPI.Controllers.Base
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize("Bearer")]
+    // [Authorize("Bearer")]
     [AllowAnonymous]
     public class UsersController : BaseController
     {
