@@ -1,5 +1,7 @@
-﻿using DefaultAPI.Domain.Entities;
+﻿using DefaultAPI.Domain.Dto;
+using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
+using DefaultAPI.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +13,6 @@ namespace DefaultAPI.Application.Interfaces
     {
         Task<Log> GetById(long id);
         List<Log> GetAllWithLike(string parametro);
-        Task<LogPagedReturned> GetAllWithPaginate(LogFilter filter);
+        Task<PagedResult<LogReturnedDto>> GetAllWithPaginate(LogFilter filter);
     }
 }

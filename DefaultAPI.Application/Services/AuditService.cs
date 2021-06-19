@@ -1,7 +1,9 @@
-﻿using DefaultAPI.Application.Interfaces;
+﻿using DefaultAPI.Application.Factory;
+using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Domain.Dto;
 using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
+using DefaultAPI.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -30,7 +32,7 @@ namespace DefaultAPI.Application.Services
 
         public List<Audit> GetAllWithLike(string parametro) => _auditRepository.GetAll().Where(x => EF.Functions.Like(x.TableName, $"%{parametro}%")).ToList();
 
-        public async Task<AuditPagedReturned> GetAllDapper(AuditFilter filter)
+        public async Task<PagedResult<AuditReturnedDto>> GetAllDapper(AuditFilter filter)
         {
             string sql = @"select count(*) from audits " +
             @"select Id = Id, TableName = Table_Name, ActionName = Action_Name from audits where (Table_Name = '" + filter.TableName + "')";
@@ -49,19 +51,10 @@ namespace DefaultAPI.Application.Services
                                   NewValues = x.NewValues
                               };
 
-            filter.pageIndex++;
-            return new AuditPagedReturned
-            {
-                Audits = queryResult.Skip((filter.pageIndex - 1) * filter.pageSize).Take(filter.pageSize).ToList(),
-                NextPage = (filter.pageSize * filter.pageIndex) >= reader.Count ? null : (int?)filter.pageIndex + 1,
-                Page = filter.pageIndex,
-                Total = (int)Math.Ceiling((decimal)reader.Count / filter.pageSize),
-                TotalRecords = reader.Count
-            };
-
+            return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
         }
 
-        public async Task<AuditPagedReturned> GetAllWithPaginate(AuditFilter filter)
+        public async Task<PagedResult<AuditReturnedDto>> GetAllWithPaginate(AuditFilter filter)
         {
             try
             {
@@ -81,15 +74,7 @@ namespace DefaultAPI.Application.Services
                                       NewValues = x.NewValues
                                   };
 
-                filter.pageIndex++;
-                return new AuditPagedReturned
-                {
-                    Audits = queryResult.Skip((filter.pageIndex - 1) * filter.pageSize).Take(filter.pageSize).ToList(),
-                    NextPage = (filter.pageSize * filter.pageIndex) >= queryCount ? null : (int?)filter.pageIndex + 1,
-                    Page = filter.pageIndex,
-                    Total = (int)Math.Ceiling((decimal)queryCount / filter.pageSize),
-                    TotalRecords = queryCount
-                };
+                return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
             }
             catch (Exception ex)
             {

@@ -12,6 +12,6 @@ namespace DefaultAPI.Application.Interfaces
         Task<Ceps> GetByCep(string cep);
         Task<bool> UpdateStatusById(long id);
         List<Ceps> GetAllWithLike(string parametro);
-        Task<CepPagedReturned> GetAllWithPaginate(CepFilter filter);
+        Task<PagedResult<Ceps>> GetAllWithPaginate(CepFilter filter);
     }
 }

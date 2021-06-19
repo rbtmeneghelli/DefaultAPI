@@ -11,7 +11,7 @@ namespace DefaultAPI.Application.Interfaces
     public interface IUserService
     {
         Task<List<UserReturnedDto>> GetAll();
-        Task<UserPaged> GetAllPaginate(UserFilter filter);
+        Task<PagedResult<UserReturnedDto>> GetAllPaginate(UserFilter filter);
         Task<UserReturnedDto> GetById(long id);
         Task<UserReturnedDto> GetByLogin(string login);
         Task<List<DropDownList>> GetUsers();

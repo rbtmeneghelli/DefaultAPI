@@ -21,6 +21,6 @@ namespace DefaultAPI.Application.Interfaces
 
         List<Region> GetAllWithLike(string parametro);
 
-        Task<RegionPagedReturned> GetAllWithPaginate(RegionFilter filter);
+        Task<PagedResult<Region>> GetAllWithPaginate(RegionFilter filter);
     }
 }

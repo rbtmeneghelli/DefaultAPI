@@ -1,5 +1,7 @@
-﻿using DefaultAPI.Domain.Entities;
+﻿using DefaultAPI.Domain.Dto;
+using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
+using DefaultAPI.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +13,6 @@ namespace DefaultAPI.Application.Interfaces
     {
         Task<Audit> GetById(long id);
         List<Audit> GetAllWithLike(string parametro);
-        Task<AuditPagedReturned> GetAllWithPaginate(AuditFilter filter);
+        Task<PagedResult<AuditReturnedDto>> GetAllWithPaginate(AuditFilter filter);
     }
 }

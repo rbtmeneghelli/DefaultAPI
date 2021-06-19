@@ -3,6 +3,7 @@ using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Controllers.Base;
 using DefaultAPI.Domain.Dto;
 using DefaultAPI.Domain.Filters;
+using DefaultAPI.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +40,7 @@ namespace DefaultAPI.Controllers
         }
 
         [HttpPost("v1/GetAllFilter")]
-        public async Task<ActionResult<AuditPagedReturned>> GetAllFilter(AuditFilter filter)
+        public async Task<ActionResult<PagedResult<AuditReturnedDto>>> GetAllFilter(AuditFilter filter)
         {
             return Ok(await _auditService.GetAllWithPaginate(filter));
         }

@@ -155,4 +155,14 @@ namespace DefaultAPI.Configuration
             var descriptor = context.ApiDescription.ActionDescriptor as ControllerActionDescriptor;
         }
     }
+
+    // Metodo de configuração para permitir acesso ao hangFire externo
+    //public class DashboardNoAuthorizationFilter : IDashBoardAuthorizationFilter
+    //{
+    //    public bool Authorize(DashboardContext dashboardContext) => true;
+    //}
+
+    // Adicionar ao Arquivo Startup.cs o codigo abaixo
+    // App.UseHangFireDashboard("/hangfire", new DashboardOptions() {
+    // Authorization = new [] { new DashboardNoAuthorizationFilter() } });
 }

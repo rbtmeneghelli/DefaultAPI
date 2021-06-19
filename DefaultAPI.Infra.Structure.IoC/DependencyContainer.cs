@@ -7,6 +7,7 @@ using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Application.Services;
 using DefaultAPI.Application;
 using DefaultAPI.Infra.Structure.IoC.MapEntitiesXDto;
+using System;
 
 namespace DefaultAPI.Infra.Structure.IoC
 {
@@ -34,10 +35,17 @@ namespace DefaultAPI.Infra.Structure.IoC
             return services;
         }
 
+        //public static IServiceCollection RegisterMapperConfig(IServiceCollection services)
+        //{
+        //    services.AddSingleton(MapperConfigurations.CreateMap().CreateMapper());
+        //    return services;
+        //}
+
         public static IServiceCollection RegisterMapperConfig(IServiceCollection services)
         {
-            services.AddSingleton(MapperConfigurations.CreateMap().CreateMapper());
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
+
     }
 }

@@ -27,6 +27,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefaultAPI.Infra.Structure.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DefaultAPI.Infra.CrossCutting", "DefaultAPI.Infra.CrossCutting\DefaultAPI.Infra.CrossCutting.csproj", "{8794BC84-608D-4F48-B477-39AEBAC25B73}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "7. UnitTesting", "7. UnitTesting", "{54580C3B-E2DB-43C7-8A20-56FACC662577}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DefaultAPI.UnitTesting", "DefaultAPI.UnitTesting\DefaultAPI.UnitTesting.csproj", "{AA8D15F0-851C-4008-93FE-2523C54FEC78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +61,10 @@ Global
 		{8794BC84-608D-4F48-B477-39AEBAC25B73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8794BC84-608D-4F48-B477-39AEBAC25B73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8794BC84-608D-4F48-B477-39AEBAC25B73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA8D15F0-851C-4008-93FE-2523C54FEC78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA8D15F0-851C-4008-93FE-2523C54FEC78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA8D15F0-851C-4008-93FE-2523C54FEC78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA8D15F0-851C-4008-93FE-2523C54FEC78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -68,6 +76,7 @@ Global
 		{4C8D8120-732B-448D-BED6-0C1762F6CABC} = {4622050B-D737-4549-B421-2361C133F64A}
 		{5540630E-AEBF-4D8C-A52A-0B8EB9D7BCF7} = {81D24234-8012-4A5A-B547-156797399A62}
 		{8794BC84-608D-4F48-B477-39AEBAC25B73} = {925FD64F-9328-4E83-ACB9-DF97F3CB8573}
+		{AA8D15F0-851C-4008-93FE-2523C54FEC78} = {54580C3B-E2DB-43C7-8A20-56FACC662577}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7F95BD5D-4658-472E-8C1B-DB5BDA567261}

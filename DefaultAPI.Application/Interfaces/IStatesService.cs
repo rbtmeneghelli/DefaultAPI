@@ -14,6 +14,6 @@ namespace DefaultAPI.Application.Interfaces
         Task RefreshStates(List<States> listState, List<States> ListStateAPI, List<Region> listRegion);
         Task<bool> UpdateStatusById(long id);
         List<States> GetAllWithLike(string param);
-        Task<StatePagedReturned> GetAllWithPaginate(StateFilter filter);
+        Task<PagedResult<States>> GetAllWithPaginate(StateFilter filter);
     }
 }

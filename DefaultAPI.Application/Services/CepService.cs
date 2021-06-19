@@ -1,4 +1,5 @@
-﻿using DefaultAPI.Application.Interfaces;
+﻿using DefaultAPI.Application.Factory;
+using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
 using DefaultAPI.Domain.Models;
@@ -72,7 +73,7 @@ namespace DefaultAPI.Application.Services
 
         public List<Ceps> GetAllWithLike(string parametro) => _cepRepository.GetAll().Where(x => EF.Functions.Like(x.Cep, $"%{parametro}%")).ToList();
 
-        public async Task<CepPagedReturned> GetAllWithPaginate(CepFilter filter)
+        public async Task<PagedResult<Ceps>> GetAllWithPaginate(CepFilter filter)
         {
             try
             {
@@ -97,15 +98,7 @@ namespace DefaultAPI.Application.Services
                                       IsActive = x.IsActive
                                   };
 
-                filter.pageIndex++;
-                return new CepPagedReturned
-                {
-                    Ceps = queryResult.Skip((filter.pageIndex - 1) * filter.pageSize).Take(filter.pageSize).ToList(),
-                    NextPage = (filter.pageSize * filter.pageIndex) >= queryCount ? null : (int?)filter.pageIndex + 1,
-                    Page = filter.pageIndex,
-                    Total = (int)Math.Ceiling((decimal)queryCount / filter.pageSize),
-                    TotalRecords = queryCount
-                };
+                return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
             }
             catch (Exception ex)
             {

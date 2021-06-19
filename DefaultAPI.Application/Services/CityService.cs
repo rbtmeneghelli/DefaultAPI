@@ -1,4 +1,5 @@
-﻿using DefaultAPI.Application.Interfaces;
+﻿using DefaultAPI.Application.Factory;
+using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Domain;
 using DefaultAPI.Domain.Dto;
 using DefaultAPI.Domain.Entities;
@@ -28,32 +29,21 @@ namespace DefaultAPI.Application.Services
             return (from x in list select x.IdState.Value).Distinct().ToList();
         }
 
-        public async Task<CityPagedReturned> GetAllFromUf(int IdState = 25, int? page = 1, int? limit = int.MaxValue)
+        public async Task<PagedResult<CityReturnedDto>> GetAllFromUf(int IdState = 25, int? page = 1, int? limit = int.MaxValue)
         {
             page = page ?? 1;
             limit = limit ?? 10;
 
-            var set = await _cityRepository.GetAll()
-                .Where(x => x.IdState == IdState)
-                .OrderBy(a => a.Name)
-                .Skip((page.Value - 1) * limit.Value)
-                .Take(limit.Value)
-                .Select(a => new CityReturnedDto
-                {
-                    Id = a.Id,
-                    Name = a.Name
-                }).ToListAsync();
+            var queryResult = (from x in _cityRepository.GetAll().AsQueryable().AsNoTracking()
+                               where x.IdState == IdState
+                               orderby x.Name ascending
+                               select new CityReturnedDto()
+                               {
+                                   Id = x.Id,
+                                   Name = x.Name
+                               });
 
-            var total = set.Count();
-
-            return new CityPagedReturned
-            {
-                Cities = set,
-                NextPage = (page.Value * limit.Value) >= total ? null : (int?)page.Value + 1,
-                Page = page.Value,
-                Total = (int)Math.Ceiling((decimal)total / limit.Value),
-                TotalRecords = total
-            };
+            return PagedFactory.GetPaged(queryResult, page.Value, limit.Value);
         }
 
         public async Task<List<CityReturnedDto>> GetAllEntity()

@@ -11,7 +11,7 @@ namespace DefaultAPI.Application.Interfaces
 {
     public interface ICityService
     {
-        Task<CityPagedReturned> GetAllFromUf(int IdState = 25, int? page = 1, int? limit = int.MaxValue);
+        Task<PagedResult<CityReturnedDto>> GetAllFromUf(int IdState = 25, int? page = 1, int? limit = int.MaxValue);
         Task<List<CityReturnedDto>> GetAllEntity();
         Task<CityReturnedDto> GetById(int id);
         Task Add(City city);

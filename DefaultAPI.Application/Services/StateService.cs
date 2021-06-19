@@ -1,4 +1,5 @@
-﻿using DefaultAPI.Application.Interfaces;
+﻿using DefaultAPI.Application.Factory;
+using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
 using DefaultAPI.Domain.Models;
@@ -94,7 +95,7 @@ namespace DefaultAPI.Application.Services
 
         public List<States> GetAllWithLike(string parametro) => _stateRepository.GetAll().Where(x => EF.Functions.Like(x.Nome, $"%{parametro}%")).ToList();
 
-        public async Task<StatePagedReturned> GetAllWithPaginate(StateFilter filter)
+        public async Task<PagedResult<States>> GetAllWithPaginate(StateFilter filter)
         {
             try
             {
@@ -111,15 +112,7 @@ namespace DefaultAPI.Application.Services
                                       IsActive = x.IsActive
                                   };
 
-                filter.pageIndex++;
-                return new StatePagedReturned
-                {
-                    States = queryResult.Skip((filter.pageIndex - 1) * filter.pageSize).Take(filter.pageSize).ToList(),
-                    NextPage = (filter.pageSize * filter.pageIndex) >= queryCount ? null : (int?)filter.pageIndex + 1,
-                    Page = filter.pageIndex,
-                    Total = (int)Math.Ceiling((decimal)queryCount / filter.pageSize),
-                    TotalRecords = queryCount
-                };
+                return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
             }
             catch (Exception ex)
             {

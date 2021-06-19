@@ -17,7 +17,7 @@ using System.Xml;
 
 namespace DefaultAPI.Infra.CrossCutting
 {
-    public class ExtensionMethods
+    public sealed class ExtensionMethods
     {
         public string RemoveMimeType(string base64)
         {
@@ -977,6 +977,24 @@ namespace DefaultAPI.Infra.CrossCutting
         {
             DropDownList model = obj as DropDownList;
             return model;
+        }
+
+        public string RemoveSpaceBetweenWords(string text)
+        {
+            if (!string.IsNullOrEmpty(text))
+                return Regex.Replace(text, @"\s+", " ");
+
+            return text;
+        }
+
+        public List<int> GetListPermissions(string from, string to)
+        {
+            Dictionary<(string, string), List<int>> dictionary = new Dictionary<(string, string), List<int>>();
+            dictionary.Add(("Sistema", "Administrador"), new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            dictionary.Add(("Sistema", "Supervisor"), new List<int>() { 1, 3, 5, 7, 9 });
+            dictionary.Add(("Sistema", "Colaborador"), new List<int>() { 2, 4, 6, 8 });
+            dictionary.Add(("Sistema", "Usuario"), new List<int>() { 1, 2 });
+            return dictionary[(from, to)];
         }
     }
 }

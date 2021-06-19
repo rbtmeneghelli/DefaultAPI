@@ -1,7 +1,9 @@
-﻿using DefaultAPI.Application.Interfaces;
+﻿using DefaultAPI.Application.Factory;
+using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Domain.Dto;
 using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
+using DefaultAPI.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -28,7 +30,7 @@ namespace DefaultAPI.Application.Services
 
         public List<Log> GetAllWithLike(string parametro) => _logRepository.GetAll().Where(x => EF.Functions.Like(x.Class, $"%{parametro}%")).ToList();
 
-        public async Task<LogPagedReturned> GetAllWithPaginate(LogFilter filter)
+        public async Task<PagedResult<LogReturnedDto>> GetAllWithPaginate(LogFilter filter)
         {
             try
             {
@@ -47,16 +49,7 @@ namespace DefaultAPI.Application.Services
                                       UpdateTime = x.UpdateTime
                                   };
 
-                filter.pageIndex++;
-
-                return new LogPagedReturned
-                {
-                    Logs = queryResult.Skip((filter.pageIndex - 1) * filter.pageSize).Take(filter.pageSize).ToList(),
-                    NextPage = (filter.pageSize * filter.pageIndex) >= queryCount ? null : (int?)filter.pageIndex + 1,
-                    Page = filter.pageIndex,
-                    Total = (int)Math.Ceiling((decimal)queryCount / filter.pageSize),
-                    TotalRecords = queryCount
-                };
+                return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
             }
             catch (Exception ex)
             {

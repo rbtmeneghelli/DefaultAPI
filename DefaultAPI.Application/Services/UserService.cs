@@ -12,6 +12,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using DefaultAPI.Application.Interfaces;
+using DefaultAPI.Application.Factory;
 
 namespace DefaultAPI.Application.Services
 {
@@ -42,7 +43,7 @@ namespace DefaultAPI.Application.Services
                           }).ToListAsync();
         }
 
-        public async Task<UserPaged> GetAllPaginate(UserFilter filter)
+        public async Task<PagedResult<UserReturnedDto>> GetAllPaginate(UserFilter filter)
         {
             var query = GetAllUsers(filter);
 
@@ -60,14 +61,7 @@ namespace DefaultAPI.Application.Services
                                   Status = p.IsActive ? "Ativo" : "Inativo"
                               };
 
-            return new UserPaged
-            {
-                UserReturnedSet = await queryResult.Skip((filter.pageIndex - 1) * filter.pageSize).Take(filter.pageSize).ToListAsync(),
-                NextPage = (filter.pageSize * filter.pageIndex) >= queryResult.Count() ? null : (int?)filter.pageIndex + 1,
-                Page = filter.pageIndex,
-                Total = (int)Math.Ceiling((decimal)queryResult.Count() / filter.pageSize),
-                TotalRecords = queryResult.Count()
-            };
+            return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
         }
 
         public async Task<UserReturnedDto> GetById(long id)

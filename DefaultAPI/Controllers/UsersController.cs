@@ -100,7 +100,7 @@ namespace DefaultAPI.Controllers.Base
         public async Task<IActionResult> Export2Excel([FromBody] UserFilter filter)
         {
             var list = await _userService.GetAllPaginate(filter);
-            var result = await _generalService.Export2Excel(list.UserReturnedSet, "Users");
+            var result = await _generalService.Export2Excel(list.Results, "Users");
             return File(result.Memory, result.FileExtension, result.FileName);
         }
     }
