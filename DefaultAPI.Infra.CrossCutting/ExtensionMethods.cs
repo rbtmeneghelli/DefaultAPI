@@ -979,14 +979,6 @@ namespace DefaultAPI.Infra.CrossCutting
             return model;
         }
 
-        public string RemoveSpaceBetweenWords(string text)
-        {
-            if (!string.IsNullOrEmpty(text))
-                return Regex.Replace(text, @"\s+", " ");
-
-            return text;
-        }
-
         public List<int> GetListPermissions(string from, string to)
         {
             Dictionary<(string, string), List<int>> dictionary = new Dictionary<(string, string), List<int>>();
@@ -995,6 +987,29 @@ namespace DefaultAPI.Infra.CrossCutting
             dictionary.Add(("Sistema", "Colaborador"), new List<int>() { 2, 4, 6, 8 });
             dictionary.Add(("Sistema", "Usuario"), new List<int>() { 1, 2 });
             return dictionary[(from, to)];
+        }
+
+        public string RemoveSpaceFromWords(string text)
+        {
+            if (!string.IsNullOrEmpty(text))
+                return Regex.Replace(text.ToUpper().Trim(), @"\s+", "");
+
+            return string.Empty;
+        }
+
+        public DateTime FirstDayCurrentMonth()
+        {
+            return DateTime.Parse(string.Format("{0}/{1}/{2}", "01", DateTime.Now.Month, DateTime.Now.Year));
+        }
+
+        public string[] RepeatValues(int times, string word)
+        {
+            times = times > 0 ? times : 1;
+
+            if (!string.IsNullOrEmpty(word))
+                return Enumerable.Range(1, times).Select(x => word).ToArray();
+
+            return Enumerable.Range(1, times).Select(x => "gray").ToArray();
         }
     }
 }
