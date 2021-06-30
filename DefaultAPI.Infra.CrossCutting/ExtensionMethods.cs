@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -1010,6 +1011,14 @@ namespace DefaultAPI.Infra.CrossCutting
                 return Enumerable.Range(1, times).Select(x => word).ToArray();
 
             return Enumerable.Range(1, times).Select(x => "gray").ToArray();
+        }
+
+        public string RemoveAccent(string text)
+        {
+            return new string(text
+                .Normalize(NormalizationForm.FormD)
+                .Where(ch => char.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark)
+                .ToArray());
         }
     }
 }
