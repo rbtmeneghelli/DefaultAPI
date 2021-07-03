@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +17,14 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace DefaultAPI.Configuration
 {
     public static class DependencyConfig
     {
+
         internal static void RegisterJwtConfig(IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication
@@ -78,31 +81,13 @@ namespace DefaultAPI.Configuration
         {
             services.AddSwaggerGen(x =>
             {
-                x.SwaggerDoc("V1", new OpenApiInfo
-                {
-                    Title = "DefaultAPIAPI",
-                    Version = "V1",
-                    Description = "Lista de Endpoints disponíveis",
-                });
-                x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Description = "Insira a palavra Bearer com o token JWT gerado no campo",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
-                });
-                x.AddSecurityRequirement(new OpenApiSecurityRequirement {
-                    { new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                              Type = ReferenceType.SecurityScheme,
-                              Id = "Bearer"
-                            }
-                        },
-                        new string[] { }
-                    }
-                });
+                x.SwaggerDoc("v1", GetApiConfig("v1"));
+                x.SwaggerDoc("v2", GetApiConfig("v2"));
+                x.AddSecurityDefinition("Bearer", GetBearerConfig());
+                x.AddSecurityRequirement(GetSecurityConfig());
+                // Metodos abaixo são utilizados quando temos mais versões de API
+                x.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                x.DocInclusionPredicate((docName, apiDesc) => apiDesc.GroupName == docName);
             });
         }
 
@@ -143,6 +128,44 @@ namespace DefaultAPI.Configuration
                 var context = serviceScope.ServiceProvider.GetService<DefaultAPIContext>();
                 context.Database.Migrate();
             }
+        }
+
+        private static OpenApiSecurityScheme GetBearerConfig()
+        {
+            return new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Insira a palavra Bearer com o token JWT gerado no campo",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey
+            };
+        }
+
+        private static OpenApiSecurityRequirement GetSecurityConfig()
+        {
+            return new OpenApiSecurityRequirement {
+                { new OpenApiSecurityScheme
+                  {
+                    Reference = new OpenApiReference
+                    {
+                      Type = ReferenceType.SecurityScheme,
+                      Id = "Bearer"
+                    }
+                  },
+                  new string[] { }
+            }   };
+        }
+
+        private static OpenApiInfo GetApiConfig(string version, bool isNotDepreciated = true)
+        {
+            return new OpenApiInfo
+            {
+                Title = "DefaultAPI",
+                Version = version,
+                Description = isNotDepreciated ? "Lista de Endpoints disponíveis" : "Endpoints descontinuados",
+                Contact = new OpenApiContact() { Name = "Roberto Meneghelli", Email = "teste@teste.com.br" },
+                License = new OpenApiLicense() { Name = "ROMAR SOFTWARE" }
+            };
         }
     }
 

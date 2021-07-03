@@ -9,8 +9,9 @@ using DefaultAPI.Application.Interfaces;
 
 namespace DefaultAPI.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [AllowAnonymous]
     public class AccountController : BaseController
     {
@@ -21,7 +22,7 @@ namespace DefaultAPI.Controllers
             _accountService = accountService;
         }
 
-        [HttpPost("v1/Login/{login}/{senha}")]
+        [HttpPost("Login/{login}/{senha}")]
         public async Task<IActionResult> Login(string login, string senha)
         {
             ResultReturned resultReturned = await _accountService.CheckUserAuthentication(login, senha);
@@ -37,7 +38,7 @@ namespace DefaultAPI.Controllers
             }
         }
 
-        [HttpPost("v1/ChangePassword")]
+        [HttpPost("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] User user)
         {
             ResultReturned resultReturned = await _accountService.ChangePassword(_generalService.GetCurrentUserId(), user);
@@ -46,7 +47,7 @@ namespace DefaultAPI.Controllers
             return BadRequest(resultReturned);
         }
 
-        [HttpGet("v1/ResetPassword/{email}")]
+        [HttpGet("ResetPassword/{email}")]
         public async Task<IActionResult> ResetPassword(string email)
         {
             ResultReturned resultReturned = await _accountService.ResetPassword(email);

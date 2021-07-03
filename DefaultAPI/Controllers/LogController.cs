@@ -15,8 +15,10 @@ using System.Threading.Tasks;
 namespace DefaultAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize("Bearer")]
+    [ApiExplorerSettings(GroupName = "1.0")]
     public class LogController : BaseController
     {
         private readonly ILogService _logService;
@@ -26,7 +28,7 @@ namespace DefaultAPI.Controllers
             _logService = logService;
         }
 
-        [HttpGet("v1/getById/{id}")]
+        [HttpGet("getById/{id}")]
         public async Task<IActionResult> GetById(long id)
         {
             var record = _mapper.Map<LogReturnedDto>(await _logService.GetById(id));
@@ -38,7 +40,7 @@ namespace DefaultAPI.Controllers
             return Ok(record);
         }
 
-        [HttpPost("v1/GetAllFilter")]
+        [HttpPost("GetAllFilter")]
         public async Task<ActionResult<PagedResult<LogReturnedDto>>> GetAllFilter(LogFilter filter)
         {
             return Ok(await _logService.GetAllWithPaginate(filter));

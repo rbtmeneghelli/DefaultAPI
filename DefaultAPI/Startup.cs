@@ -3,6 +3,7 @@ using DefaultAPI.Infra.Data.Context;
 using DefaultAPI.Infra.Structure.IoC;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +41,19 @@ namespace DefaultAPI
             DependencyConfig.RegisterConfigs(services, Configuration);
             DependencyConfig.RegisterPolicy(services);
             services.AddControllers();
+            services.AddApiVersioning(options =>
+            {
+                options.ReportApiVersions = true;
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1,0);
+            });
+
+            services.AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'V";
+                options.SubstituteApiVersionInUrl = true;
+
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -62,7 +76,8 @@ namespace DefaultAPI
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/V1/swagger.json", "DefaultAPIAPI");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "DefaultAPI V1");
+                c.SwaggerEndpoint("/swagger/v2/swagger.json", "DefaultAPI V2");
             });
             app.UseEndpoints(endpoints =>
             {

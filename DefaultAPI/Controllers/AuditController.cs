@@ -15,7 +15,8 @@ using System.Threading.Tasks;
 namespace DefaultAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize("Bearer")]
     public class AuditController : BaseController
     {
@@ -26,7 +27,7 @@ namespace DefaultAPI.Controllers
             _auditService = auditService;
         }
 
-        [HttpGet("v1/getById/{id}")]
+        [HttpGet("getById/{id}")]
         public async Task<IActionResult> GetById(long id)
         {
             var record = _mapper.Map<AuditReturnedDto>(await _auditService.GetById(id));
@@ -38,7 +39,7 @@ namespace DefaultAPI.Controllers
             return Ok(record);
         }
 
-        [HttpPost("v1/GetAllFilter")]
+        [HttpPost("GetAllFilter")]
         public async Task<ActionResult<PagedResult<AuditReturnedDto>>> GetAllFilter(AuditFilter filter)
         {
             return Ok(await _auditService.GetAllWithPaginate(filter));
