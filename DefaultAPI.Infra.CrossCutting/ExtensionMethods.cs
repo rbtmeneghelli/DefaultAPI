@@ -1020,5 +1020,29 @@ namespace DefaultAPI.Infra.CrossCutting
                 .Where(ch => char.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark)
                 .ToArray());
         }
+
+        public string GetEnvironmentVariableValue(string path)
+        {
+            try
+            {
+                return Environment.GetEnvironmentVariable(path, EnvironmentVariableTarget.Process);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message, ex.InnerException);
+            }
+        }
+
+        public void SetEnvironmentVariableValue(string path, string value)
+        {
+            try
+            {
+                Environment.SetEnvironmentVariable(path, value, EnvironmentVariableTarget.Process);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex.InnerException);
+            }
+        }
     }
 }
