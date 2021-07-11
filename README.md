@@ -1,2 +1,2 @@
 # DefaultAPI
-Projeto desenvolvido em padrão repository com DDD, C#, Net Core 3.0
+REST WEBAPI em Net Core 3.0 com arquitetura Repository e CQRS, seguindo modelo DDD e TDD na linguagem C#.
