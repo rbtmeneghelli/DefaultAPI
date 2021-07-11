@@ -8,6 +8,9 @@ using DefaultAPI.Application.Services;
 using DefaultAPI.Application;
 using DefaultAPI.Infra.Structure.IoC.MapEntitiesXDto;
 using System;
+using System.Reflection;
+using MediatR;
+using DefaultAPI.Application.Queries;
 
 namespace DefaultAPI.Infra.Structure.IoC
 {
@@ -31,7 +34,7 @@ namespace DefaultAPI.Infra.Structure.IoC
 
         public static IServiceCollection RegisterDbConnection(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<DefaultAPIContext>(opts => opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DefaultAPIContext>(opts => opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly(typeof(DefaultAPIContext).Assembly.FullName)));
             return services;
         }
 
@@ -46,6 +49,12 @@ namespace DefaultAPI.Infra.Structure.IoC
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             return services;
         }
+
+        //public static IServiceCollection RegisterMediator(IServiceCollection services)
+        //{
+        //    services.AddMediatR(Assembly.GetExecutingAssembly());
+        //    return services;
+        //}
 
     }
 }
