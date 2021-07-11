@@ -42,6 +42,10 @@ namespace DefaultCQRSAPI.Configuration
             }
         }
 
+        /// <summary>
+        /// Para mais detalhes sobre CQRS: http://www.macoratti.net/20/07/aspc_mediatr1.htm
+        /// </summary>
+        /// <param name="services"></param>
         internal static void RegisterMediator(IServiceCollection services)
         {
             services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());

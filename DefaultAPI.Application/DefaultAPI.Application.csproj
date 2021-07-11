@@ -24,8 +24,4 @@
     <ProjectReference Include="..\DefaultAPI.Infra.CrossCutting\DefaultAPI.Infra.CrossCutting.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Command\" />
-  </ItemGroup>
-
 </Project>
