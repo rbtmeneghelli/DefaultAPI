@@ -1,5 +1,6 @@
 ﻿using DefaultAPI.Domain.Enums;
 using DefaultAPI.Domain.Models;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using System.Net.NetworkInformation;
 using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace DefaultAPI.Infra.CrossCutting
@@ -1043,6 +1045,13 @@ namespace DefaultAPI.Infra.CrossCutting
             {
                 throw new Exception(ex.Message, ex.InnerException);
             }
+        }
+
+        public async Task<byte[]> SetFileToByteArray(IFormFile formfile)
+        {
+            MemoryStream ms = new MemoryStream(new byte[formfile.Length]);
+            await formfile.CopyToAsync(ms);
+            return ms.ToArray();
         }
     }
 }
