@@ -60,45 +60,41 @@ namespace DefaultAPI.Application.Services
         /// <param name="objectValue"></param>
         /// <param name="QueueIsDurable"></param>
         /// <returns></returns>
-        public override async Task ReceiveMessageToQueue(string QueueName, T ObjectValue, bool QueueIsDurable)
+        public override async Task ReceiveMessageToQueue(string QueueName, bool QueueIsDurable)
         {
             var factory = ConfigConnectionFactory();
-            using (var connection = factory.CreateConnection())
+            var connection = factory.CreateConnection();
+            var channel = connection.CreateModel();
+
+            channel.QueueDeclare(queue: QueueName,
+                         durable: QueueIsDurable,
+                         exclusive: false,
+                         autoDelete: false,
+                         arguments: null);
+
+            #region [Make Consumer get one message to process until end]
+            channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
+            #endregion
+
+            var consumer = new AsyncEventingBasicConsumer(channel);
+            string messages = string.Empty;
+
+            consumer.Received += async (model, ea) =>
             {
-                using (var channel = connection.CreateModel())
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+
+                if (QueueIsDurable)
                 {
-                    channel.QueueDeclare(queue: QueueName,
-                                 durable: QueueIsDurable,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
-
-                    #region [Make Consumer get one message to process until end]
-                    channel.BasicQos(prefetchSize: 0, prefetchCount: 1, global: false);
-                    #endregion
-
-                    var consumer = new EventingBasicConsumer(channel);
-
-                    consumer.Received += (model, ea) =>
-                    {
-                        var body = ea.Body.ToArray();
-                        var message = Encoding.UTF8.GetString(body);
-                        Console.WriteLine($"Recebido a mensagem {message} para a fila {QueueName} com sucesso");
-                        if (QueueIsDurable)
-                        {
-                            int dots = message.Split('.').Length - 1;
-                            Thread.Sleep(dots * 1000);
-                            channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                        }
-                    };
-
-                    channel.BasicConsume(queue: QueueName,
-                                         autoAck: QueueIsDurable ? false : true,
-                                         consumer: consumer);
-
-                    await Task.CompletedTask;
+                    int dots = message.Split('.').Length - 1;
+                    Thread.Sleep(dots * 1000);
+                    channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                 }
-            }
+            };
+
+            channel.BasicConsume(queue: QueueName,
+                                 autoAck: QueueIsDurable ? false : true,
+                                 consumer: consumer);
         }
 
 
@@ -139,33 +135,30 @@ namespace DefaultAPI.Application.Services
         public override async Task ReceiveMessageToQueueInSameTime(string ExchangeName)
         {
             var factory = ConfigConnectionFactory();
-            using (var connection = factory.CreateConnection())
+            var connection = factory.CreateConnection();
+            var channel = connection.CreateModel();
+            channel.ExchangeDeclare(exchange: ExchangeName, type: ExchangeType.Fanout);
+
+            #region [Will generate Random Queue]
+            var queueName = channel.QueueDeclare().QueueName;
+            #endregion
+
+            channel.QueueBind(queue: queueName,
+                              exchange: ExchangeName,
+                              routingKey: "");
+
+            var consumer = new AsyncEventingBasicConsumer(channel);
+            consumer.Received += async (model, ea) =>
             {
-                using (var channel = connection.CreateModel())
-                {
-                    channel.ExchangeDeclare(exchange: ExchangeName, type: ExchangeType.Fanout);
-                    #region [Will generate Random Queue]
-                    var queueName = channel.QueueDeclare().QueueName;
-                    #endregion
-                    channel.QueueBind(queue: queueName,
-                                      exchange: ExchangeName,
-                                      routingKey: "");
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+            };
 
-                    var consumer = new EventingBasicConsumer(channel);
-                    consumer.Received += (model, ea) =>
-                    {
-                        var body = ea.Body.ToArray();
-                        var message = Encoding.UTF8.GetString(body);
-                        Console.WriteLine($"Recebido a mensagem {message} para a fila {queueName} com sucesso");
-                    };
+            channel.BasicConsume(queue: queueName,
+                                 autoAck: true,
+                                 consumer: consumer);
 
-                    channel.BasicConsume(queue: queueName,
-                                         autoAck: true,
-                                         consumer: consumer);
-
-                    await Task.CompletedTask;
-                }
-            }
+            await Task.CompletedTask;
         }
 
         /// <summary>
@@ -183,12 +176,18 @@ namespace DefaultAPI.Application.Services
                 using (var channel = connection.CreateModel())
                 {
                     channel.ExchangeDeclare(exchange: ExchangeName, type: ExchangeType.Direct);
+                    channel.QueueDeclare(queue: "Excel",
+                                durable: false,
+                                exclusive: false,
+                                autoDelete: false,
+                                arguments: null);
                     var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(ObjectValue));
-                    channel.BasicPublish(exchange: ExchangeName,
-                                 routingKey: RoutingKey,
+                    channel.BasicPublish(
+                                 exchange: ExchangeName,
+                                 routingKey: "Excel",
                                  basicProperties: null,
                                  body: body);
-                    Console.WriteLine($"Enviado mensagem {body} para o publicador {ExchangeName} com destino a rota {RoutingKey} com sucesso");
+                    Console.WriteLine($"Enviado mensagem {JsonSerializer.Serialize(ObjectValue)} para o publicador {ExchangeName} com destino a rota {RoutingKey} com sucesso");
                     await Task.CompletedTask;
                 }
             }
@@ -204,29 +203,25 @@ namespace DefaultAPI.Application.Services
         public override async Task ReceiveMessageToQueueRouting(string ExchangeName, string RoutingKey)
         {
             var factory = ConfigConnectionFactory();
-            using (var connection = factory.CreateConnection())
+            var connection = factory.CreateConnection();
+            var channel = connection.CreateModel();
+
+            channel.ExchangeDeclare(exchange: ExchangeName, type: ExchangeType.Direct);
+            var queueName = channel.QueueDeclare().QueueName;
+            channel.QueueBind(queue: queueName, exchange: ExchangeName, routingKey: RoutingKey);
+            var consumer = new EventingBasicConsumer(channel);
+            consumer.Received += async (model, ea) =>
             {
-                using (var channel = connection.CreateModel())
-                {
-                    channel.ExchangeDeclare(exchange: ExchangeName, type: ExchangeType.Direct);
-                    var queueName = channel.QueueDeclare().QueueName;
-                    channel.QueueBind(queue: queueName, exchange: ExchangeName, routingKey: RoutingKey);
-                    var consumer = new EventingBasicConsumer(channel);
-                    consumer.Received += async (model, ea) =>
-                    {
-                        var body = ea.Body.ToArray();
-                        var message = Encoding.UTF8.GetString(body);
-                        var routingKey = ea.RoutingKey;
-                        Console.WriteLine($"Recebido a mensagem {message} para a fila {queueName} com sucesso");
-                    };
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+                var routingKey = ea.RoutingKey;
+            };
 
-                    channel.BasicConsume(queue: queueName,
-                                         autoAck: true,
-                                         consumer: consumer);
+            channel.BasicConsume(queue: queueName,
+                                 autoAck: true,
+                                 consumer: consumer);
 
-                    await Task.CompletedTask;
-                }
-            }
+            await Task.CompletedTask;
         }
     }
 }

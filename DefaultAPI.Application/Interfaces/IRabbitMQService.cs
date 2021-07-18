@@ -18,13 +18,14 @@ namespace DefaultAPI.Application.Interfaces
             {
                 HostName = HostName,
                 UserName = UserName,
-                Password = Password
+                Password = Password,
+                DispatchConsumersAsync = true
             };
         }
 
         public abstract Task SendMessageToQueue(string QueueName, T ObjectValue, bool QueueIsDurable);
 
-        public abstract Task ReceiveMessageToQueue(string QueueName, T ObjectValue, bool QueueIsDurable);
+        public abstract Task ReceiveMessageToQueue(string QueueName, bool QueueIsDurable);
 
         public abstract Task SendMessageToQueueInSameTime(string ExchangeName, T ObjectValue);
 
