@@ -22,7 +22,7 @@ namespace DefaultAPI.Infra.Data.Mapping
         private void ConfigureColumns()
         {
             _builder.Property(a => a.IdProfile).IsRequired(true).HasColumnName("Id_Profile");
-            _builder.Property(a => a.IdOperation).IsRequired(true).HasColumnName("Id_Role");
+            _builder.Property(a => a.IdOperation).IsRequired(true).HasColumnName("Id_Operation");
             _builder.Property(a => a.CanCreate).HasDefaultValue(false).HasColumnName("CanCreate");
             _builder.Property(a => a.CanResearch).HasDefaultValue(false).HasColumnName("CanResearch");
             _builder.Property(a => a.CanUpdate).HasDefaultValue(false).HasColumnName("CanUpdate");

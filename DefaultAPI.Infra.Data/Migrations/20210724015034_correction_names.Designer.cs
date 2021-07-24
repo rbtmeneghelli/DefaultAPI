@@ -4,14 +4,16 @@ using DefaultAPI.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DefaultAPI.Infra.Data.Migrations
 {
     [DbContext(typeof(DefaultAPIContext))]
-    partial class DefaultAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20210724015034_correction_names")]
+    partial class correction_names
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +41,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 53, 43, 7, DateTimeKind.Local).AddTicks(3520));
+                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 50, 34, 67, DateTimeKind.Local).AddTicks(7311));
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -107,7 +109,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 53, 43, 7, DateTimeKind.Local).AddTicks(290));
+                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 50, 34, 67, DateTimeKind.Local).AddTicks(2977));
 
                     b.Property<string>("Ddd")
                         .HasColumnName("Ddd")
@@ -177,7 +179,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 53, 42, 975, DateTimeKind.Local).AddTicks(3240));
+                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 50, 34, 36, DateTimeKind.Local).AddTicks(1959));
 
                     b.Property<long?>("IBGE")
                         .IsRequired()
@@ -265,7 +267,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 53, 42, 980, DateTimeKind.Local).AddTicks(7902));
+                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 50, 34, 41, DateTimeKind.Local).AddTicks(6851));
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -322,7 +324,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedTime = new DateTime(2021, 7, 23, 22, 53, 43, 9, DateTimeKind.Local).AddTicks(9647),
+                            CreatedTime = new DateTime(2021, 7, 23, 22, 50, 34, 71, DateTimeKind.Local).AddTicks(4394),
                             Description = "Auditoria",
                             IsActive = true
                         });
@@ -379,7 +381,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         {
                             Id = 1L,
                             AccessGroup = (byte)0,
-                            CreatedTime = new DateTime(2021, 7, 23, 22, 53, 43, 8, DateTimeKind.Local).AddTicks(3826),
+                            CreatedTime = new DateTime(2021, 7, 23, 22, 50, 34, 69, DateTimeKind.Local).AddTicks(777),
                             Description = "Perfil Usuário Tria",
                             IsActive = true,
                             LoginType = (byte)1,
@@ -389,7 +391,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         {
                             Id = 2L,
                             AccessGroup = (byte)0,
-                            CreatedTime = new DateTime(2021, 7, 23, 22, 53, 43, 8, DateTimeKind.Local).AddTicks(5139),
+                            CreatedTime = new DateTime(2021, 7, 23, 22, 50, 34, 69, DateTimeKind.Local).AddTicks(2115),
                             Description = "Perfil Administrador Tria",
                             IsActive = true,
                             LoginType = (byte)1,
@@ -399,7 +401,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         {
                             Id = 3L,
                             AccessGroup = (byte)0,
-                            CreatedTime = new DateTime(2021, 7, 23, 22, 53, 43, 8, DateTimeKind.Local).AddTicks(5165),
+                            CreatedTime = new DateTime(2021, 7, 23, 22, 50, 34, 69, DateTimeKind.Local).AddTicks(2143),
                             Description = "Perfil Manager Tria",
                             IsActive = true,
                             LoginType = (byte)1,
@@ -490,7 +492,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 53, 43, 7, DateTimeKind.Local).AddTicks(1908));
+                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 50, 34, 67, DateTimeKind.Local).AddTicks(4423));
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -551,6 +553,9 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<long?>("OperationId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("RoleTag")
                         .IsRequired()
                         .HasColumnName("Role")
@@ -563,7 +568,7 @@ namespace DefaultAPI.Infra.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdOperation");
+                    b.HasIndex("OperationId");
 
                     b.ToTable("Roles");
 
@@ -572,7 +577,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         {
                             Id = 1L,
                             Action = (byte)0,
-                            CreatedTime = new DateTime(2021, 7, 23, 22, 53, 43, 10, DateTimeKind.Local).AddTicks(4270),
+                            CreatedTime = new DateTime(2021, 7, 23, 22, 50, 34, 71, DateTimeKind.Local).AddTicks(8479),
                             Description = "Regra de acesso a tela de Auditoria",
                             IsActive = false,
                             RoleTag = "ROLE_AUDIT"
@@ -593,7 +598,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("Created_Time")
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 53, 43, 6, DateTimeKind.Local).AddTicks(8042));
+                        .HasDefaultValue(new DateTime(2021, 7, 23, 22, 50, 34, 67, DateTimeKind.Local).AddTicks(568));
 
                     b.Property<long>("IdRegiao")
                         .HasColumnType("bigint");
@@ -685,13 +690,13 @@ namespace DefaultAPI.Infra.Data.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedTime = new DateTime(2021, 7, 23, 22, 53, 43, 12, DateTimeKind.Local).AddTicks(2413),
+                            CreatedTime = new DateTime(2021, 7, 23, 22, 50, 34, 79, DateTimeKind.Local).AddTicks(9331),
                             IdProfile = 1L,
                             IsActive = true,
                             IsAuthenticated = true,
                             LastPassword = "",
                             Login = "admin@DefaultAPI.com.br",
-                            Password = "AQAQJwAAQxT9DYCy1PeWTyRFtjz5ClT5B9twYJ1MePTdEaFTLu4="
+                            Password = "AQAQJwAAJBQGTYzl2qeETdPKe57nuc4tEFbfSQP6u/uQHFHjPx0="
                         });
                 });
 
@@ -732,8 +737,7 @@ namespace DefaultAPI.Infra.Data.Migrations
                 {
                     b.HasOne("DefaultAPI.Domain.Entities.Operation", "Operation")
                         .WithMany("Roles")
-                        .HasForeignKey("IdOperation")
-                        .HasConstraintName("IdOperation");
+                        .HasForeignKey("OperationId");
                 });
 
             modelBuilder.Entity("DefaultAPI.Domain.Entities.States", b =>

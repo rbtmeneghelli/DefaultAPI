@@ -4,14 +4,16 @@ using DefaultAPI.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DefaultAPI.Infra.Data.Migrations
 {
     [DbContext(typeof(DefaultAPIContext))]
-    partial class DefaultAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20210724015343_correction_names_II")]
+    partial class correction_names_II
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

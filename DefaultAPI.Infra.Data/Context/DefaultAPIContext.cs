@@ -35,7 +35,7 @@ namespace DefaultAPI.Infra.Data.Context
             modelBuilder.ApplyConfiguration(new RegionMapping());
             modelBuilder.ApplyConfiguration(new AuditMapping());
             modelBuilder.ApplyConfiguration(new LogMapping());
-            ModelBuilder.ApplyConfiguration(new OperationMapping());
+            modelBuilder.ApplyConfiguration(new OperationMapping());
             modelBuilder.ExecuteSeed();
             base.OnModelCreating(modelBuilder);
         }

@@ -15,8 +15,9 @@ namespace DefaultAPI.Infra.Data
         public static void ExecuteSeed(this ModelBuilder modelBuilder)
         {
             SeedProfile(modelBuilder);
+            SeedOperation(modelBuilder);
             SeedRole(modelBuilder);
-            SeedProfileRole(modelBuilder);
+            SeedProfileOperation(modelBuilder);
             SeedUser(modelBuilder);
         }
 
@@ -44,6 +45,13 @@ namespace DefaultAPI.Infra.Data
             );
         }
 
+        private static void SeedOperation(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Operation>().HasData(
+              new Operation() { Id = 1, Description = "Auditoria", CreatedTime = DateTime.Now, IsActive = true }
+            );
+        }
+
         private static void SeedRole(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Role>().HasData(
@@ -51,10 +59,10 @@ namespace DefaultAPI.Infra.Data
             );
         }
 
-        private static void SeedProfileRole(ModelBuilder modelBuilder)
+        private static void SeedProfileOperation(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ProfileRole>().HasData(
-               new ProfileRole() { IdProfile = 1, IdRole = 1 }
+            modelBuilder.Entity<ProfileOperation>().HasData(
+               new ProfileOperation() { IdProfile = 1, IdOperation = 1 }
             );
         }
     }

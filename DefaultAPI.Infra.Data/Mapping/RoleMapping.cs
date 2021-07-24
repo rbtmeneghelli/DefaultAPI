@@ -27,6 +27,7 @@ namespace DefaultAPI.Infra.Data.Mapping
             _builder.Property(x => x.CreatedTime).HasColumnName("Created_Time");
             _builder.Property(x => x.UpdateTime).HasColumnName("Update_Time");
             _builder.Property(x => x.IsActive).HasDefaultValue(true).HasColumnName("Is_Active");
+            _builder.HasOne(x => x.Operation).WithMany(x => x.Roles).HasForeignKey(x => x.IdOperation).HasConstraintName("IdOperation");
         }
     }
 }
