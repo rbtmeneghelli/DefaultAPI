@@ -29,12 +29,13 @@ namespace DefaultAPI.Infra.Data.Context
             modelBuilder.ApplyConfiguration(new UserMapping());
             modelBuilder.ApplyConfiguration(new ProfileMapping());
             modelBuilder.ApplyConfiguration(new RoleMapping());
-            modelBuilder.ApplyConfiguration(new ProfileRoleMapping());
+            modelBuilder.ApplyConfiguration(new ProfileOperationMapping());
             modelBuilder.ApplyConfiguration(new StatesMapping());
             modelBuilder.ApplyConfiguration(new CepsMapping());
             modelBuilder.ApplyConfiguration(new RegionMapping());
             modelBuilder.ApplyConfiguration(new AuditMapping());
             modelBuilder.ApplyConfiguration(new LogMapping());
+            ModelBuilder.ApplyConfiguration(new OperationMapping());
             modelBuilder.ExecuteSeed();
             base.OnModelCreating(modelBuilder);
         }
@@ -138,7 +139,7 @@ namespace DefaultAPI.Infra.Data.Context
 
         public virtual DbSet<User> User { get; set; }
         public virtual DbSet<Profile> Profile { get; set; }
-        public virtual DbSet<ProfileRole> ProfileRole { get; set; }
+        public virtual DbSet<ProfileOperation> ProfileOperations { get; set; }
         public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Region> Region { get; set; }
         public virtual DbSet<States> State { get; set; }
@@ -146,5 +147,6 @@ namespace DefaultAPI.Infra.Data.Context
         public virtual DbSet<City> City { get; set; }
         public DbSet<Audit> Audit { get; set; }
         public DbSet<Log> Log { get; set; }
+        public virtual DbSet<Operation> Operation { get; set; }
     }
 }

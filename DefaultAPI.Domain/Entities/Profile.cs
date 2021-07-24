@@ -13,6 +13,6 @@ namespace DefaultAPI.Domain.Entities
         public EnumAccessGroup AccessGroup { get; set; }
         public EnumLoginType LoginType { get; set; }
         public List<User> Users { get; set; }
-        public List<ProfileRole> ProfileRoles { get; set; }
+        public List<ProfileOperation> ProfileOperations { get; set; }
     }
 }

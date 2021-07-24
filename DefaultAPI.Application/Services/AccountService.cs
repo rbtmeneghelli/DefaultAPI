@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DefaultAPI.Application.Interfaces;
+using DefaultAPI.Domain.Enums;
 
 namespace DefaultAPI.Application.Services
 {
@@ -47,14 +48,19 @@ namespace DefaultAPI.Application.Services
         public async Task<Credentials> GetUserCredentials(string login)
         {
             Credentials credenciais = new Credentials();
-            User user = await _userRepository.GetAllTracking().Include("Profile.ProfileRoles.Role").Where(p => p.Login == login).FirstOrDefaultAsync();
+            User user = await _userRepository.GetAll().Include("Profile.ProfileOperations.Operation.Roles").Where(p => p.Login == login).FirstOrDefaultAsync();
+
             if (user != null)
             {
                 credenciais.Id = user.Id;
                 credenciais.Login = user.Login;
                 credenciais.Perfil = user.Profile.Description;
                 credenciais.Roles = new List<string>() { };
-                credenciais.Roles = user.Profile.ProfileRoles.Select(x => x.Role.RoleTag).ToList();
+                foreach (var item in user.Profile.ProfileOperations)
+                {
+                    List<EnumActions> condition = GetActions(item);
+                    credenciais.Roles.AddRange(item.Operation.Roles.Where(y => condition.Contains(y.Action)).Select(z => z.RoleTag).ToList());
+                }
             }
 
             return credenciais;
@@ -102,6 +108,18 @@ namespace DefaultAPI.Application.Services
                 return new ResultReturned() { Result = false, Message = Constants.ErrorInResetPassword };
             }
             return new ResultReturned() { Result = false, Message = Constants.ErrorInResetPassword };
+        }
+
+        private List<EnumActions> GetActions(ProfileOperation profileOperation)
+        {
+            List<EnumActions> condition = new List<EnumActions>();
+            condition.Add(profileOperation.CanCreate ? EnumActions.Insert : EnumActions.None);
+            condition.Add(profileOperation.CanResearch ? EnumActions.Research : EnumActions.None);
+            condition.Add(profileOperation.CanUpdate ? EnumActions.Update : EnumActions.None);
+            condition.Add(profileOperation.CanDelete ? EnumActions.Delete : EnumActions.None);
+            condition.Add(profileOperation.CanExport ? EnumActions.Export : EnumActions.None);
+            condition.Add(profileOperation.CanImport ? EnumActions.Import : EnumActions.None);
+            return condition;
         }
     }
 }

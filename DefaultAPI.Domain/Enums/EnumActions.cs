@@ -7,13 +7,25 @@ namespace DefaultAPI.Domain.Enums
 {
     public enum EnumActions : byte
     {
+        [Display(Name = "Nenhum")]
+        None = 0,
+
         [Display(Name = "Cadastro")]
-        Insert = 0,
+        Insert = 1,
 
         [Display(Name = "Edição")]
-        Update = 1,
+        Update = 2,
 
         [Display(Name = "Exclusão")]
-        Delete = 2,
+        Delete = 3,
+
+        [Display(Name = "Procurar")]
+        Research = 4,
+
+        [Display(Name = "Exportar")]
+        Export = 5,
+
+        [Display(Name = "Importar")]
+        Import = 6,
     }
 }
