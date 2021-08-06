@@ -17,6 +17,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace DefaultAPI.Infra.CrossCutting
 {
@@ -1052,6 +1053,25 @@ namespace DefaultAPI.Infra.CrossCutting
             MemoryStream ms = new MemoryStream(new byte[formfile.Length]);
             await formfile.CopyToAsync(ms);
             return ms.ToArray();
+        }
+
+        public void CreateJsonFile<T>(T model, string fileName = "arquivo.json")
+        {
+            File.WriteAllText(fileName, JsonConvert.SerializeObject(model));
+        }
+
+        public void CreateXmlFile<T>(T model, string fileName = "arquivo.xml")
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+            xmlSerializer.Serialize(new FileStream(fileName, FileMode.OpenOrCreate), model);
+        }
+
+        public T ConvertXmlToObject<T>(string xmlFile)
+        {
+            StreamReader xmlStream = new StreamReader(xmlFile);
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
+            var result = (T)serializer.Deserialize(xmlStream);
+            return result;
         }
     }
 }
