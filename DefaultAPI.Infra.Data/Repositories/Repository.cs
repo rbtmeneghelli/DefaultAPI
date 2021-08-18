@@ -7,6 +7,8 @@ using System.Linq.Expressions;
 using DefaultAPI.Application;
 using DefaultAPI.Domain;
 using DefaultAPI.Domain.Entities;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace DefaultAPI.Infra.Data.Repositories
 {
@@ -198,7 +200,31 @@ namespace DefaultAPI.Infra.Data.Repositories
         public IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate) => DbSet.AsNoTracking().Where(predicate);
 
         public bool Exist(Expression<Func<TEntity, bool>> predicate) => DbSet.Any(predicate);
-  
+
+        public T RunStoredProcedureWithReturn<T>(string procedureName = "[dbo].[FelizAnoNovo]") where T : class
+        {
+            var parameterReturn = new SqlParameter
+            {
+                ParameterName = "ReturnValue",
+                SqlDbType = GetSqlDbType(typeof(T)),
+                Direction = System.Data.ParameterDirection.Output,
+            };
+
+            try
+            {
+                var result = _context.Database.ExecuteSqlRaw($"EXEC @returnValue = {procedureName}", parameterReturn);
+                var returnValue = (T)parameterReturn.Value;
+                return returnValue;
+            }
+
+            catch (Exception ex)
+            {
+                SaveLogErrorSql(procedureName, "Script", "RunStoredProcedureWithReturn", ex.Message);
+            }
+
+            return null;
+        }
+
         private string[] GetValuesFromEntity(IList<TEntity> entity)
         {
             return entity.GetType().GetProperties().Select(x => x.Name + ": " + x.GetValue(entity, null)).ToArray();
@@ -217,6 +243,15 @@ namespace DefaultAPI.Infra.Data.Repositories
         private void SaveLogErrorSql(string sql, string entity, string method, string messageError)
         {
             _context.Database.ExecuteSqlRaw(string.Format(Constants.saveLog, entity, method, messageError, DateTime.Now.ToString("yyyy-MM-dd"), sql));
+        }
+
+        private SqlDbType GetSqlDbType(Type type)
+        {
+            Dictionary<Type, SqlDbType> dictionary = new Dictionary<Type, SqlDbType>();
+            dictionary.Add(typeof(int), SqlDbType.Int);
+            dictionary.Add(typeof(string), SqlDbType.VarChar);
+            dictionary.Add(typeof(DateTime), SqlDbType.DateTime);
+            return dictionary[type];
         }
     }
 }
