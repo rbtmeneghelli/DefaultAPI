@@ -1030,7 +1030,7 @@ namespace DefaultAPI.Infra.CrossCutting
             {
                 return Environment.GetEnvironmentVariable(path, EnvironmentVariableTarget.Process);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message, ex.InnerException);
             }
@@ -1072,6 +1072,39 @@ namespace DefaultAPI.Infra.CrossCutting
             XmlSerializer serializer = new XmlSerializer(typeof(T));
             var result = (T)serializer.Deserialize(xmlStream);
             return result;
+        }
+
+        public Match EncontrarOcorrenciaDe(string fonte, string criterio, int ocorrencia)
+        {
+            Regex RE = new Regex(criterio, RegexOptions.Multiline);
+
+            if (ocorrencia < 1)
+                throw (new ArgumentException("Não pode ser menor que 1", nameof(ocorrencia)));
+
+            MatchCollection correspondencias = RE.Matches(fonte);
+
+            if (ocorrencia >= correspondencias.Count)
+                return (null);
+
+            return (correspondencias[ocorrencia]);
+        }
+
+        public List<Match> EncontrarCadaOcorrenciaDe(string fonte, string criterio, int ocorrencia)
+        {
+            List<Match> ocorrencias = new List<Match>();
+            Regex RE = new Regex(criterio, RegexOptions.Multiline);
+
+            if (ocorrencia < 1)
+                throw (new ArgumentException("Não pode ser menor que 1", nameof(ocorrencia)));
+
+            MatchCollection correspondencias = RE.Matches(fonte);
+
+            for (int index = (ocorrencia - 1); index < correspondencias.Count; index += ocorrencia)
+            {
+                ocorrencias.Add(correspondencias[index]);
+            }
+
+            return (ocorrencias);
         }
     }
 }
