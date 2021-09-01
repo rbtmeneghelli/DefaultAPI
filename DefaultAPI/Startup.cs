@@ -1,4 +1,5 @@
 using DefaultAPI.Configuration;
+using DefaultAPI.Configuration.Middleware;
 using DefaultAPI.Infra.Data.Context;
 using DefaultAPI.Infra.Structure.IoC;
 using Microsoft.AspNetCore.Builder;
@@ -17,7 +18,7 @@ namespace DefaultAPI
         public IWebHostEnvironment HostingEnvironment { get; }
 
         public Startup(IWebHostEnvironment hostingEnvironment)
-        { 
+        {
             HostingEnvironment = hostingEnvironment;
 
             var configuration = new ConfigurationBuilder()
@@ -45,7 +46,7 @@ namespace DefaultAPI
             {
                 options.ReportApiVersions = true;
                 options.AssumeDefaultVersionWhenUnspecified = true;
-                options.DefaultApiVersion = new ApiVersion(1,0);
+                options.DefaultApiVersion = new ApiVersion(1, 0);
             });
 
             services.AddVersionedApiExplorer(options =>
@@ -79,6 +80,9 @@ namespace DefaultAPI
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "DefaultAPI V1");
                 c.SwaggerEndpoint("/swagger/v2/swagger.json", "DefaultAPI V2");
             });
+            //app.UseMiddleware<ApiLoggingMiddleware>(); // Caso for usar Middleware no net core 2.2, basta descomentar essa linha
+            //app.UseMiddleware<RequestResponseLoggingMiddleware>(); // Caso for usar Middleware no net core 3.0, basta descomentar essa linha
+            //app.UseMiddleware<HttpLoggingMiddleware>(); // Caso for usar Middleware no net core 5.0, basta descomentar essa linha
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
