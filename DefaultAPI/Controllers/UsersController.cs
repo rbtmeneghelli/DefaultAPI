@@ -36,13 +36,13 @@ namespace DefaultAPI.Controllers.Base
             return Ok(await _userService.GetAllPaginate(userFilter));
         }
 
-        [HttpGet("GetById/{id}")]
+        [HttpGet("GetById/{id:long}")]
         public async Task<IActionResult> GetById(long id)
         {
             return Ok(await _userService.GetById(id));
         }
 
-        [HttpGet("GetByLogin/{login}")]
+        [HttpGet("GetByLogin/{login:string}")]
         public async Task<IActionResult> GetByLogin(string login)
         {
             return Ok(await _userService.GetByLogin(login));
@@ -64,7 +64,7 @@ namespace DefaultAPI.Controllers.Base
             {
                 result = await _userService.Add(user);
                 if (result.Result)
-                    return Ok(result);
+                    return CreatedAtAction(nameof(Add), result);
             }
 
             return BadRequest(result);
@@ -80,13 +80,13 @@ namespace DefaultAPI.Controllers.Base
             {
                 result = await _userService.Update(id, user);
                 if (result.Result)
-                    return Ok(result);
+                    return NoContent();
             }
 
             return BadRequest(result);
         }
 
-        [HttpDelete("Delete/{id}/{isDeletePhysical}")]
+        [HttpDelete("Delete/{id:long}/{isDeletePhysical:bool}")]
         public async Task<IActionResult> Delete(int id, bool isDeletePhysical)
         {
             ResultReturned result = new ResultReturned();

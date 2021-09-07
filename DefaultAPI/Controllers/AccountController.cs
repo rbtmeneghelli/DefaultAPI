@@ -22,7 +22,7 @@ namespace DefaultAPI.Controllers
             _accountService = accountService;
         }
 
-        [HttpPost("Login/{login}/{senha}")]
+        [HttpPost("Login/{login:string}/{senha:string}")]
         public async Task<IActionResult> Login(string login, string senha)
         {
             ResultReturned resultReturned = await _accountService.CheckUserAuthentication(login, senha);
@@ -47,7 +47,7 @@ namespace DefaultAPI.Controllers
             return BadRequest(resultReturned);
         }
 
-        [HttpGet("ResetPassword/{email}")]
+        [HttpGet("ResetPassword/{email:string}")]
         public async Task<IActionResult> ResetPassword(string email)
         {
             ResultReturned resultReturned = await _accountService.ResetPassword(email);

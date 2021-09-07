@@ -27,7 +27,7 @@ namespace DefaultAPI.Controllers
             _auditService = auditService;
         }
 
-        [HttpGet("getById/{id}")]
+        [HttpGet("getById/{id:long}")]
         public async Task<IActionResult> GetById(long id)
         {
             var record = _mapper.Map<AuditReturnedDto>(await _auditService.GetById(id));

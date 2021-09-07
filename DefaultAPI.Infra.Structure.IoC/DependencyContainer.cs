@@ -47,6 +47,7 @@ namespace DefaultAPI.Infra.Structure.IoC
         public static IServiceCollection RegisterMapperConfig(IServiceCollection services)
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            // services.AddAutoMapper(typeof(Startup));
             return services;
         }
 

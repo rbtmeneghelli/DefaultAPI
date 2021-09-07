@@ -28,7 +28,7 @@ namespace DefaultAPI.Controllers
             _logService = logService;
         }
 
-        [HttpGet("getById/{id}")]
+        [HttpGet("getById/{id:long}")]
         public async Task<IActionResult> GetById(long id)
         {
             var record = _mapper.Map<LogReturnedDto>(await _logService.GetById(id));
