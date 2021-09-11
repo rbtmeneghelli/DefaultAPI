@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,6 +17,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -188,4 +190,29 @@ namespace DefaultAPI.Configuration
     // Adicionar ao Arquivo Startup.cs o codigo abaixo
     // App.UseHangFireDashboard("/hangfire", new DashboardOptions() {
     // Authorization = new [] { new DashboardNoAuthorizationFilter() } });
+
+    public class DefaultAPIContextFactory : IDesignTimeDbContextFactory<DefaultAPIContext>
+    {
+        /// <summary>
+        /// Se for necessario, remover <PrivateAssets>all</PrivateAssets> da referência ao pacote Microsoft.EntityFrameworkCore.Design no arquivo de projeto. Assim a referência a este pacote ficou definida assim:
+        /// <PackageReference Include = "Microsoft.EntityFrameworkCore.Design" Version="5.0.3">
+        /// <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        /// </PackageReference>
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public DefaultAPIContext CreateDbContext(string[] args)
+        {
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            var builder = new DbContextOptionsBuilder<DefaultAPIContext>();
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            builder.UseSqlServer(connectionString);
+
+            return new DefaultAPIContext(builder.Options);
+        }
+    }
 }
