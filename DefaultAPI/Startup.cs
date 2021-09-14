@@ -32,15 +32,15 @@ namespace DefaultAPI
 
         public void ConfigureServices(IServiceCollection services)
         {
-            DependencyContainer.RegisterDbConnection(services, Configuration);
-            DependencyContainer.RegisterServices(services);
-            DependencyContainer.RegisterMapperConfig(services);
+            services.RegisterDbConnection(Configuration);
+            services.RegisterServices();
+            services.RegisterMapperConfig();
+            services.RegisterCorsConfig(Configuration);
+            services.RegisterJwtConfig(Configuration);
+            services.RegisterSwaggerConfig();
+            services.RegisterConfigs(Configuration);
             services.AddHttpContextAccessor();
-            DependencyConfig.RegisterCorsConfig(services, Configuration);
-            DependencyConfig.RegisterJwtConfig(services, Configuration);
-            DependencyConfig.RegisterSwaggerConfig(services);
-            DependencyConfig.RegisterConfigs(services, Configuration);
-            DependencyConfig.RegisterPolicy(services);
+            services.RegisterPolicy();
             services.AddControllers();
             services.AddApiVersioning(options =>
             {
@@ -48,7 +48,6 @@ namespace DefaultAPI
                 options.AssumeDefaultVersionWhenUnspecified = true;
                 options.DefaultApiVersion = new ApiVersion(1, 0);
             });
-
             services.AddVersionedApiExplorer(options =>
             {
                 options.GroupNameFormat = "'v'V";
@@ -69,24 +68,7 @@ namespace DefaultAPI
             }
 
             app.MigrateDatabase();
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseCors("EnableCORS");
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "DefaultAPI V1");
-                c.SwaggerEndpoint("/swagger/v2/swagger.json", "DefaultAPI V2");
-            });
-            //app.UseMiddleware<ApiLoggingMiddleware>(); // Caso for usar Middleware no net core 2.2, basta descomentar essa linha
-            //app.UseMiddleware<RequestResponseLoggingMiddleware>(); // Caso for usar Middleware no net core 3.0, basta descomentar essa linha
-            //app.UseMiddleware<HttpLoggingMiddleware>(); // Caso for usar Middleware no net core 5.0, basta descomentar essa linha
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.ApiConfig();
         }
     }
 }

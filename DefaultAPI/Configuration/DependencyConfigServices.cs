@@ -24,10 +24,10 @@ using System.Text;
 
 namespace DefaultAPI.Configuration
 {
-    public static class DependencyConfig
+    public static class DependencyConfigServices
     {
 
-        internal static void RegisterJwtConfig(IServiceCollection services, IConfiguration configuration)
+        internal static void RegisterJwtConfig(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication
                   (x =>
@@ -61,7 +61,7 @@ namespace DefaultAPI.Configuration
             });
         }
 
-        internal static void RegisterCorsConfig(IServiceCollection services, IConfiguration configuration)
+        internal static void RegisterCorsConfig(this IServiceCollection services, IConfiguration configuration)
         {
             var origins = configuration["ConnectionStrings:CorsOrigins"].Split(',');
             services.AddCors(options =>
@@ -79,7 +79,7 @@ namespace DefaultAPI.Configuration
             });
         }
 
-        internal static void RegisterSwaggerConfig(IServiceCollection services)
+        internal static void RegisterSwaggerConfig(this IServiceCollection services)
         {
             services.AddSwaggerGen(x =>
             {
@@ -93,7 +93,7 @@ namespace DefaultAPI.Configuration
             });
         }
 
-        internal static void RegisterConfigs(IServiceCollection services, IConfiguration configuration)
+        internal static void RegisterConfigs(this IServiceCollection services, IConfiguration configuration)
         {
             var configEmail = new EmailSettings();
             configuration.Bind("EmailSettings", configEmail);
@@ -104,7 +104,7 @@ namespace DefaultAPI.Configuration
             services.AddSingleton(tokenConfiguration);
         }
 
-        internal static void RegisterPolicy(IServiceCollection services)
+        internal static void RegisterPolicy(this IServiceCollection services)
         {
             services.AddMvc(config =>
             {
@@ -121,15 +121,6 @@ namespace DefaultAPI.Configuration
             //services.AddHangfire(x => x.UseSqlServerStorage(Configuration["ConnectionString:DefaultConnection"]));
             //services.AddHangfireServer();
             //return services;
-        }
-
-        internal static void MigrateDatabase(this IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            {
-                var context = serviceScope.ServiceProvider.GetService<DefaultAPIContext>();
-                context.Database.Migrate();
-            }
         }
 
         private static OpenApiSecurityScheme GetBearerConfig()

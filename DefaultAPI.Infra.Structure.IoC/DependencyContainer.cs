@@ -16,7 +16,7 @@ namespace DefaultAPI.Infra.Structure.IoC
 {
     public static class DependencyContainer
     {
-        public static IServiceCollection RegisterServices(IServiceCollection services)
+        public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IGeneralService, GeneralService>();
@@ -32,7 +32,7 @@ namespace DefaultAPI.Infra.Structure.IoC
             return services;
         }
 
-        public static IServiceCollection RegisterDbConnection(IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection RegisterDbConnection(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<DefaultAPIContext>(opts => opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly(typeof(DefaultAPIContext).Assembly.FullName)));
             return services;
@@ -44,7 +44,7 @@ namespace DefaultAPI.Infra.Structure.IoC
         //    return services;
         //}
 
-        public static IServiceCollection RegisterMapperConfig(IServiceCollection services)
+        public static IServiceCollection RegisterMapperConfig(this IServiceCollection services)
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             // services.AddAutoMapper(typeof(Startup));
