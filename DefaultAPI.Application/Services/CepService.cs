@@ -13,11 +13,11 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Services
 {
-    public class CepService : ICepService
+    public class CepService : BaseService, ICepService
     {
-        public readonly IRepository<Ceps> _cepRepository;
+        public readonly ICepRepository _cepRepository;
 
-        public CepService(IRepository<Ceps> cepRepository)
+        public CepService(ICepRepository cepRepository, INotificationMessageService notificationMessageService): base(notificationMessageService)
         {
             _cepRepository = cepRepository;
         }
@@ -71,7 +71,7 @@ namespace DefaultAPI.Application.Services
             }
         }
 
-        public List<Ceps> GetAllWithLike(string parametro) => _cepRepository.GetAll().Where(x => EF.Functions.Like(x.Cep, $"%{parametro}%")).ToList();
+        public async Task<List<Ceps>> GetAllWithLike(string parametro) => await _cepRepository.GetAllWithLike(parametro);
 
         public async Task<PagedResult<Ceps>> GetAllWithPaginate(CepFilter filter)
         {
@@ -120,6 +120,11 @@ namespace DefaultAPI.Application.Services
         {
             return p =>
                    (string.IsNullOrWhiteSpace(filter.Cep) || p.Cep.Trim().ToUpper().Contains(filter.Cep.Trim().ToUpper()));
+        }
+
+        public void Dispose()
+        {
+            _cepRepository?.Dispose();
         }
     }
 }

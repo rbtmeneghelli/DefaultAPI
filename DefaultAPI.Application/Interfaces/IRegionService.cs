@@ -19,7 +19,7 @@ namespace DefaultAPI.Application.Interfaces
 
         Task<bool> UpdateStatusById(long id);
 
-        List<Region> GetAllWithLike(string parametro);
+        Task<List<Region>> GetAllWithLike(string parametro);
 
         Task<PagedResult<Region>> GetAllWithPaginate(RegionFilter filter);
     }

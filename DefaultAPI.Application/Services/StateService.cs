@@ -15,9 +15,9 @@ namespace DefaultAPI.Application.Services
 {
     public class StatesService : IStatesService
     {
-        public readonly IRepository<States> _stateRepository;
+        public readonly IStatesRepository _stateRepository;
 
-        public StatesService(IRepository<States> stateRepository)
+        public StatesService(IStatesRepository stateRepository)
         {
             _stateRepository = stateRepository;
         }
@@ -93,7 +93,7 @@ namespace DefaultAPI.Application.Services
             }
         }
 
-        public List<States> GetAllWithLike(string parametro) => _stateRepository.GetAll().Where(x => EF.Functions.Like(x.Nome, $"%{parametro}%")).ToList();
+        public async Task<List<States>> GetAllWithLike(string parametro) => await _stateRepository.GetAllWithLike(parametro); 
 
         public async Task<PagedResult<States>> GetAllWithPaginate(StateFilter filter)
         {

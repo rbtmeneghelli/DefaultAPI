@@ -16,9 +16,9 @@ namespace DefaultAPI.Application.Services
 {
     public class LogService : ILogService
     {
-        public readonly IRepository<Log> _logRepository;
+        public readonly ILogRepository _logRepository;
 
-        public LogService(IRepository<Log> logRepository)
+        public LogService(ILogRepository logRepository)
         {
             _logRepository = logRepository;
         }
@@ -28,7 +28,7 @@ namespace DefaultAPI.Application.Services
             return await Task.FromResult(_logRepository.GetById(id));
         }
 
-        public List<Log> GetAllWithLike(string parametro) => _logRepository.GetAll().Where(x => EF.Functions.Like(x.Class, $"%{parametro}%")).ToList();
+        public async Task<List<Log>> GetAllWithLike(string parametro) => await _logRepository.GetAllWithLike(parametro);
 
         public async Task<PagedResult<LogReturnedDto>> GetAllWithPaginate(LogFilter filter)
         {

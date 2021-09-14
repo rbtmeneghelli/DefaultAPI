@@ -16,9 +16,9 @@ namespace DefaultAPI.Application.Services
 {
     public class CityService : BaseService, ICityService
     {
-        public readonly IRepository<City> _cityRepository;
+        public readonly ICityRepository _cityRepository;
 
-        public CityService(IRepository<City> cityRepository, INotificationMessageService notificationMessageService): base(notificationMessageService)
+        public CityService(ICityRepository cityRepository, INotificationMessageService notificationMessageService): base(notificationMessageService)
         {
             _cityRepository = cityRepository;
         }

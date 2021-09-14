@@ -13,7 +13,7 @@ namespace DefaultAPI.Application.Interfaces
         Task<List<States>> GetAllStates();
         Task RefreshStates(List<States> listState, List<States> ListStateAPI, List<Region> listRegion);
         Task<bool> UpdateStatusById(long id);
-        List<States> GetAllWithLike(string param);
+        Task<List<States>> GetAllWithLike(string param);
         Task<PagedResult<States>> GetAllWithPaginate(StateFilter filter);
     }
 }

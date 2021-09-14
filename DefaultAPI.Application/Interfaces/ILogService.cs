@@ -12,7 +12,7 @@ namespace DefaultAPI.Application.Interfaces
     public interface ILogService
     {
         Task<Log> GetById(long id);
-        List<Log> GetAllWithLike(string parametro);
+        Task<List<Log>> GetAllWithLike(string parametro);
         Task<PagedResult<LogReturnedDto>> GetAllWithPaginate(LogFilter filter);
     }
 }

@@ -18,9 +18,9 @@ namespace DefaultAPI.Application.Services
 {
     public class UserService : BaseService, IUserService
     {
-        public readonly IRepository<User> _userRepository;
+        public readonly IUserRepository _userRepository;
 
-        public UserService(IRepository<User> userRepository, INotificationMessageService notificationMessageService) : base(notificationMessageService)
+        public UserService(IUserRepository userRepository, INotificationMessageService notificationMessageService) : base(notificationMessageService)
         {
             _userRepository = userRepository;
         }

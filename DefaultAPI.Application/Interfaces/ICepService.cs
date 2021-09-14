@@ -11,7 +11,7 @@ namespace DefaultAPI.Application.Interfaces
         Task RefreshCep(string cep, Ceps modelCep, Ceps modelCepAPI);
         Task<Ceps> GetByCep(string cep);
         Task<bool> UpdateStatusById(long id);
-        List<Ceps> GetAllWithLike(string parametro);
+        Task<List<Ceps>> GetAllWithLike(string parametro);
         Task<PagedResult<Ceps>> GetAllWithPaginate(CepFilter filter);
     }
 }

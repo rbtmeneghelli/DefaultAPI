@@ -15,9 +15,9 @@ namespace DefaultAPI.Application.Services
 {
     public class RegionService : IRegionService
     {
-        private readonly IRepository<Region> _regionRepository;
+        private readonly IRegionRepository _regionRepository;
 
-        public RegionService(IRepository<Region> regionRepository)
+        public RegionService(IRegionRepository regionRepository)
         {
             _regionRepository = regionRepository;
         }
@@ -93,7 +93,7 @@ namespace DefaultAPI.Application.Services
             }
         }
 
-        public List<Region> GetAllWithLike(string parametro) => _regionRepository.GetAll().Where(x => EF.Functions.Like(x.Nome, $"%{parametro}%")).ToList();
+        public async Task<List<Region>> GetAllWithLike(string parametro) => await _regionRepository.GetAllWithLike(parametro);
 
         public async Task<PagedResult<Region>> GetAllWithPaginate(RegionFilter filter)
         {

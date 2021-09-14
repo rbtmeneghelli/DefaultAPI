@@ -12,7 +12,7 @@ namespace DefaultAPI.Application.Interfaces
     public interface IAuditService
     {
         Task<Audit> GetById(long id);
-        List<Audit> GetAllWithLike(string parametro);
+        Task<List<Audit>> GetAllWithLike(string parametro);
         Task<PagedResult<AuditReturnedDto>> GetAllWithPaginate(AuditFilter filter);
     }
 }

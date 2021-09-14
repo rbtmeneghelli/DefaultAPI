@@ -16,10 +16,10 @@ namespace DefaultAPI.Application.Services
 {
     public class AuditService : BaseService, IAuditService
     {
-        public readonly IRepository<Audit> _auditRepository;
+        public readonly IAuditRepository _auditRepository;
         public readonly IRepositoryDapper<Audit> _auditDapper;
 
-        public AuditService(IRepository<Audit> auditRepository, IRepositoryDapper<Audit> auditDapper, INotificationMessageService notificationMessageService): base(notificationMessageService)
+        public AuditService(IAuditRepository auditRepository, IRepositoryDapper<Audit> auditDapper, INotificationMessageService notificationMessageService): base(notificationMessageService)
         {
             _auditRepository = auditRepository;
             _auditDapper = auditDapper;
@@ -30,7 +30,7 @@ namespace DefaultAPI.Application.Services
             return await Task.FromResult(_auditRepository.GetById(id));
         }
 
-        public List<Audit> GetAllWithLike(string parametro) => _auditRepository.GetAll().Where(x => EF.Functions.Like(x.TableName, $"%{parametro}%")).ToList();
+        public async Task<List<Audit>> GetAllWithLike(string parametro) => await _auditRepository.GetAllWithLike(parametro);
 
         public async Task<PagedResult<AuditReturnedDto>> GetAllDapper(AuditFilter filter)
         {
@@ -96,6 +96,11 @@ namespace DefaultAPI.Application.Services
         {
             return p =>
             (string.IsNullOrWhiteSpace(filter.TableName) || p.TableName.Trim().ToUpper().Contains(filter.TableName.Trim().ToUpper()));
+        }
+
+        public void Dispose()
+        {
+            _auditRepository?.Dispose();
         }
     }
 }
