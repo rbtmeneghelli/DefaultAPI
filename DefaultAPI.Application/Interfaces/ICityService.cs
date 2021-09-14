@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Interfaces
 {
-    public interface ICityService
+    public interface ICityService : IDisposable
     {
         Task<PagedResult<CityReturnedDto>> GetAllFromUf(int IdState = 25, int? page = 1, int? limit = int.MaxValue);
         Task<List<CityReturnedDto>> GetAllEntity();

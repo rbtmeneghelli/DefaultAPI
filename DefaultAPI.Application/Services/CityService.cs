@@ -158,5 +158,10 @@ namespace DefaultAPI.Application.Services
         {
             return await Task.FromResult(_cityRepository.Exist(a => a.Name == city && a.IdState == IdState));
         }
+
+        public void Dispose()
+        {
+            _cityRepository?.Dispose();
+        }
     }
 }

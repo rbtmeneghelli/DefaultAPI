@@ -222,5 +222,10 @@ namespace DefaultAPI.Application.Services
                    &&
                    (!filter.IdProfile.HasValue || filter.IdProfile == p.IdProfile);
         }
+
+        public void Dispose()
+        {
+            _userRepository?.Dispose();
+        }
     }
 }

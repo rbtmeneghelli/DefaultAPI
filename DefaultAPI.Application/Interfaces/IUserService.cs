@@ -3,12 +3,13 @@ using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
 using DefaultAPI.Domain.Models;
 using ServiceTria.Framework.DTO;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Interfaces
 {
-    public interface IUserService
+    public interface IUserService : IDisposable
     {
         Task<List<UserReturnedDto>> GetAll();
         Task<PagedResult<UserReturnedDto>> GetAllPaginate(UserFilter filter);

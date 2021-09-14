@@ -1,12 +1,13 @@
 ﻿using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
 using DefaultAPI.Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Interfaces
 {
-    public interface IStatesService
+    public interface IStatesService : IDisposable
     {
         Task AddStates(List<States> list);
         Task<long> GetStateByInitials(string initials);

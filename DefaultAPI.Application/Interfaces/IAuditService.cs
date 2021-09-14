@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Interfaces
 {
-    public interface IAuditService
+    public interface IAuditService : IDisposable
     {
         Task<Audit> GetById(long id);
         Task<List<Audit>> GetAllWithLike(string parametro);

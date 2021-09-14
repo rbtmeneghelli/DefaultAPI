@@ -135,5 +135,10 @@ namespace DefaultAPI.Application.Services
             return p =>
                    (string.IsNullOrWhiteSpace(filter.Nome) || p.Nome.Trim().ToUpper().Contains(filter.Nome.Trim().ToUpper()));
         }
+
+        public void Dispose()
+        {
+            _stateRepository?.Dispose();
+        }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
 using DefaultAPI.Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Interfaces
 {
-    public interface ICepService
+    public interface ICepService : IDisposable
     {
         Task RefreshCep(string cep, Ceps modelCep, Ceps modelCepAPI);
         Task<Ceps> GetByCep(string cep);

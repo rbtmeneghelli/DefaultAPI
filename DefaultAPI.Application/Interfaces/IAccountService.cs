@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Interfaces
 {
-    public interface IAccountService
+    public interface IAccountService : IDisposable
     {
         Task<bool> CheckUserAuthentication(LoginUser loginUser);
         Task<Credentials> GetUserCredentials(string login);

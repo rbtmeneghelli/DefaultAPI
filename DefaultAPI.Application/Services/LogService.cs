@@ -72,5 +72,10 @@ namespace DefaultAPI.Application.Services
             return p =>
             (string.IsNullOrWhiteSpace(filter.Class) || p.Class.Trim().ToUpper().Contains(filter.Class.Trim().ToUpper()));
         }
+
+        public void Dispose()
+        {
+            _logRepository?.Dispose();
+        }
     }
 }

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Interfaces
 {
-    public interface ILogService
+    public interface ILogService : IDisposable
     {
         Task<Log> GetById(long id);
         Task<List<Log>> GetAllWithLike(string parametro);

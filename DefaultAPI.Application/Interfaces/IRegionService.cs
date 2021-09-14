@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Interfaces
 {
-    public interface IRegionService
+    public interface IRegionService : IDisposable
     {
         Task AddRegions(List<Region> list);
 
