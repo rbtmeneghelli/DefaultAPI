@@ -13,42 +13,44 @@ using DefaultAPI.Domain.Enums;
 
 namespace DefaultAPI.Application.Services
 {
-    public class AccountService : IAccountService
+    public class AccountService : BaseService, IAccountService
     {
-        private readonly IRepository<User> _userRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IGeneralService _generalService;
 
-        public AccountService(IRepository<User> userRepository, IGeneralService generalService)
+        public AccountService(IUserRepository userRepository, IGeneralService generalService, INotificationMessageService notificationMessageService) : base(notificationMessageService)
         {
             _userRepository = userRepository;
             _generalService = generalService;
         }
 
-        public async Task<ResultReturned> CheckUserAuthentication(string login, string password)
+        public async Task<bool> CheckUserAuthentication(LoginUser loginUser)
         {
             try
             {
-                User user = await _userRepository.FindBy(x => x.Login.ToUpper().Trim() == login.ToUpper().Trim() && x.IsActive == true).FirstOrDefaultAsync();
+                User user = await _userRepository.FindBy(x => x.Login.ToUpper().Trim() == loginUser.Login.ToUpper().Trim() && x.IsActive == true).FirstOrDefaultAsync();
                 if (user is not null)
                 {
-                    if (new HashingManager().Verify(password, user.Password))
-                        return new ResultReturned() { Result = true, Message = "Usuário OK" };
+                    if (new HashingManager().Verify(loginUser.Password, user.Password))
+                        return true;
 
-                    return new ResultReturned() { Result = false, Message = "Autenticação invalida" };
+                    Notify("Autenticação invalida");
                 }
 
-                return new ResultReturned() { Result = false, Message = "Erro na validação" };
+                Notify("Erro na validação");
+                return false;
             }
             catch (Exception)
             {
-                return new ResultReturned() { Result = false, Message = "Erro na validação" };
+                Notify("Erro na validação");
+                return false;
             }
         }
 
         public async Task<Credentials> GetUserCredentials(string login)
         {
             Credentials credenciais = new Credentials();
-            User user = await _userRepository.GetAll().Include("Profile.ProfileOperations.Operation.Roles").Where(p => p.Login == login).FirstOrDefaultAsync();
+            User user = await _userRepository.GetUserCredentialsByLogin(login);
 
             if (user != null)
             {
@@ -66,7 +68,7 @@ namespace DefaultAPI.Application.Services
             return credenciais;
         }
 
-        public async Task<ResultReturned> ChangePassword(long id, User user)
+        public async Task<bool> ChangePassword(long id, User user)
         {
             User dbUser = _userRepository.GetById(id);
             if (dbUser != null)
@@ -79,35 +81,37 @@ namespace DefaultAPI.Application.Services
                     dbUser.UpdateTime = DateTime.Now;
                     _userRepository.Update(dbUser);
                     _userRepository.SaveChanges();
-                    return new ResultReturned() { Result = true, Message = Constants.SuccessInChangePassword };
+                    return true;
                 }
             }
-            return new ResultReturned() { Result = false, Message = Constants.ErrorInChangePassword };
+
+            Notify(Constants.ErrorInChangePassword);
+            return false;
         }
 
-        public async Task<ResultReturned> ResetPassword(string login)
+        public async Task<bool> ResetPassword(string login)
         {
-            string password = "123mudar";
-
             if (!string.IsNullOrWhiteSpace(login))
             {
                 User user = await _userRepository.FindBy(x => x.Login == login.ToUpper().Trim()).FirstOrDefaultAsync();
                 if (user is not null)
                 {
                     user.LastPassword = user.Password;
-                    user.Password = new HashingManager().HashToString("123mudar");
+                    user.Password = new HashingManager().HashToString(Constants.DefaultPassword);
                     user.IsAuthenticated = false;
                     user.IsActive = true;
                     user.CreatedTime = DateTime.Now;
-                    _generalService.SendEmail(new EmailConfig("Reset de senha", "roberto.mng.89@gmail.com", "Reset de Senha - Admin", $"Caro Administrador, <br> Sua senha de administrador foi resetada com sucesso. <br> Segue a sua nova senha: {password} ", "Roberto")).Wait();
+                    _generalService.SendEmail(new EmailConfig("Reset de senha", "roberto.mng.89@gmail.com", "Reset de Senha - Admin", $"Caro Administrador, <br> Sua senha de administrador foi resetada com sucesso. <br> Segue a sua nova senha: {Constants.DefaultPassword} ", "Roberto")).Wait();
                     _userRepository.Update(user);
                     _userRepository.SaveChanges();
-                    return new ResultReturned() { Result = true, Message = Constants.SuccessInResetPassword };
+                    return true;
                 }
 
-                return new ResultReturned() { Result = false, Message = Constants.ErrorInResetPassword };
+                Notify(Constants.ErrorInResetPassword);
             }
-            return new ResultReturned() { Result = false, Message = Constants.ErrorInResetPassword };
+
+            Notify(Constants.ErrorInResetPassword);
+            return false;
         }
 
         private List<EnumActions> GetActions(ProfileOperation profileOperation)
@@ -120,6 +124,11 @@ namespace DefaultAPI.Application.Services
             condition.Add(profileOperation.CanExport ? EnumActions.Export : EnumActions.None);
             condition.Add(profileOperation.CanImport ? EnumActions.Import : EnumActions.None);
             return condition;
+        }
+
+        public void Dispose()
+        {
+            _userRepository?.Dispose();
         }
     }
 }

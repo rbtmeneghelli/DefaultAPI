@@ -14,11 +14,11 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Services
 {
-    public class CityService : ICityService
+    public class CityService : BaseService, ICityService
     {
         public readonly IRepository<City> _cityRepository;
 
-        public CityService(IRepository<City> cityRepository)
+        public CityService(IRepository<City> cityRepository, INotificationMessageService notificationMessageService): base(notificationMessageService)
         {
             _cityRepository = cityRepository;
         }
@@ -112,7 +112,7 @@ namespace DefaultAPI.Application.Services
             return Task.CompletedTask;
         }
 
-        public async Task<ResultReturned> AddOrUpdateCity(List<City> lista)
+        public async Task<bool> AddOrUpdateCity(List<City> lista)
         {
             City entityBase = new City();
             try
@@ -145,11 +145,12 @@ namespace DefaultAPI.Application.Services
                     }
                 }
 
-                return new ResultReturned(true, Constants.SuccessInAddCity);
+                return true;
             }
             catch (Exception ex)
             {
-                return new ResultReturned(true, Constants.ErrorInAddCity);
+                Notify(Constants.ErrorInAddCity);
+                return false;
             }
         }
 

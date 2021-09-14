@@ -15,8 +15,8 @@ namespace DefaultAPI.Application.Interfaces
         Task<UserReturnedDto> GetById(long id);
         Task<UserReturnedDto> GetByLogin(string login);
         Task<List<DropDownList>> GetUsers();
-        Task<ResultReturned> Add(User user);
-        Task<ResultReturned> Update(long id, User user);
-        Task<ResultReturned> Delete(long id, bool isDeletePhysical = false);
+        Task<bool> Add(User user);
+        Task<bool> Update(long id, User user);
+        Task<bool> Delete(long id, bool isDeletePhysical = false);
     }
 }

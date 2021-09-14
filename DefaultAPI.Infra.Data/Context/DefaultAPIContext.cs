@@ -13,7 +13,7 @@ namespace DefaultAPI.Infra.Data.Context
 {
     public class DefaultAPIContext : DbContext
     {
-        public DefaultAPIContext(DbContextOptions options) : base(options)
+        public DefaultAPIContext(DbContextOptions<DefaultAPIContext> options) : base(options)
         {
         }
 
@@ -24,8 +24,7 @@ namespace DefaultAPI.Infra.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var assembly = typeof(DefaultAPIContext).Assembly;
-            modelBuilder.ApplyConfigurationsFromAssembly(assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(DefaultAPIContext).Assembly);
             modelBuilder.ApplyConfiguration(new UserMapping());
             modelBuilder.ApplyConfiguration(new ProfileMapping());
             modelBuilder.ApplyConfiguration(new RoleMapping());
@@ -36,12 +35,28 @@ namespace DefaultAPI.Infra.Data.Context
             modelBuilder.ApplyConfiguration(new AuditMapping());
             modelBuilder.ApplyConfiguration(new LogMapping());
             modelBuilder.ApplyConfiguration(new OperationMapping());
+            foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) relationship.DeleteBehavior = DeleteBehavior.ClientSetNull;
             modelBuilder.ExecuteSeed();
             base.OnModelCreating(modelBuilder);
         }
 
         public override int SaveChanges()
         {
+            foreach (var entry in ChangeTracker.Entries().Where(entry => entry.Entity.GetType().GetProperty("CreatedTime") != null))
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Property("CreatedTime").CurrentValue = DateTime.Now;
+                    entry.Property("UpdateTime").IsModified = false;
+                }
+
+                if (entry.State == EntityState.Modified)
+                {
+                    entry.Property("CreatedTime").IsModified = false;
+                    entry.Property("UpdateTime").CurrentValue = DateTime.Now;
+                }
+            }
+
             var auditEntries = OnBeforeSaveChanges();
             var result = base.SaveChanges();
             OnAfterSaveChanges(auditEntries);
@@ -145,8 +160,8 @@ namespace DefaultAPI.Infra.Data.Context
         public virtual DbSet<States> State { get; set; }
         public virtual DbSet<Ceps> Cep { get; set; }
         public virtual DbSet<City> City { get; set; }
-        public DbSet<Audit> Audit { get; set; }
-        public DbSet<Log> Log { get; set; }
+        public virtual DbSet<Audit> Audit { get; set; }
+        public virtual DbSet<Log> Log { get; set; }
         public virtual DbSet<Operation> Operation { get; set; }
     }
 }

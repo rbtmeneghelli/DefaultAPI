@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Services
 {
-    public sealed class GeneralService : IGeneralService
+    public sealed class GeneralService : BaseService, IGeneralService
     {
         private readonly IHttpContextAccessor _accessor;
 
@@ -38,7 +38,7 @@ namespace DefaultAPI.Application.Services
 
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public GeneralService(IHttpContextAccessor accessor, TokenConfiguration tokenConfiguration, EmailSettings emailSettings, IHostingEnvironment hostingEnvironment)
+        public GeneralService(IHttpContextAccessor accessor, TokenConfiguration tokenConfiguration, EmailSettings emailSettings, IHostingEnvironment hostingEnvironment, INotificationMessageService notificationMessageService): base(notificationMessageService)
         {
             _accessor = accessor;
             _tokenConfiguration = tokenConfiguration;
@@ -180,7 +180,7 @@ namespace DefaultAPI.Application.Services
             await ExecuteMailWithMailKit(emailConfig, email);
         }
 
-        public async Task<ResultReturned> RunSqlProcedure(string procName, string paramName, string paramValue)
+        public async Task<bool> RunSqlProcedure(string procName, string paramName, string paramValue)
         {
             SqlConnection sqlConnObj = GetSqlConnection();
             try
@@ -193,16 +193,18 @@ namespace DefaultAPI.Application.Services
             }
             catch (Exception ex)
             {
-                return new ResultReturned(false, string.Format(Constants.ErrorInProcedure, procName));
+                Notify(string.Format(Constants.ErrorInProcedure, procName));
+                return false;
             }
             finally
             {
                 sqlConnObj.Close();
             }
-            return new ResultReturned(true, string.Format(Constants.SuccessInProcedure, procName));
+
+            return true;
         }
 
-        public async Task<ResultReturned> RunSqlBackup(string directory)
+        public async Task<bool> RunSqlBackup(string directory)
         {
             string dir = string.IsNullOrWhiteSpace(directory) ? Directory.GetCurrentDirectory() : directory;
             SqlConnection sqlConnObj = GetSqlConnection();
@@ -220,14 +222,15 @@ namespace DefaultAPI.Application.Services
             }
             catch (Exception ex)
             {
-                return new ResultReturned(false, Constants.ErrorInBackup);
+                Notify(Constants.ErrorInBackup);
+                return false;
             }
             finally
             {
                 sqlConnObj.Close();
             }
 
-            return new ResultReturned(true, Constants.SuccessInBackup);
+            return true;
         }
 
         public async Task<MemoryStream> Export2Zip(string directory, int typeFile = 2)
@@ -255,7 +258,7 @@ namespace DefaultAPI.Application.Services
             }
         }
 
-        public async Task<bool> SendPushNotification(Notification notification, string tokenUser)
+        public async Task<bool> SendPushNotification(PushNotification notification, string tokenUser)
         {
              // Reference: http://codepickup.in/csharp/fcm-push-notification-in-csharp/
              // Se nao gerar a chave web api, so ir na autentication
@@ -271,12 +274,12 @@ namespace DefaultAPI.Application.Services
 
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Constants.urlToGetFireBase);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Constants.UrlToGetFireBase);
                 request.Method = "post";
                 request.KeepAlive = false;
                 request.ContentType = "application/json";
-                request.Headers.Add(string.Format("Authorization: key={0}", Constants.serverApiKey));
-                request.Headers.Add(string.Format("Sender: id={0}", Constants.senderId));
+                request.Headers.Add(string.Format("Authorization: key={0}", Constants.ServerApiKey));
+                request.Headers.Add(string.Format("Sender: id={0}", Constants.SenderId));
                 request.ContentLength = byteArray.Length;
 
                 Stream dataStream = request.GetRequestStream();
@@ -384,6 +387,11 @@ namespace DefaultAPI.Application.Services
         {
             return null;
             //return new SqlConnection(_configuration["ConnectionString:DefaultConnection"]);
+        }
+
+        public bool IsAuthenticated()
+        {
+            return _accessor.HttpContext.User.Identity.IsAuthenticated;
         }
     }
 }

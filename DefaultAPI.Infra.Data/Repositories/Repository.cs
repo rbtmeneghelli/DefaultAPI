@@ -1,33 +1,66 @@
-﻿using DefaultAPI.Infra.Data.Context;
+﻿using DefaultAPI.Application;
+using DefaultAPI.Domain;
+using DefaultAPI.Domain.Entities;
+using DefaultAPI.Infra.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
-using DefaultAPI.Application;
-using DefaultAPI.Domain;
-using DefaultAPI.Domain.Entities;
-using System.Data.SqlClient;
-using System.Data;
 
 namespace DefaultAPI.Infra.Data.Repositories
 {
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : class, new()
     {
         protected readonly DefaultAPIContext _context;
         protected readonly DbSet<TEntity> DbSet;
 
-        public Repository(DefaultAPIContext context)
+        protected Repository(DefaultAPIContext context)
         {
             _context = context;
             DbSet = _context.Set<TEntity>();
         }
 
-        public void Add(TEntity entity)
+        public virtual IQueryable<TEntity> GetAll()
+        {
+            return DbSet.AsNoTracking();
+        }
+
+        public virtual IQueryable<TEntity> GetAllTracking()
+        {
+            return DbSet;
+        }
+
+        public virtual IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate)
+        {
+            return DbSet.AsNoTracking().Where(predicate);
+        }
+
+        public virtual IQueryable<TEntity> FindByTracking(Expression<Func<TEntity, bool>> predicate)
+        {
+            return DbSet.Where(predicate);
+        }
+
+        public virtual TEntity GetById(long id)
+        {
+            var result = DbSet.Find(id);
+            _context.Entry(result).State = EntityState.Detached;
+            return result;
+        }
+
+        public virtual long GetCount()
+        {
+            return DbSet.AsNoTracking().Count();
+        }
+
+        public virtual void Add(TEntity entity)
         {
             try
             {
                 DbSet.Add(entity);
+                SaveChanges();
             }
             catch (Exception ex)
             {
@@ -35,11 +68,12 @@ namespace DefaultAPI.Infra.Data.Repositories
             }
         }
 
-        public void AddRange(IList<TEntity> listaEntity)
+        public virtual void AddRange(IEnumerable<TEntity> listaEntity)
         {
             try
             {
                 DbSet.AddRange(listaEntity);
+                SaveChanges();
             }
             catch (Exception ex)
             {
@@ -47,42 +81,38 @@ namespace DefaultAPI.Infra.Data.Repositories
             }
         }
 
-        public void Dispose()
+        public virtual void Update(TEntity entity)
         {
-            if (_context != null)
+            try
             {
-                _context.Dispose();
+                DbSet.Update(entity);
+                SaveChanges();
             }
-            GC.SuppressFinalize(this);
+            catch (Exception ex)
+            {
+                SaveLogError(GetValuesFromEntity(entity), entity.GetType().Name, "Update", ex.Message);
+            }
         }
 
-        public IQueryable<TEntity> GetAll()
+        public virtual void UpdateRange(IEnumerable<TEntity> listaEntity)
         {
-            return DbSet.AsNoTracking();
+            try
+            {
+                DbSet.UpdateRange(listaEntity);
+                SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                SaveLogError(GetValuesFromEntity(listaEntity), listaEntity.GetType().Name, "UpdateRange", ex.Message);
+            }
         }
 
-        public IQueryable<TEntity> GetAllTracking()
-        {
-            return DbSet;
-        }
-
-        public long GetCount()
-        {
-            return DbSet.AsNoTracking().Count();
-        }
-
-        public virtual TEntity GetById(params object[] keyvalues)
-        {
-            var result = DbSet.Find(keyvalues);
-            _context.Entry(result).State = EntityState.Detached;
-            return result;
-        }
-
-        public void Remove(TEntity entity)
+        public virtual void Remove(TEntity entity)
         {
             try
             {
                 DbSet.Remove(entity);
+                SaveChanges();
             }
             catch (Exception ex)
             {
@@ -90,19 +120,21 @@ namespace DefaultAPI.Infra.Data.Repositories
             }
         }
 
-        public void RemoveRange(IList<TEntity> listaEntity)
+        public virtual void RemoveRange(IEnumerable<TEntity> listaEntity)
         {
             try
             {
                 DbSet.RemoveRange(listaEntity);
+                SaveChanges();
             }
             catch (Exception ex)
             {
                 SaveLogError(GetValuesFromEntity(listaEntity), listaEntity.GetType().Name, "RemoveRange", ex.Message);
             }
+
         }
 
-        public long SaveChanges()
+        public virtual long SaveChanges()
         {
             try
             {
@@ -121,19 +153,12 @@ namespace DefaultAPI.Infra.Data.Repositories
             }
         }
 
-        public void Update(TEntity entity)
+        public void Dispose()
         {
-            try
-            {
-                DbSet.Update(entity);
-            }
-            catch (Exception ex)
-            {
-                SaveLogError(GetValuesFromEntity(entity), entity.GetType().Name, "Update", ex.Message);
-            }
+            _context?.Dispose();
         }
 
-        public bool ExecuteSql(string sql, params object[] parameters)
+        public virtual bool ExecuteSql(string sql, params object[] parameters)
         {
             int count = 0;
 
@@ -148,7 +173,7 @@ namespace DefaultAPI.Infra.Data.Repositories
             return count > 0 ? true : false;
         }
 
-        public List<dynamic> ExecuteDynamicSQL(string sql, Dictionary<string, object> parameters = null)
+        public virtual List<dynamic> ExecuteDynamicSQL(string sql, Dictionary<string, object> parameters = null)
         {
             List<dynamic> list = new List<dynamic>();
             try
@@ -166,12 +191,12 @@ namespace DefaultAPI.Infra.Data.Repositories
             return list;
         }
 
-        public void SetCommandTimeout(int timeout)
+        public virtual void SetCommandTimeout(int timeout)
         {
             _context.Database.SetCommandTimeout(timeout);
         }
 
-        public bool ExecuteProcedureSql(string sql)
+        public virtual bool ExecuteProcedureSql(string sql)
         {
             int count = 0;
             try
@@ -185,23 +210,9 @@ namespace DefaultAPI.Infra.Data.Repositories
             return count > 0 ? true : false;
         }
 
-        public void UpdateRange(List<TEntity> listaEntity)
-        {
-            try
-            {
-                DbSet.UpdateRange(listaEntity);
-            }
-            catch (Exception ex)
-            {
-                SaveLogError(GetValuesFromEntity(listaEntity), listaEntity.GetType().Name, "UpdateRange", ex.Message);
-            }
-        }
+        public virtual bool Exist(Expression<Func<TEntity, bool>> predicate) => DbSet.Any(predicate);
 
-        public IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate) => DbSet.AsNoTracking().Where(predicate);
-
-        public bool Exist(Expression<Func<TEntity, bool>> predicate) => DbSet.Any(predicate);
-
-        public T RunStoredProcedureWithReturn<T>(string procedureName = "[dbo].[FelizAnoNovo]") where T : class
+        public virtual T RunStoredProcedureWithReturn<T>(string procedureName = "[dbo].[FelizAnoNovo]") where T : class
         {
             var parameterReturn = new SqlParameter
             {
@@ -225,7 +236,9 @@ namespace DefaultAPI.Infra.Data.Repositories
             return null;
         }
 
-        private string[] GetValuesFromEntity(IList<TEntity> entity)
+        #region Private Methods
+
+        private string[] GetValuesFromEntity(IEnumerable<TEntity> entity)
         {
             return entity.GetType().GetProperties().Select(x => x.Name + ": " + x.GetValue(entity, null)).ToArray();
         }
@@ -237,12 +250,12 @@ namespace DefaultAPI.Infra.Data.Repositories
 
         private void SaveLogError(string[] values, string entity, string method, string messageError)
         {
-            _context.Database.ExecuteSqlRaw(string.Format(Constants.saveLog, entity, method, messageError, DateTime.Now.ToString("yyyy-MM-dd"), string.Join(",", values)));
+            _context.Database.ExecuteSqlRaw(string.Format(Constants.SaveLog, entity, method, messageError, DateTime.Now.ToString("yyyy-MM-dd"), string.Join(",", values)));
         }
 
         private void SaveLogErrorSql(string sql, string entity, string method, string messageError)
         {
-            _context.Database.ExecuteSqlRaw(string.Format(Constants.saveLog, entity, method, messageError, DateTime.Now.ToString("yyyy-MM-dd"), sql));
+            _context.Database.ExecuteSqlRaw(string.Format(Constants.SaveLog, entity, method, messageError, DateTime.Now.ToString("yyyy-MM-dd"), sql));
         }
 
         private SqlDbType GetSqlDbType(Type type)
@@ -253,5 +266,7 @@ namespace DefaultAPI.Infra.Data.Repositories
             dictionary.Add(typeof(DateTime), SqlDbType.DateTime);
             return dictionary[type];
         }
+
+        #endregion
     }
 }

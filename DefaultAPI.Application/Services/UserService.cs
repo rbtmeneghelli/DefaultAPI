@@ -16,11 +16,11 @@ using DefaultAPI.Application.Factory;
 
 namespace DefaultAPI.Application.Services
 {
-    public class UserService : IUserService
+    public class UserService : BaseService, IUserService
     {
         public readonly IRepository<User> _userRepository;
 
-        public UserService(IRepository<User> userRepository)
+        public UserService(IRepository<User> userRepository, INotificationMessageService notificationMessageService) : base(notificationMessageService)
         {
             _userRepository = userRepository;
         }
@@ -122,12 +122,15 @@ namespace DefaultAPI.Application.Services
             return _userRepository.Exist(x => x.IsActive == true && x.Login == Login.ToUpper().Trim());
         }
 
-        public async Task<ResultReturned> Add(User user)
+        public async Task<bool> Add(User user)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(user.Login) && string.IsNullOrWhiteSpace(user.Password))
-                    return new ResultReturned() { Result = false, Message = "Para realizar o login, o campo login e senha deve ser preenchido" };
+                {
+                    Notify("Para realizar o login, o campo login e senha deve ser preenchido");
+                    return false;
+                }
 
                 else if (!ExistByLogin(user.Login))
                 {
@@ -135,51 +138,69 @@ namespace DefaultAPI.Application.Services
                     user.CreatedTime = DateTime.Now;
                     _userRepository.Add(user);
                     _userRepository.SaveChanges();
-                    return new ResultReturned() { Result = true, Message = Constants.SuccessInAdd };
+                    return true;
                 }
 
-                return new ResultReturned() { Result = false, Message = $"Já existe um login {user.Login} cadastrado, troque de login" };
+                Notify($"Já existe um login {user.Login} cadastrado, troque de login");
+                return false;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return new ResultReturned() { Result = false, Message = Constants.ErrorInAdd };
+                Notify(Constants.ErrorInAdd);
+                return false;
             }
         }
 
-        public async Task<ResultReturned> Update(long id, User user)
+        public async Task<bool> Update(long id, User user)
         {
-            User userDb = _userRepository.GetById(id);
-
-            if (userDb is not null)
+            try
             {
-                userDb.LastPassword = userDb.Password;
-                userDb.Password = new HashingManager().HashToString(user.Password);
-                userDb.UpdateTime = DateTime.Now;
-                _userRepository.Update(userDb);
-                _userRepository.SaveChanges();
-                return new ResultReturned() { Result = true, Message = Constants.SuccessInUpdate };
-            }
+                User userDb = _userRepository.GetById(id);
 
-            return new ResultReturned() { Result = true, Message = Constants.ErrorInUpdate };
+                if (userDb is not null)
+                {
+                    userDb.LastPassword = userDb.Password;
+                    userDb.Password = new HashingManager().HashToString(user.Password);
+                    userDb.UpdateTime = DateTime.Now;
+                    _userRepository.Update(userDb);
+                    _userRepository.SaveChanges();
+                    return true;
+                }
+                Notify(Constants.ErrorInUpdate);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Notify(Constants.ErrorInUpdate);
+                return false;
+            }
         }
 
-        public async Task<ResultReturned> Delete(long id, bool isDeletePhysical = false)
+        public async Task<bool> Delete(long id, bool isDeletePhysical = false)
         {
-            User user = _userRepository.GetById(id);
-
-            if (isDeletePhysical && user is not null)
-                _userRepository.Remove(user);
-
-            else if (!isDeletePhysical && user is not null)
+            try
             {
-                user.UpdateTime = DateTime.Now;
-                user.IsActive = user.IsActive ? false : true;
-                _userRepository.Update(user);
-                _userRepository.SaveChanges();
-                return new ResultReturned() { Result = true, Message = Constants.SuccessInDelete };
-            }
+                User user = _userRepository.GetById(id);
 
-            return new ResultReturned() { Result = false, Message = Constants.ErrorInDelete };
+                if (isDeletePhysical && user is not null)
+                    _userRepository.Remove(user);
+
+                else if (!isDeletePhysical && user is not null)
+                {
+                    user.UpdateTime = DateTime.Now;
+                    user.IsActive = user.IsActive ? false : true;
+                    _userRepository.Update(user);
+                    _userRepository.SaveChanges();
+                    return true;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Notify(Constants.ErrorInDelete);
+                return false;
+            }
         }
 
         private IQueryable<User> GetAllUsers(UserFilter filter)

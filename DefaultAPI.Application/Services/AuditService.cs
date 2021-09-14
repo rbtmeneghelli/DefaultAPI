@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Services
 {
-    public class AuditService : IAuditService
+    public class AuditService : BaseService, IAuditService
     {
         public readonly IRepository<Audit> _auditRepository;
         public readonly IRepositoryDapper<Audit> _auditDapper;
 
-        public AuditService(IRepository<Audit> auditRepository, IRepositoryDapper<Audit> auditDapper)
+        public AuditService(IRepository<Audit> auditRepository, IRepositoryDapper<Audit> auditDapper, INotificationMessageService notificationMessageService): base(notificationMessageService)
         {
             _auditRepository = auditRepository;
             _auditDapper = auditDapper;

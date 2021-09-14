@@ -6,15 +6,17 @@ namespace DefaultAPI.Domain
     {
         public const int SaltSize = 16;
         public const int HashSize = 20;
-        public const string serverApiKey = "AIzaSyD2i3-nX8RkclUxWPFwirDHKN_D0x2h4Pc"; // Get this from your Firebase Developer Console Login  
-        public const string senderId = "AAAANLjaZwE:APA91bFAfv1CviU_8WyiL971mnqBXi2m6qJax9VwWvmUOnMepnShnGeZmw_sBYAAe3YH5CW370xJm-LZrWCMNt5CMK_Hn8fhigbtc5OaJd0_rqubiHK4hEI4CFh179hfTmwMoHOk9QkW"; // Get this from your Firebase Developer Console Login  
+        public const string DefaultPassword = "123mudar";
 
-        public const string urlToGetFireBase = "https://fcm.googleapis.com/fcm/send";
-        public const string urlToGetCep = "http://viacep.com.br/ws/";
-        public const string urlToGetStates = "https://servicodados.ibge.gov.br/api/v1/localidades/estados";
-        public const string urlToGetCities = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/{0}/municipios";
+        public const string ServerApiKey = "AIzaSyD2i3-nX8RkclUxWPFwirDHKN_D0x2h4Pc"; // Get this from your Firebase Developer Console Login  
+        public const string SenderId = "AAAANLjaZwE:APA91bFAfv1CviU_8WyiL971mnqBXi2m6qJax9VwWvmUOnMepnShnGeZmw_sBYAAe3YH5CW370xJm-LZrWCMNt5CMK_Hn8fhigbtc5OaJd0_rqubiHK4hEI4CFh179hfTmwMoHOk9QkW"; // Get this from your Firebase Developer Console Login  
 
-        public const string saveLog = @"insert into Log(Class,Method,Message_Error,Update_time,Object) values('{0}','{1}','{2}','{3}','{4}')";
+        public const string UrlToGetFireBase = "https://fcm.googleapis.com/fcm/send";
+        public const string UrlToGetCep = "http://viacep.com.br/ws/";
+        public const string UrlToGetStates = "https://servicodados.ibge.gov.br/api/v1/localidades/estados";
+        public const string UrlToGetCities = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/{0}/municipios";
+
+        public const string SaveLog = @"insert into Log(Class,Method,Message_Error,Update_time,Object) values('{0}','{1}','{2}','{3}','{4}')";
 
         public const string ExceptionRequestAPI = "Erro ao efetuar request da Api externa: {0}";
         public const string ExceptionExcel = "Erro ao gerar o excel solicitado";

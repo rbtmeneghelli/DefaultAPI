@@ -18,9 +18,10 @@ namespace DefaultAPI.Application.Interfaces
         Task<RequestData> RequestDataToExternalAPI(string url);
         Task<RequestData> RequestLogin(string url, string key = "");
         Task SendEmail(EmailConfig emailConfig);
-        Task<ResultReturned> RunSqlProcedure(string procName, string paramName, string paramValue);
-        Task<ResultReturned> RunSqlBackup(string directory);
+        Task<bool> RunSqlProcedure(string procName, string paramName, string paramValue);
+        Task<bool> RunSqlBackup(string directory);
         Task<MemoryStream> Export2Zip(string directory, int typeFile = 2);
-        Task<bool> SendPushNotification(Notification notification, string tokenUser);
+        Task<bool> SendPushNotification(PushNotification notification, string tokenUser);
+        bool IsAuthenticated();
     }
 }

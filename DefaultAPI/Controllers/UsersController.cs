@@ -19,7 +19,7 @@ namespace DefaultAPI.Controllers.Base
     {
         private readonly IUserService _userService;
 
-        public UsersController(IMapper mapper, IGeneralService generalService, IUserService userService) : base(mapper, generalService)
+        public UsersController(IMapper mapper, IGeneralService generalService, INotificationMessageService noticationMessageService, IUserService userService) : base(mapper, generalService, noticationMessageService)
         {
             _userService = userService;
         }
@@ -27,79 +27,90 @@ namespace DefaultAPI.Controllers.Base
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _userService.GetAll());
+            return CustomResponse(await _userService.GetAll());
         }
 
         [HttpPost("GetAllPaginate")]
         public async Task<IActionResult> GetAllPaginate([FromBody] UserFilter userFilter)
         {
-            return Ok(await _userService.GetAllPaginate(userFilter));
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+            return CustomResponse(await _userService.GetAllPaginate(userFilter));
         }
 
         [HttpGet("GetById/{id:long}")]
         public async Task<IActionResult> GetById(long id)
         {
-            return Ok(await _userService.GetById(id));
+            return CustomResponse(await _userService.GetById(id));
         }
 
         [HttpGet("GetByLogin/{login:string}")]
         public async Task<IActionResult> GetByLogin(string login)
         {
-            return Ok(await _userService.GetByLogin(login));
+            return CustomResponse(await _userService.GetByLogin(login));
         }
 
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
-            return Ok(await _userService.GetUsers());
+            return CustomResponse(await _userService.GetUsers());
         }
 
         [HttpPost("Add")]
         public async Task<IActionResult> Add([FromBody] UserSendDto userSendDto)
         {
-            User user = _mapper.Map<User>(userSendDto);
-            ResultReturned result = new ResultReturned();
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+            User user = _mapperService.Map<User>(userSendDto);
 
             if (ModelState.IsValid)
             {
-                result = await _userService.Add(user);
-                if (result.Result)
+                var result = await _userService.Add(user);
+                if (result)
                     return CreatedAtAction(nameof(Add), result);
             }
 
-            return BadRequest(result);
+            return CustomResponse();
         }
 
         [HttpPut("Update")]
         public async Task<IActionResult> Update(int id, [FromBody] UserSendDto userSendDto)
         {
-            User user = _mapper.Map<User>(userSendDto);
-            ResultReturned result = new ResultReturned();
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+            User user = _mapperService.Map<User>(userSendDto);
+
+            if (id != userSendDto.Id)
+            {
+                NotificationError("O id informado não é o mesmo que foi passado na query");
+                return CustomResponse();
+            }
 
             if (ModelState.IsValid)
             {
-                result = await _userService.Update(id, user);
-                if (result.Result)
+                var result = await _userService.Update(id, user);
+                if (result)
                     return NoContent();
             }
 
-            return BadRequest(result);
+            return CustomResponse();
         }
 
         [HttpDelete("Delete/{id:long}/{isDeletePhysical:bool}")]
-        public async Task<IActionResult> Delete(int id, bool isDeletePhysical)
+        public async Task<IActionResult> Delete(int id, bool isDeletePhysical = false)
         {
-            ResultReturned result = new ResultReturned();
-            result = await _userService.Delete(id, isDeletePhysical);
-            if (result.Result)
-                return Ok(result);
+            var result = await _userService.Delete(id, isDeletePhysical);
+            if (result)
+                return CustomResponse();
 
-            return BadRequest(result);
+            return CustomResponse();
         }
 
         [HttpPost("Export2Excel")]
         public async Task<IActionResult> Export2Excel([FromBody] UserFilter filter)
         {
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
             var list = await _userService.GetAllPaginate(filter);
             var result = await _generalService.Export2Excel(list.Results, "Users");
             return File(result.Memory, result.FileExtension, result.FileName);

@@ -22,7 +22,7 @@ namespace DefaultAPI.Controllers
     {
         private readonly IAuditService _auditService;
 
-        public AuditController(IMapper mapper, IGeneralService generalService, IAuditService auditService) : base(mapper, generalService)
+        public AuditController(IMapper mapper, IGeneralService generalService, INotificationMessageService noticationMessageService, IAuditService auditService) : base(mapper, generalService, noticationMessageService)
         {
             _auditService = auditService;
         }
@@ -30,19 +30,21 @@ namespace DefaultAPI.Controllers
         [HttpGet("getById/{id:long}")]
         public async Task<IActionResult> GetById(long id)
         {
-            var record = _mapper.Map<AuditReturnedDto>(await _auditService.GetById(id));
+            var record = _mapperService.Map<AuditReturnedDto>(await _auditService.GetById(id));
             if (record == null)
             {
                 return NotFound();
             }
 
-            return Ok(record);
+            return CustomResponse(record);
         }
 
         [HttpPost("GetAllFilter")]
-        public async Task<ActionResult<PagedResult<AuditReturnedDto>>> GetAllFilter(AuditFilter filter)
+        public async Task<IActionResult> GetAllFilter(AuditFilter filter)
         {
-            return Ok(await _auditService.GetAllWithPaginate(filter));
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+            return CustomResponse(await _auditService.GetAllWithPaginate(filter));
         }
     }
 }

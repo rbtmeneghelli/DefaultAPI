@@ -9,9 +9,9 @@ namespace DefaultAPI.Application.Interfaces
 {
     public interface IAccountService
     {
-        Task<ResultReturned> CheckUserAuthentication(string login, string password);
+        Task<bool> CheckUserAuthentication(LoginUser loginUser);
         Task<Credentials> GetUserCredentials(string login);
-        Task<ResultReturned> ChangePassword(long id, User user);
-        Task<ResultReturned> ResetPassword(string email);
+        Task<bool> ChangePassword(long id, User user);
+        Task<bool> ResetPassword(string email);
     }
 }

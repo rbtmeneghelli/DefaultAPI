@@ -17,7 +17,7 @@ namespace DefaultAPI.Application.Interfaces
         Task Add(City city);
         Task Remove(long id);
         Task Update(City city);
-        Task<ResultReturned> AddOrUpdateCity(List<City> lista);
+        Task<bool> AddOrUpdateCity(List<City> lista);
         Task<bool> CheckCityExist(string city, long IdState);
         Task<List<long>> GetIdStates();
     }

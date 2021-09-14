@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DefaultAPI.Application.Interfaces;
+using DefaultAPI.Domain;
 
 namespace DefaultAPI.Controllers
 {
@@ -17,44 +18,51 @@ namespace DefaultAPI.Controllers
     {
         private IAccountService _accountService;
 
-        public AccountController(IMapper mapper, IGeneralService generalService, IAccountService accountService) : base(mapper, generalService)
+        public AccountController(IMapper mapper, IGeneralService generalService, INotificationMessageService notificationMessageService, IAccountService accountService) : base(mapper, generalService, notificationMessageService)
         {
             _accountService = accountService;
         }
 
-        [HttpPost("Login/{login:string}/{senha:string}")]
-        public async Task<IActionResult> Login(string login, string senha)
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login([FromBody] LoginUser loginUser)
         {
-            ResultReturned resultReturned = await _accountService.CheckUserAuthentication(login, senha);
-            if (resultReturned.Result)
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+            var result = await _accountService.CheckUserAuthentication(loginUser);
+
+            if (result)
             {
-                Credentials credentials = await _accountService.GetUserCredentials(login);
+                Credentials credentials = await _accountService.GetUserCredentials(loginUser.Login);
                 credentials.Token = _generalService.CreateJwtToken(credentials);
-                return Ok(credentials);
+                return CustomResponse(credentials);
             }
             else
             {
-                return BadRequest(resultReturned);
+                return CustomResponse();
             }
         }
 
         [HttpPost("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] User user)
         {
-            ResultReturned resultReturned = await _accountService.ChangePassword(_generalService.GetCurrentUserId(), user);
-            if (resultReturned.Result)
-                return Ok(resultReturned);
-            return BadRequest(resultReturned);
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+            var result = await _accountService.ChangePassword(UserId, user);
+            if (result)
+                return CustomResponse(null, Constants.SuccessInChangePassword);
+
+            return CustomResponse();
         }
 
         [HttpGet("ResetPassword/{email:string}")]
         public async Task<IActionResult> ResetPassword(string email)
         {
-            ResultReturned resultReturned = await _accountService.ResetPassword(email);
+            var result = await _accountService.ResetPassword(email);
 
-            if (resultReturned.Result)
-                return Ok(resultReturned);
-            return BadRequest(resultReturned);
+            if (result)
+                return CustomResponse(null, Constants.SuccessInResetPassword);
+
+            return CustomResponse();
         }
     }
 }

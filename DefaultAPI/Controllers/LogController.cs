@@ -19,11 +19,12 @@ namespace DefaultAPI.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize("Bearer")]
     [ApiExplorerSettings(GroupName = "1.0")]
+    // [ApiExplorerSettings(IgnoreApi = true)] // Ignora completamente os endpoints da controller
     public class LogController : BaseController
     {
         private readonly ILogService _logService;
 
-        public LogController(IMapper mapper, IGeneralService generalService, ILogService logService) : base(mapper, generalService)
+        public LogController(IMapper mapper, IGeneralService generalService, INotificationMessageService notificationMessageService, ILogService logService) : base(mapper, generalService, notificationMessageService)
         {
             _logService = logService;
         }
@@ -31,19 +32,22 @@ namespace DefaultAPI.Controllers
         [HttpGet("getById/{id:long}")]
         public async Task<IActionResult> GetById(long id)
         {
-            var record = _mapper.Map<LogReturnedDto>(await _logService.GetById(id));
+            var record = _mapperService.Map<LogReturnedDto>(await _logService.GetById(id));
+
             if (record == null)
             {
                 return NotFound();
             }
 
-            return Ok(record);
+            return CustomResponse(record);
         }
 
         [HttpPost("GetAllFilter")]
-        public async Task<ActionResult<PagedResult<LogReturnedDto>>> GetAllFilter(LogFilter filter)
+        public async Task<IActionResult> GetAllFilter(LogFilter filter)
         {
-            return Ok(await _logService.GetAllWithPaginate(filter));
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
+
+            return CustomResponse(await _logService.GetAllWithPaginate(filter));
         }
     }
 }

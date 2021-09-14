@@ -29,7 +29,7 @@ namespace DefaultAPI.Controllers
         private readonly IRegionService _regionService;
         private readonly ICityService _cityService;
 
-        public GeneralController(IMapper mapper, IGeneralService generalService, ICepService cepsService, IStatesService statesService, IRegionService regionService, ICityService cityService) : base(mapper, generalService)
+        public GeneralController(IMapper mapper, IGeneralService generalService, ICepService cepsService, IStatesService statesService, IRegionService regionService, ICityService cityService, INotificationMessageService notificationMessageService) : base(mapper, generalService, notificationMessageService)
         {
             _cepsService = cepsService;
             _statesService = statesService;
@@ -37,7 +37,7 @@ namespace DefaultAPI.Controllers
             _cityService = cityService;
         }
 
-        [HttpGet("v1/export2Zip/{directory}/{typeFile}")]
+        [HttpGet("v1/export2Zip/{directory:string}/{typeFile:int}")]
         public async Task<IActionResult> Export2Zip(string directory, int typeFile = 2)
         {
             ExtensionMethods extensionMethods = new ExtensionMethods();
@@ -45,18 +45,18 @@ namespace DefaultAPI.Controllers
             return File(await Task.FromResult(memoryStream.ToArray()), extensionMethods.GetMemoryStreamType(typeFile), $"Archive.{extensionMethods.GetMemoryStreamExtension(typeFile)}");
         }
 
-        [HttpGet("v1/backup/{directory}")]
+        [HttpGet("v1/backup/{directory:string}")]
         public async Task<IActionResult> Backup(string directory)
         {
-            ResultReturned result = await _generalService.RunSqlBackup(directory);
+            var result = await _generalService.RunSqlBackup(directory);
 
-            if (result.Result)
-                return Ok(result);
+            if (result)
+                return CustomResponse(null, "Backup executado com sucesso");
 
-            return BadRequest(result);
+            return CustomResponse();
         }
 
-        [HttpGet("v1/getCep/{cep}/{refreshCep}")]
+        [HttpGet("v1/getCep/{cep:string}/{refreshCep:bool}")]
         public async Task<IActionResult> GetCep(string cep, bool refreshCep)
         {
             try
@@ -65,7 +65,7 @@ namespace DefaultAPI.Controllers
                 if (refreshCep && !string.IsNullOrWhiteSpace(cep))
                 {
                     modelCep = await _cepsService.GetByCep(cep);
-                    RequestData requestData = await _generalService.RequestDataToExternalAPI(string.Format("{0}{1}{2}", Constants.urlToGetCep, cep, "/json/"));
+                    RequestData requestData = await _generalService.RequestDataToExternalAPI(string.Format("{0}{1}{2}", Constants.UrlToGetCep, cep, "/json/"));
                     if (requestData.IsSuccess)
                     {
                         Ceps modelCepAPI = JsonConvert.DeserializeObject<Ceps>(requestData.Data);
@@ -81,15 +81,16 @@ namespace DefaultAPI.Controllers
                 {
                     modelCep = await _cepsService.GetByCep(cep);
                 }
-                return Ok(modelCep);
+                return CustomResponse(modelCep);
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResultReturned(false, string.Format(Constants.ExceptionRequestAPI, Constants.urlToGetCep)));
+                NotificationError(string.Format(Constants.ExceptionRequestAPI, Constants.UrlToGetCep));
+                return CustomResponse();
             }
         }
 
-        [HttpGet("v1/getStates/{refreshStates}")]
+        [HttpGet("v1/getStates/{refreshStates:bool}")]
         public async Task<IActionResult> RefreshStates(bool refreshEstados)
         {
             try
@@ -100,7 +101,7 @@ namespace DefaultAPI.Controllers
                 {
                     if (listStates != null && listStates.Count > 0)
                     {
-                        RequestData requestData = await _generalService.RequestDataToExternalAPI(Constants.urlToGetStates);
+                        RequestData requestData = await _generalService.RequestDataToExternalAPI(Constants.UrlToGetStates);
                         if (requestData.IsSuccess)
                         {
                             List<States> listStatesAPI = JsonConvert.DeserializeObject<List<States>>(requestData.Data);
@@ -113,16 +114,17 @@ namespace DefaultAPI.Controllers
                         }
                     }
                 }
-                return Ok(listStates);
+                return CustomResponse(listStates);
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResultReturned(false, string.Format(Constants.ExceptionRequestAPI, Constants.urlToGetStates)));
+                NotificationError(string.Format(Constants.ExceptionRequestAPI, Constants.UrlToGetStates));
+                return CustomResponse();
             }
         }
 
         [HttpGet("v1/addCities")]
-        public async Task<ActionResult> getCities()
+        public async Task<IActionResult> GetCities()
         {
             List<MesoRegion> mesoRegions = new List<MesoRegion>();
             List<City> cities = new List<City>();
@@ -139,7 +141,7 @@ namespace DefaultAPI.Controllers
                 foreach (States state in listaEstados.Where(x => x.Sigla != "DF"))
                 {
 
-                    requestData = await _generalService.RequestDataToExternalAPI(string.Format(Constants.urlToGetCities, state.Sigla));
+                    requestData = await _generalService.RequestDataToExternalAPI(string.Format(Constants.UrlToGetCities, state.Sigla));
                     
                     if (requestData.IsSuccess)
                     {
@@ -164,10 +166,11 @@ namespace DefaultAPI.Controllers
             }
             catch (Exception ex)
             {
-                
+                NotificationError("Ocorreu um erro ao tentar adicionar cidades no sistema");
+                return CustomResponse();
             }
 
-            return Ok();
+            return CustomResponse(null, "Cidades foram adicionadas com sucesso");
         }
 
         [HttpGet("v1/addRegions")]
@@ -176,7 +179,7 @@ namespace DefaultAPI.Controllers
             try
             {
                 List<Region> list = new List<Region>();
-                RequestData requestData = await _generalService.RequestDataToExternalAPI(Constants.urlToGetStates);
+                RequestData requestData = await _generalService.RequestDataToExternalAPI(Constants.UrlToGetStates);
                 if (requestData.IsSuccess)
                 {
                     List<States> listStatesAPI = JsonConvert.DeserializeObject<List<States>>(requestData.Data);
@@ -198,11 +201,12 @@ namespace DefaultAPI.Controllers
                     }
                 }
 
-                return Ok(list);
+                return CustomResponse(list);
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResultReturned(false, string.Format(Constants.ExceptionRequestAPI, Constants.urlToGetStates)));
+                NotificationError(string.Format(Constants.ExceptionRequestAPI, Constants.UrlToGetStates));
+                return CustomResponse();
             }
         }
 
@@ -213,7 +217,7 @@ namespace DefaultAPI.Controllers
             {
                 List<Region> listRegion = await _regionService.GetAllRegion();
                 List<States> listStates = new List<States>();
-                RequestData requestData = await _generalService.RequestDataToExternalAPI(Constants.urlToGetStates);
+                RequestData requestData = await _generalService.RequestDataToExternalAPI(Constants.UrlToGetStates);
                 if (requestData.IsSuccess)
                 {
                     List<States> listStatesAPI = JsonConvert.DeserializeObject<List<States>>(requestData.Data);
@@ -232,11 +236,12 @@ namespace DefaultAPI.Controllers
                     }
                 }
 
-                return Ok(listStates);
+                return CustomResponse(listStates);
             }
             catch (Exception ex)
             {
-                return BadRequest(new ResultReturned(false, string.Format(Constants.ExceptionRequestAPI, Constants.urlToGetStates)));
+                NotificationError(string.Format(Constants.ExceptionRequestAPI, Constants.UrlToGetStates));
+                return CustomResponse();
             }
         }
 

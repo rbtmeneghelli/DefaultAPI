@@ -6,18 +6,18 @@ namespace DefaultAPI.Domain.Models
 {
     public class ResultReturned
     {
-        public bool Result { get; set; }
         public string Message { get; set; }
+        public object Result { get; set; }
 
         public ResultReturned()
         {
 
         }
 
-        public ResultReturned(bool result, string message)
+        public ResultReturned(string message, object model)
         {
-            Result = result;
             Message = message;
+            Result = model;
         }
     }
 }
