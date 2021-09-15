@@ -1,18 +1,13 @@
 ﻿using AutoMapper;
 using DefaultAPI.Application.Interfaces;
-using DefaultAPI.Controllers.Base;
+using DefaultAPI.Controllers;
 using DefaultAPI.Domain.Dto;
 using DefaultAPI.Domain.Filters;
-using DefaultAPI.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace DefaultAPI.Controllers
+namespace DefaultAPI.V1.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]

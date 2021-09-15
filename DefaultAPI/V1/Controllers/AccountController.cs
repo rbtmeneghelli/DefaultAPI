@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DefaultAPI.Controllers.Base;
 using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -7,8 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Domain;
+using DefaultAPI.Controllers;
 
-namespace DefaultAPI.Controllers
+namespace DefaultAPI.V1.Controllers
 {
     [ApiController]
     [Route("api/v{version:apiVersion}/[controller]")]

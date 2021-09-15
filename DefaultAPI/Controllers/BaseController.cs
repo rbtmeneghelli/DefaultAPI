@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace DefaultAPI.Controllers.Base
+namespace DefaultAPI.Controllers
 {
     [Produces("application/json")]
     [ApiController]

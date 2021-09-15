@@ -50,9 +50,13 @@ namespace DefaultAPI
             });
             services.AddVersionedApiExplorer(options =>
             {
-                options.GroupNameFormat = "'v'V";
+                options.GroupNameFormat = "'v'VV";
                 options.SubstituteApiVersionInUrl = true;
 
+            });
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
             });
         }
 

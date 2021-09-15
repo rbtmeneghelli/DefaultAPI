@@ -38,7 +38,7 @@ namespace DefaultAPI.Application.Services
 
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public GeneralService(IHttpContextAccessor accessor, TokenConfiguration tokenConfiguration, EmailSettings emailSettings, IHostingEnvironment hostingEnvironment, INotificationMessageService notificationMessageService): base(notificationMessageService)
+        public GeneralService(IHttpContextAccessor accessor, TokenConfiguration tokenConfiguration, EmailSettings emailSettings, IHostingEnvironment hostingEnvironment, INotificationMessageService notificationMessageService) : base(notificationMessageService)
         {
             _accessor = accessor;
             _tokenConfiguration = tokenConfiguration;
@@ -73,6 +73,7 @@ namespace DefaultAPI.Application.Services
                 Audience = _tokenConfiguration.Audience,
                 Subject = new ClaimsIdentity(new Claim[]
                 {
+                        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim("Id",credentials.Id.ToString()),
                         new Claim("Login", credentials.Login.ToString()),
                         new Claim("Roles", string.Join(",",credentials.Roles))
@@ -260,8 +261,8 @@ namespace DefaultAPI.Application.Services
 
         public async Task<bool> SendPushNotification(PushNotification notification, string tokenUser)
         {
-             // Reference: http://codepickup.in/csharp/fcm-push-notification-in-csharp/
-             // Se nao gerar a chave web api, so ir na autentication
+            // Reference: http://codepickup.in/csharp/fcm-push-notification-in-csharp/
+            // Se nao gerar a chave web api, so ir na autentication
 
             var postData = JsonConvert.SerializeObject(new
             {
@@ -391,7 +392,21 @@ namespace DefaultAPI.Application.Services
 
         public bool IsAuthenticated()
         {
+            teste();
+            teste2();
             return _accessor.HttpContext.User.Identity.IsAuthenticated;
+        }
+
+        public void teste()
+        {
+            var result = _accessor.HttpContext.Request;
+            var a = "";
+        }
+
+        public void teste2()
+        {
+            var result = _accessor.HttpContext.Connection;
+            var a = "";
         }
     }
 }

@@ -1106,5 +1106,61 @@ namespace DefaultAPI.Infra.CrossCutting
 
             return (ocorrencias);
         }
+
+        /// <summary>
+        /// Nesse metodo nós iremos receber um base64 em string
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="imgFile">Esse parametro tem que ser formado por um guid + "_" + nomearquivo</param>
+        /// <returns></returns>
+        public async Task<(bool, string)> UploadFile(string file, string imgFile)
+        {
+
+            if (string.IsNullOrEmpty(file))
+            {
+                return (false, "Forneça uma imagem!");
+            }
+
+            var imageDataByteArray = Convert.FromBase64String(file);
+
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imgFile);
+
+            if (File.Exists(filePath))
+            {
+                return (false, "Já existe um arquivo com este nome!");
+            }
+
+            await File.WriteAllBytesAsync(filePath, imageDataByteArray);
+
+            return (true, "Upload efetuado com sucesso");
+        }
+
+        /// <summary>
+        /// Nesse metodo enviamos a imagem por stream sem necessidade de base 64
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="imgPrefix">Esse parametro tem que ser formado por um guid + "_"</param>
+        /// <returns></returns>
+        private async Task<(bool, string)> UploadArquivoAlternativo(IFormFile arquivo, string imgPrefix)
+        {
+            if (arquivo == null || arquivo.Length == 0)
+            {
+                return (false, "Forneça uma imagem!");
+            }
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imgPrefix + arquivo.FileName);
+
+            if (System.IO.File.Exists(path))
+            {
+                return (false, "Já existe um arquivo com este nome!");
+            }
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                await arquivo.CopyToAsync(stream);
+            }
+
+            return (true, "Upload efetuado com sucesso");
+        }
     }
 }

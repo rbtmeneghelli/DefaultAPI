@@ -69,7 +69,8 @@ namespace DefaultAPI.Configuration
                 options.AddPolicy("EnableCORS", builder =>
                 {
                     builder
-                    .WithOrigins(origins.ToArray())
+                    //.WithMethods() // Configuração de tipos de metodos que serão liberados para consumo GET, POST, PUT, DELETE
+                    .WithOrigins(origins.ToArray()) // Configuração de sites que tem permissão para acessar a API
                     .SetIsOriginAllowed((host) => true)
                     .AllowAnyMethod()
                     .AllowAnyHeader()

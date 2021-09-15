@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
 using DefaultAPI.Application.Interfaces;
-using DefaultAPI.Controllers.Base;
+using DefaultAPI.Controllers;
 using DefaultAPI.Domain;
 using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Models;
 using DefaultAPI.Infra.CrossCutting;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
@@ -16,7 +15,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DefaultAPI.Controllers
+namespace DefaultAPI.V1.Controllers
 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
