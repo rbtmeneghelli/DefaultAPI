@@ -23,12 +23,6 @@ namespace DefaultAPI.Configuration
             app.UseCors("EnableCORS");
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "DefaultAPI V1");
-                c.SwaggerEndpoint("/swagger/v2/swagger.json", "DefaultAPI V2");
-            });
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

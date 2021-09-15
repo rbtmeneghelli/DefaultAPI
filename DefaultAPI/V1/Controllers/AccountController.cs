@@ -54,7 +54,7 @@ namespace DefaultAPI.V1.Controllers
             return CustomResponse();
         }
 
-        [HttpGet("ResetPassword/{email:string}")]
+        [HttpGet("ResetPassword/{email}")]
         public async Task<IActionResult> ResetPassword(string email)
         {
             var result = await _accountService.ResetPassword(email);

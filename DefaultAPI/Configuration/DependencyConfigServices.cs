@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
@@ -80,20 +81,6 @@ namespace DefaultAPI.Configuration
             });
         }
 
-        internal static void RegisterSwaggerConfig(this IServiceCollection services)
-        {
-            services.AddSwaggerGen(x =>
-            {
-                x.SwaggerDoc("v1", GetApiConfig("v1"));
-                x.SwaggerDoc("v2", GetApiConfig("v2"));
-                x.AddSecurityDefinition("Bearer", GetBearerConfig());
-                x.AddSecurityRequirement(GetSecurityConfig());
-                // Metodos abaixo são utilizados quando temos mais versões de API
-                x.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
-                x.DocInclusionPredicate((docName, apiDesc) => apiDesc.GroupName == docName);
-            });
-        }
-
         internal static void RegisterConfigs(this IServiceCollection services, IConfiguration configuration)
         {
             var configEmail = new EmailSettings();
@@ -123,65 +110,7 @@ namespace DefaultAPI.Configuration
             //services.AddHangfireServer();
             //return services;
         }
-
-        private static OpenApiSecurityScheme GetBearerConfig()
-        {
-            return new OpenApiSecurityScheme
-            {
-                In = ParameterLocation.Header,
-                Description = "Insira a palavra Bearer com o token JWT gerado no campo",
-                Name = "Authorization",
-                Type = SecuritySchemeType.ApiKey
-            };
-        }
-
-        private static OpenApiSecurityRequirement GetSecurityConfig()
-        {
-            return new OpenApiSecurityRequirement {
-                { new OpenApiSecurityScheme
-                  {
-                    Reference = new OpenApiReference
-                    {
-                      Type = ReferenceType.SecurityScheme,
-                      Id = "Bearer"
-                    }
-                  },
-                  new string[] { }
-            }   };
-        }
-
-        private static OpenApiInfo GetApiConfig(string version, bool isNotDepreciated = true)
-        {
-            return new OpenApiInfo
-            {
-                Title = "DefaultAPI",
-                Version = version,
-                Description = isNotDepreciated ? "Lista de Endpoints disponíveis" : "Endpoints descontinuados",
-                Contact = new OpenApiContact() { Name = "Roberto Meneghelli", Email = "teste@teste.com.br" },
-                License = new OpenApiLicense() { Name = "ROMAR SOFTWARE" }
-            };
-        }
     }
-
-    public class SwaggerDefaultValues : IOperationFilter
-    {
-        public void Apply(OpenApiOperation operation, OperationFilterContext context)
-        {
-            if (operation.Parameters == null) operation.Parameters = new List<OpenApiParameter>();
-
-            var descriptor = context.ApiDescription.ActionDescriptor as ControllerActionDescriptor;
-        }
-    }
-
-    // Metodo de configuração para permitir acesso ao hangFire externo
-    //public class DashboardNoAuthorizationFilter : IDashBoardAuthorizationFilter
-    //{
-    //    public bool Authorize(DashboardContext dashboardContext) => true;
-    //}
-
-    // Adicionar ao Arquivo Startup.cs o codigo abaixo
-    // App.UseHangFireDashboard("/hangfire", new DashboardOptions() {
-    // Authorization = new [] { new DashboardNoAuthorizationFilter() } });
 
     public class DefaultAPIContextFactory : IDesignTimeDbContextFactory<DefaultAPIContext>
     {

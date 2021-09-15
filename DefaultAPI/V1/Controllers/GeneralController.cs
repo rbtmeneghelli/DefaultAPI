@@ -36,7 +36,7 @@ namespace DefaultAPI.V1.Controllers
             _cityService = cityService;
         }
 
-        [HttpGet("v1/export2Zip/{directory:string}/{typeFile:int}")]
+        [HttpGet("v1/export2Zip/{directory}/{typeFile:int}")]
         public async Task<IActionResult> Export2Zip(string directory, int typeFile = 2)
         {
             ExtensionMethods extensionMethods = new ExtensionMethods();
@@ -44,7 +44,7 @@ namespace DefaultAPI.V1.Controllers
             return File(await Task.FromResult(memoryStream.ToArray()), extensionMethods.GetMemoryStreamType(typeFile), $"Archive.{extensionMethods.GetMemoryStreamExtension(typeFile)}");
         }
 
-        [HttpGet("v1/backup/{directory:string}")]
+        [HttpGet("v1/backup/{directory}")]
         public async Task<IActionResult> Backup(string directory)
         {
             var result = await _generalService.RunSqlBackup(directory);
@@ -55,7 +55,7 @@ namespace DefaultAPI.V1.Controllers
             return CustomResponse();
         }
 
-        [HttpGet("v1/getCep/{cep:string}/{refreshCep:bool}")]
+        [HttpGet("v1/getCep/{cep}/{refreshCep:bool}")]
         public async Task<IActionResult> GetCep(string cep, bool refreshCep)
         {
             try

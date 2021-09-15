@@ -12,7 +12,8 @@ namespace DefaultAPI.V1.Controllers
 {
 
     [ApiController]
-    [ApiVersion("1.0")]
+    [ApiVersion("1.0", Deprecated = true)]
+    [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize("Bearer")]
     public class UsersController : BaseController
@@ -44,7 +45,7 @@ namespace DefaultAPI.V1.Controllers
             return CustomResponse(await _userService.GetById(id));
         }
 
-        [HttpGet("GetByLogin/{login:string}")]
+        [HttpGet("GetByLogin/{login}")]
         public async Task<IActionResult> GetByLogin(string login)
         {
             return CustomResponse(await _userService.GetByLogin(login));

@@ -11,6 +11,7 @@ using System;
 using System.Reflection;
 using MediatR;
 using DefaultAPI.Application.Queries;
+using Microsoft.Extensions.Options;
 
 namespace DefaultAPI.Infra.Structure.IoC
 {
@@ -18,6 +19,7 @@ namespace DefaultAPI.Infra.Structure.IoC
     {
         public static IServiceCollection RegisterServices(this IServiceCollection services)
         {
+            services.AddScoped<DefaultAPIContext>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IGeneralService, GeneralService>();
             services.AddScoped<IAccountService, AccountService>();
@@ -27,8 +29,19 @@ namespace DefaultAPI.Infra.Structure.IoC
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<ILogService, LogService>();
             services.AddScoped<IAuditService, AuditService>();
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<INotificationMessageService, NotificationMessageService>();
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ICepRepository, CepRepository>();
+            services.AddScoped<ICityRepository, CityRepository>();
+            services.AddScoped<IRegionRepository, RegionRepository>();
+            services.AddScoped<IStatesRepository, StateRepository>();
+            services.AddScoped<ILogRepository, LogRepository>();
+            services.AddScoped<IAuditRepository, AuditRepository>();
+
+            //services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(typeof(IRepositoryDapper<>), typeof(RepositoryDapper<>));
+
             return services;
         }
 

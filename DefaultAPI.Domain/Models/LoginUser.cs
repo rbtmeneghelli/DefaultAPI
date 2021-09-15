@@ -8,7 +8,6 @@ namespace DefaultAPI.Domain.Models
     public sealed class LoginUser
     {
         [Required(ErrorMessage = "O campo {0} é obrigatório")]
-        [EmailAddress(ErrorMessage = "O campo {0} é obrigatório")]
         public string Login { get; set; }
 
         [Required(ErrorMessage = "O campo Password é obrigatório")]
