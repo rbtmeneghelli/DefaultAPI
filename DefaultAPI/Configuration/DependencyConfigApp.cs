@@ -23,10 +23,6 @@ namespace DefaultAPI.Configuration
             app.UseCors("EnableCORS");
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
             //app.UseMiddleware<ApiLoggingMiddleware>(); // Caso for usar Middleware no net core 2.2, basta descomentar essa linha
             //app.UseMiddleware<RequestResponseLoggingMiddleware>(); // Caso for usar Middleware no net core 3.0, basta descomentar essa linha
             //app.UseMiddleware<HttpLoggingMiddleware>(); // Caso for usar Middleware no net core 5.0, basta descomentar essa linha

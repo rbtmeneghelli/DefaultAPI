@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Controllers;
+using System;
 
 namespace DefaultAPI.V1.Controllers
 {
@@ -15,8 +16,7 @@ namespace DefaultAPI.V1.Controllers
     [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    //[Authorize("Bearer")]
-    [AllowAnonymous]
+    [Authorize("Bearer")]
     public class UsersController : BaseController
     {
         private readonly IUserService _userService;
@@ -69,6 +69,7 @@ namespace DefaultAPI.V1.Controllers
             if (result)
                 return CreatedAtAction(nameof(Add), user);
 
+            throw new Exception("Ocorreu um erro no metodo de add");
             return CustomResponse();
         }
 

@@ -6,11 +6,11 @@ namespace DefaultAPI.Domain.Models
 {
     public class NotificationMessage
     {
-        public string Mensagem { get; }
+        public string Message { get; }
 
-        public NotificationMessage(string mensagem)
+        public NotificationMessage(string message)
         {
-            Mensagem = mensagem;
+            Message = message;
         }
     }
 }

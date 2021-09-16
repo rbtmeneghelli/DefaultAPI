@@ -54,7 +54,7 @@ namespace DefaultAPI.Controllers
             return BadRequest(new
             {
                 success = false,
-                errors = _notificationService.GetNotifications().Select(n => n.Mensagem)
+                errors = _notificationService.GetNotifications().Select(n => n.Message)
             });
         }
 

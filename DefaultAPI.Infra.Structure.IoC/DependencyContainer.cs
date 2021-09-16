@@ -6,12 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Application.Services;
 using DefaultAPI.Application;
-using DefaultAPI.Infra.Structure.IoC.MapEntitiesXDto;
 using System;
-using System.Reflection;
-using MediatR;
-using DefaultAPI.Application.Queries;
-using Microsoft.Extensions.Options;
+using KissLog;
+using KissLog.AspNetCore;
+using KissLog.CloudListeners.Auth;
+using KissLog.CloudListeners.RequestLogsListener;
+using System.Text;
+using Microsoft.AspNetCore.Builder;
+using System.Diagnostics;
 
 namespace DefaultAPI.Infra.Structure.IoC
 {
@@ -30,6 +32,7 @@ namespace DefaultAPI.Infra.Structure.IoC
             services.AddScoped<ILogService, LogService>();
             services.AddScoped<IAuditService, AuditService>();
             services.AddScoped<INotificationMessageService, NotificationMessageService>();
+            services.AddScoped(typeof(ILoggerService<>), typeof(LoggerService<>));
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICepRepository, CepRepository>();
@@ -69,6 +72,68 @@ namespace DefaultAPI.Infra.Structure.IoC
         //    services.AddMediatR(Assembly.GetExecutingAssembly());
         //    return services;
         //}
+
+        public static IServiceCollection RegisterKissLog(this IServiceCollection services)
+        {
+            services.AddScoped<ILogger>((context) =>
+            {
+                return Logger.Factory.Get();
+            });
+
+            services.AddLogging(logging =>
+            {
+                logging.AddKissLog();
+            });
+
+            return services;
+        }
+
+        public static IApplicationBuilder UseKissLog(this IApplicationBuilder app, IConfiguration configuration)
+        {
+            app.UseKissLogMiddleware(options =>
+            {
+                ConfigureKissLog(options, configuration);
+            });
+
+            return app;
+        }
+
+        private static void ConfigureKissLog(IOptionsBuilder options, IConfiguration configuration)
+        {
+            // optional KissLog configuration
+            options.Options
+                .AppendExceptionDetails((Exception ex) =>
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    if (ex is System.NullReferenceException nullRefException)
+                    {
+                        sb.AppendLine("Important: check for null references");
+                    }
+
+                    return sb.ToString();
+                });
+
+            // KissLog internal logs
+            options.InternalLog = (message) =>
+            {
+                Debug.WriteLine(message);
+            };
+
+            // register logs output
+            RegisterKissLogListeners(options, configuration);
+        }
+
+        private static void RegisterKissLogListeners(IOptionsBuilder options, IConfiguration configuration)
+        {
+            options.Listeners.Add(new RequestLogsApiListener(new KissLog.CloudListeners.Auth.Application(
+                configuration["KissLog.OrganizationId"],
+                configuration["KissLog.ApplicationId"])
+            )
+            {
+                ApiUrl = configuration["KissLog.ApiUrl"]
+            });
+        }
 
     }
 }

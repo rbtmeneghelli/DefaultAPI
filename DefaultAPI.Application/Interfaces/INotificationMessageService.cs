@@ -7,10 +7,8 @@ namespace DefaultAPI.Application.Interfaces
 {
     public interface INotificationMessageService
     {
-        void Handle(ResultReturned resultReturned);
         void Handle(NotificationMessage notificacao);
         List<NotificationMessage> GetNotifications();
-        ResultReturned GetResultReturned();
         bool HaveNotification();
     }
 }

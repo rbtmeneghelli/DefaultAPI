@@ -1,12 +1,10 @@
 using DefaultAPI.Configuration;
-using DefaultAPI.Configuration.Middleware;
-using DefaultAPI.Infra.Data.Context;
 using DefaultAPI.Infra.Structure.IoC;
+using KissLog;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -59,6 +57,13 @@ namespace DefaultAPI
             {
                 options.SuppressModelStateInvalidFilter = true;
             });
+
+            services.AddScoped<ILogger>((context) =>
+            {
+                return Logger.Factory.Get();
+            });
+
+            services.RegisterKissLog();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
@@ -74,6 +79,11 @@ namespace DefaultAPI
 
             app.MigrateDatabase();
             app.ApiConfig();
+            app.UseKissLog(Configuration);
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
             app.UseSwaggerConfig(provider);
         }
     }
