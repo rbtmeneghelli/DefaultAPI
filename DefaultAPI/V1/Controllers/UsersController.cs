@@ -15,7 +15,8 @@ namespace DefaultAPI.V1.Controllers
     [ApiVersion("1.0", Deprecated = true)]
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    [Authorize("Bearer")]
+    //[Authorize("Bearer")]
+    [AllowAnonymous]
     public class UsersController : BaseController
     {
         private readonly IUserService _userService;
@@ -64,12 +65,9 @@ namespace DefaultAPI.V1.Controllers
 
             User user = _mapperService.Map<User>(userSendDto);
 
-            if (ModelState.IsValid)
-            {
-                var result = await _userService.Add(user);
-                if (result)
-                    return CreatedAtAction(nameof(Add), result);
-            }
+            var result = await _userService.Add(user);
+            if (result)
+                return CreatedAtAction(nameof(Add), user);
 
             return CustomResponse();
         }
@@ -87,12 +85,9 @@ namespace DefaultAPI.V1.Controllers
                 return CustomResponse();
             }
 
-            if (ModelState.IsValid)
-            {
-                var result = await _userService.Update(id, user);
-                if (result)
-                    return NoContent();
-            }
+            var result = await _userService.Update(id, user);
+            if (result)
+                return NoContent();
 
             return CustomResponse();
         }

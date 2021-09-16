@@ -57,7 +57,7 @@ namespace DefaultAPI.Configuration.Middleware
                     await _next(httpContext);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _next(httpContext);
             }
@@ -104,6 +104,7 @@ namespace DefaultAPI.Configuration.Middleware
                 apiLogItem.QueryString = $"(Truncated to 100 chars) {apiLogItem.QueryString.Substring(0, 100)}";
             }
 
+            await Task.CompletedTask;
             // Chama o serviço que vai gravar no banco por aqui!
         }
 

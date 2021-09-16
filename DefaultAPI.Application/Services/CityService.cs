@@ -18,7 +18,7 @@ namespace DefaultAPI.Application.Services
     {
         public readonly ICityRepository _cityRepository;
 
-        public CityService(ICityRepository cityRepository, INotificationMessageService notificationMessageService): base(notificationMessageService)
+        public CityService(ICityRepository cityRepository, INotificationMessageService notificationMessageService) : base(notificationMessageService)
         {
             _cityRepository = cityRepository;
         }
@@ -31,19 +31,30 @@ namespace DefaultAPI.Application.Services
 
         public async Task<PagedResult<CityReturnedDto>> GetAllFromUf(int IdState = 25, int? page = 1, int? limit = int.MaxValue)
         {
-            page = page ?? 1;
-            limit = limit ?? 10;
+            try
+            {
+                page = page ?? 1;
+                limit = limit ?? 10;
 
-            var queryResult = (from x in _cityRepository.GetAll().AsQueryable().AsNoTracking()
-                               where x.IdState == IdState
-                               orderby x.Name ascending
-                               select new CityReturnedDto()
-                               {
-                                   Id = x.Id,
-                                   Name = x.Name
-                               });
+                var queryResult = (from x in _cityRepository.GetAll().AsQueryable().AsNoTracking()
+                                   where x.IdState == IdState
+                                   orderby x.Name ascending
+                                   select new CityReturnedDto()
+                                   {
+                                       Id = x.Id,
+                                       Name = x.Name
+                                   });
 
-            return PagedFactory.GetPaged(queryResult, page.Value, limit.Value);
+                return PagedFactory.GetPaged(queryResult, page.Value, limit.Value);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message, ex.InnerException);
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<List<CityReturnedDto>> GetAllEntity()
@@ -147,7 +158,7 @@ namespace DefaultAPI.Application.Services
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Notify(Constants.ErrorInAddCity);
                 return false;

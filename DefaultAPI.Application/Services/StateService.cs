@@ -71,6 +71,10 @@ namespace DefaultAPI.Application.Services
             {
                 throw new Exception(ex.Message, ex.InnerException);
             }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<bool> UpdateStatusById(long id)
@@ -87,7 +91,7 @@ namespace DefaultAPI.Application.Services
                 }
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

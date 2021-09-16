@@ -45,23 +45,34 @@ namespace DefaultAPI.Application.Services
 
         public async Task<PagedResult<UserReturnedDto>> GetAllPaginate(UserFilter filter)
         {
-            var query = GetAllUsers(filter);
+            try
+            {
+                var query = GetAllUsers(filter);
 
-            var queryResult = from p in query.AsQueryable()
-                              orderby p.Login ascending
-                              select new UserReturnedDto
-                              {
-                                  Id = p.Id,
-                                  Login = p.Login,
-                                  IsAuthenticated = p.IsAuthenticated,
-                                  IsActive = p.IsActive,
-                                  Password = "-",
-                                  LastPassword = "-",
-                                  Profile = p.Profile.ProfileType.GetDisplayName(),
-                                  Status = p.IsActive ? "Ativo" : "Inativo"
-                              };
+                var queryResult = from p in query.AsQueryable()
+                                  orderby p.Login ascending
+                                  select new UserReturnedDto
+                                  {
+                                      Id = p.Id,
+                                      Login = p.Login,
+                                      IsAuthenticated = p.IsAuthenticated,
+                                      IsActive = p.IsActive,
+                                      Password = "-",
+                                      LastPassword = "-",
+                                      Profile = p.Profile.ProfileType.GetDisplayName(),
+                                      Status = p.IsActive ? "Ativo" : "Inativo"
+                                  };
 
-            return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
+                return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message, ex.InnerException);
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<UserReturnedDto> GetById(long id)
@@ -144,10 +155,14 @@ namespace DefaultAPI.Application.Services
                 Notify($"Já existe um login {user.Login} cadastrado, troque de login");
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Notify(Constants.ErrorInAdd);
                 return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
             }
         }
 
@@ -169,10 +184,14 @@ namespace DefaultAPI.Application.Services
                 Notify(Constants.ErrorInUpdate);
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Notify(Constants.ErrorInUpdate);
                 return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
             }
         }
 
@@ -196,10 +215,14 @@ namespace DefaultAPI.Application.Services
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Notify(Constants.ErrorInDelete);
                 return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
             }
         }
 

@@ -81,11 +81,13 @@ namespace DefaultAPI.Application.Services
                     dbUser.UpdateTime = DateTime.Now;
                     _userRepository.Update(dbUser);
                     _userRepository.SaveChanges();
+                    await Task.CompletedTask;
                     return true;
                 }
             }
 
             Notify(Constants.ErrorInChangePassword);
+            await Task.CompletedTask;
             return false;
         }
 

@@ -82,7 +82,7 @@ namespace DefaultAPI.V1.Controllers
                 }
                 return CustomResponse(modelCep);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 NotificationError(string.Format(Constants.ExceptionRequestAPI, Constants.UrlToGetCep));
                 return CustomResponse();
@@ -115,7 +115,7 @@ namespace DefaultAPI.V1.Controllers
                 }
                 return CustomResponse(listStates);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 NotificationError(string.Format(Constants.ExceptionRequestAPI, Constants.UrlToGetStates));
                 return CustomResponse();
@@ -163,7 +163,7 @@ namespace DefaultAPI.V1.Controllers
                 if (cities.Count() > 0)
                     await _cityService.AddOrUpdateCity(cities.OrderBy(x => x.Name).ToList());
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 NotificationError("Ocorreu um erro ao tentar adicionar cidades no sistema");
                 return CustomResponse();
@@ -202,7 +202,7 @@ namespace DefaultAPI.V1.Controllers
 
                 return CustomResponse(list);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 NotificationError(string.Format(Constants.ExceptionRequestAPI, Constants.UrlToGetStates));
                 return CustomResponse();
@@ -237,7 +237,7 @@ namespace DefaultAPI.V1.Controllers
 
                 return CustomResponse(listStates);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 NotificationError(string.Format(Constants.ExceptionRequestAPI, Constants.UrlToGetStates));
                 return CustomResponse();

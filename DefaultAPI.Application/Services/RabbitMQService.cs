@@ -90,11 +90,15 @@ namespace DefaultAPI.Application.Services
                     Thread.Sleep(dots * 1000);
                     channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
                 }
+
+                await Task.CompletedTask;
             };
 
             channel.BasicConsume(queue: QueueName,
                                  autoAck: QueueIsDurable ? false : true,
                                  consumer: consumer);
+
+            await Task.CompletedTask;
         }
 
 
@@ -152,6 +156,7 @@ namespace DefaultAPI.Application.Services
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
+                await Task.CompletedTask;
             };
 
             channel.BasicConsume(queue: queueName,
@@ -215,6 +220,7 @@ namespace DefaultAPI.Application.Services
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var routingKey = ea.RoutingKey;
+                await Task.CompletedTask;
             };
 
             channel.BasicConsume(queue: queueName,

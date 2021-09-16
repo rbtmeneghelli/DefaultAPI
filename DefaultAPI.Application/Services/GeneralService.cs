@@ -192,7 +192,7 @@ namespace DefaultAPI.Application.Services
                 sqlConnObj.Open();
                 await sqlCmd.ExecuteNonQueryAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Notify(string.Format(Constants.ErrorInProcedure, procName));
                 return false;
@@ -221,7 +221,7 @@ namespace DefaultAPI.Application.Services
                 sqlConnObj.Open();
                 await sqlCmd.ExecuteNonQueryAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Notify(Constants.ErrorInBackup);
                 return false;
@@ -255,6 +255,7 @@ namespace DefaultAPI.Application.Services
                         count++;
                     }
                 }
+                await Task.CompletedTask;
                 return ms;
             }
         }
@@ -297,6 +298,7 @@ namespace DefaultAPI.Application.Services
                 string responseLine = reader.ReadToEnd();
                 reader.Close();
 
+                await Task.CompletedTask;
                 return true;
 
             }
@@ -375,9 +377,11 @@ namespace DefaultAPI.Application.Services
                 var builder = new BodyBuilder();
                 builder.HtmlBody = GetEmailBodyTemplate(emailConfig.enumEmailDisplay, emailConfig.enumEmailTemplate, emailConfig.emailBody, emailConfig.userName);
                 builder.Attachments.Add(Path.Combine(_hostingEnvironment.WebRootPath, "Arquivos", "arquivo.pdf"));
+                await Task.CompletedTask;
                 return builder.ToMessageBody();
             }
 
+            await Task.CompletedTask;
             return new TextPart(TextFormat.Html)
             {
                 Text = GetEmailBodyTemplate(emailConfig.enumEmailDisplay, emailConfig.enumEmailTemplate, emailConfig.emailBody, emailConfig.userName),
@@ -392,21 +396,7 @@ namespace DefaultAPI.Application.Services
 
         public bool IsAuthenticated()
         {
-            teste();
-            teste2();
             return _accessor.HttpContext.User.Identity.IsAuthenticated;
-        }
-
-        public void teste()
-        {
-            var result = _accessor.HttpContext.Request;
-            var a = "";
-        }
-
-        public void teste2()
-        {
-            var result = _accessor.HttpContext.Connection;
-            var a = "";
         }
     }
 }

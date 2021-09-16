@@ -44,6 +44,10 @@ namespace DefaultAPI.Application.Services
             {
                 throw new Exception(ex.Message, ex.InnerException);
             }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<Ceps> GetByCep(string cep)
@@ -65,7 +69,7 @@ namespace DefaultAPI.Application.Services
                 }
                 return false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
