@@ -22,11 +22,16 @@ namespace DefaultAPI
 
             var configuration = new ConfigurationBuilder()
             .SetBasePath(hostingEnvironment.ContentRootPath)
-            .AddJsonFile("appsettings.json")
-            .AddEnvironmentVariables()
-            .Build();
+            .AddJsonFile("appsettings.json", true, true)
+            .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true)
+            .AddEnvironmentVariables();
 
-            Configuration = configuration;
+            if (hostingEnvironment.IsDevelopment())
+            {
+                configuration.AddUserSecrets<Startup>();
+            }
+
+            Configuration = configuration.Build();
         }
 
         public void ConfigureServices(IServiceCollection services)

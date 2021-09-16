@@ -15,6 +15,9 @@ namespace DefaultAPI.Domain
         public const string UrlToGetCep = "http://viacep.com.br/ws/";
         public const string UrlToGetStates = "https://servicodados.ibge.gov.br/api/v1/localidades/estados";
         public const string UrlToGetCities = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/{0}/municipios";
+        public const string UrlToHangFire = "https://{url}:9000/hangfire/servers";
+        public const string UrlToRabbitMQ = "https://{url}:15672";
+        public const string UrlToKissLog = "https://kisslog.net/Dashboard/{KissLog.ApplicationId}/defaultapi";
 
         public const string SaveLog = @"insert into Log(Class,Method,Message_Error,Update_time,Object) values('{0}','{1}','{2}','{3}','{4}')";
 
