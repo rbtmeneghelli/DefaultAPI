@@ -45,75 +45,113 @@ namespace DefaultAPI.Application.Services
                 Notify("Erro na validação");
                 return false;
             }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<Credentials> GetUserCredentials(string login)
         {
-            Credentials credenciais = new Credentials();
-            User user = await _userRepository.GetUserCredentialsByLogin(login);
-
-            if (user != null)
+            try
             {
-                credenciais.Id = user.Id;
-                credenciais.Login = user.Login;
-                credenciais.Perfil = user.Profile.Description;
-                credenciais.Roles = new List<string>() { };
-                foreach (var item in user.Profile.ProfileOperations)
-                {
-                    List<EnumActions> condition = GetActions(item);
-                    credenciais.Roles.AddRange(item.Operation.Roles.Where(y => condition.Contains(y.Action)).Select(z => z.RoleTag).ToList());
-                }
-            }
+                Credentials credenciais = new Credentials();
+                User user = await _userRepository.GetUserCredentialsByLogin(login);
 
-            return credenciais;
+                if (user != null)
+                {
+                    credenciais.Id = user.Id;
+                    credenciais.Login = user.Login;
+                    credenciais.Perfil = user.Profile.Description;
+                    credenciais.Roles = new List<string>() { };
+                    foreach (var item in user.Profile.ProfileOperations)
+                    {
+                        List<EnumActions> condition = GetActions(item);
+                        credenciais.Roles.AddRange(item.Operation.Roles.Where(y => condition.Contains(y.Action)).Select(z => z.RoleTag).ToList());
+                    }
+                }
+
+                return credenciais;
+            }
+            catch
+            {
+                Notify(Constants.ErrorInLogin);
+                return new Credentials();
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<bool> ChangePassword(long id, User user)
         {
-            User dbUser = _userRepository.GetById(id);
-            if (dbUser != null)
+            try
             {
-                if (new HashingManager().Verify(user.Password, dbUser.Password) && dbUser.Login.ToUpper() == user.Login.ToUpper())
+                User dbUser = _userRepository.GetById(id);
+                if (dbUser != null)
                 {
-                    dbUser.LastPassword = dbUser.Password;
-                    dbUser.Password = new HashingManager().HashToString(user.Password);
-                    dbUser.IsAuthenticated = true;
-                    dbUser.UpdateTime = DateTime.Now;
-                    _userRepository.Update(dbUser);
-                    _userRepository.SaveChanges();
-                    await Task.CompletedTask;
-                    return true;
+                    if (new HashingManager().Verify(user.Password, dbUser.Password) && dbUser.Login.ToUpper() == user.Login.ToUpper())
+                    {
+                        dbUser.LastPassword = dbUser.Password;
+                        dbUser.Password = new HashingManager().HashToString(user.Password);
+                        dbUser.IsAuthenticated = true;
+                        dbUser.UpdateTime = DateTime.Now;
+                        _userRepository.Update(dbUser);
+                        _userRepository.SaveChanges();
+                        await Task.CompletedTask;
+                        return true;
+                    }
                 }
-            }
 
-            Notify(Constants.ErrorInChangePassword);
-            await Task.CompletedTask;
-            return false;
+                Notify(Constants.ErrorInChangePassword);
+                return false;
+            }
+            catch
+            {
+                Notify(Constants.ErrorInChangePassword);
+                return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<bool> ResetPassword(string login)
         {
-            if (!string.IsNullOrWhiteSpace(login))
+            try
             {
-                User user = await _userRepository.FindBy(x => x.Login == login.ToUpper().Trim()).FirstOrDefaultAsync();
-                if (user is not null)
+                if (!string.IsNullOrWhiteSpace(login))
                 {
-                    user.LastPassword = user.Password;
-                    user.Password = new HashingManager().HashToString(Constants.DefaultPassword);
-                    user.IsAuthenticated = false;
-                    user.IsActive = true;
-                    user.CreatedTime = DateTime.Now;
-                    _generalService.SendEmail(new EmailConfig("Reset de senha", "roberto.mng.89@gmail.com", "Reset de Senha - Admin", $"Caro Administrador, <br> Sua senha de administrador foi resetada com sucesso. <br> Segue a sua nova senha: {Constants.DefaultPassword} ", "Roberto")).Wait();
-                    _userRepository.Update(user);
-                    _userRepository.SaveChanges();
-                    return true;
+                    User user = await _userRepository.FindBy(x => x.Login == login.ToUpper().Trim()).FirstOrDefaultAsync();
+                    if (user is not null)
+                    {
+                        user.LastPassword = user.Password;
+                        user.Password = new HashingManager().HashToString(Constants.DefaultPassword);
+                        user.IsAuthenticated = false;
+                        user.IsActive = true;
+                        user.CreatedTime = DateTime.Now;
+                        _generalService.SendEmail(new EmailConfig("Reset de senha", "roberto.mng.89@gmail.com", "Reset de Senha - Admin", $"Caro Administrador, <br> Sua senha de administrador foi resetada com sucesso. <br> Segue a sua nova senha: {Constants.DefaultPassword} ", "Roberto")).Wait();
+                        _userRepository.Update(user);
+                        _userRepository.SaveChanges();
+                        return true;
+                    }
+
+                    Notify(Constants.ErrorInResetPassword);
                 }
-
                 Notify(Constants.ErrorInResetPassword);
+                return false;
             }
-
-            Notify(Constants.ErrorInResetPassword);
-            return false;
+            catch
+            {
+                Notify(Constants.ErrorInResetPassword);
+                return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         private List<EnumActions> GetActions(ProfileOperation profileOperation)

@@ -10,6 +10,7 @@ namespace DefaultAPI.Application.Interfaces
     {
         Task<User> GetUserCredentialsByLogin(string login);
         Task<User> GetUserCredentialsById(long id);
+        Task<bool> CanDelete(long userId);
     }
 }
 

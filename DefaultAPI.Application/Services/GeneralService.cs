@@ -48,19 +48,13 @@ namespace DefaultAPI.Application.Services
 
         public long GetCurrentUserId()
         {
-            if (!_accessor.HttpContext.User.Identity.IsAuthenticated)
-                return 0;
-
             string userId = _accessor.HttpContext.User.FindFirst(x => x.Type == "Id")?.Value;
             return long.TryParse(userId, out _) ? long.Parse(userId) : 0;
         }
 
         public string GetCurrentUserName()
         {
-            if (!_accessor.HttpContext.User.Identity.IsAuthenticated)
-                return string.Empty;
-
-            return _accessor.HttpContext.User.FindFirst(x => x.Type == "Name")?.Value ?? string.Empty;
+            return _accessor.HttpContext.User.FindFirst(x => x.Type == "Login")?.Value ?? string.Empty;
         }
 
         public string CreateJwtToken(Credentials credentials)
@@ -397,6 +391,12 @@ namespace DefaultAPI.Application.Services
         public bool IsAuthenticated()
         {
             return _accessor.HttpContext.User.Identity.IsAuthenticated;
+        }
+
+        public long GetCurrentUserProfileId()
+        {
+            string profileId = _accessor.HttpContext.User.FindFirst(x => x.Type == "ProfileId")?.Value;
+            return long.TryParse(profileId, out _) ? long.Parse(profileId) : 0;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace DefaultAPI.V1.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [AllowAnonymous]
-    public class LoggerController : BaseController
+    public sealed class LoggerController : BaseController
     {
         private readonly ILoggerService<LoggerController> _logger;
 

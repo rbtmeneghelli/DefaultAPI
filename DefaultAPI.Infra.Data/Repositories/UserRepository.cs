@@ -23,5 +23,10 @@ namespace DefaultAPI.Infra.Data.Repositories
         {
             return await _context.User.Include("Profile.ProfileOperations.Operation.Roles").Where(p => p.Login.ToUpper() == login.ToUpper()).FirstOrDefaultAsync(); ;
         }
+
+        public async Task<bool> CanDelete(long userId)
+        {
+            return await _context.User.AsNoTracking().AnyAsync(x => x.Id == userId &&  x.Profile != null);
+        }
     }
 }

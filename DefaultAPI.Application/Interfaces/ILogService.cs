@@ -13,6 +13,7 @@ namespace DefaultAPI.Application.Interfaces
     {
         Task<Log> GetById(long id);
         Task<List<Log>> GetAllWithLike(string parametro);
-        Task<PagedResult<LogReturnedDto>> GetAllWithPaginate(LogFilter filter);
+        Task<PagedResult<LogReturnedDto>> GetAllPaginate(LogFilter filter);
+        Task<bool> ExistById(long id);
     }
 }

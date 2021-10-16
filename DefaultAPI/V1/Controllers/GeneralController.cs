@@ -21,7 +21,7 @@ namespace DefaultAPI.V1.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
     [AllowAnonymous]
-    public class GeneralController : BaseController
+    public sealed class GeneralController : BaseController
     {
         private readonly ICepService _cepsService;
         private readonly IStatesService _statesService;

@@ -1,5 +1,6 @@
 ﻿using DefaultAPI.Application.Factory;
 using DefaultAPI.Application.Interfaces;
+using DefaultAPI.Domain;
 using DefaultAPI.Domain.Dto;
 using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
@@ -54,7 +55,7 @@ namespace DefaultAPI.Application.Services
             return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
         }
 
-        public async Task<PagedResult<AuditReturnedDto>> GetAllWithPaginate(AuditFilter filter)
+        public async Task<PagedResult<AuditReturnedDto>> GetAllPaginate(AuditFilter filter)
         {
             try
             {
@@ -82,6 +83,28 @@ namespace DefaultAPI.Application.Services
             }
         }
 
+        public async Task<bool> ExistById(long id)
+        {
+            try
+            {
+                var result = _auditRepository.Exist(x => x.Id == id);
+
+                if (result == false)
+                    Notify(Constants.ErrorInGetId);
+
+                return result;
+            }
+            catch
+            {
+                Notify(Constants.ErrorInGetId);
+                return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
+        }
+
         private async Task<IQueryable<Audit>> GetAllWithFilter(AuditFilter filter)
         {
             return await Task.FromResult(_auditRepository.GetAll().Where(GetPredicate(filter)).AsQueryable());
@@ -95,7 +118,7 @@ namespace DefaultAPI.Application.Services
         private Expression<Func<Audit, bool>> GetPredicate(AuditFilter filter)
         {
             return p =>
-            (string.IsNullOrWhiteSpace(filter.TableName) || p.TableName.Trim().ToUpper().Contains(filter.TableName.Trim().ToUpper()));
+            (string.IsNullOrWhiteSpace(filter.TableName) || p.TableName.Trim().ToUpper().StartsWith(filter.TableName.Trim().ToUpper()));
         }
 
         public void Dispose()

@@ -18,6 +18,11 @@ namespace DefaultAPI.Application.Interfaces
         Task<List<DropDownList>> GetUsers();
         Task<bool> Add(User user);
         Task<bool> Update(long id, User user);
-        Task<bool> Delete(long id, bool isDeletePhysical = false);
+        Task<bool> DeletePhysical(long id);
+        Task<bool> DeleteLogic(long id);
+        Task<bool> ExistById(long id);
+        Task<bool> CanDelete(long id);
+        Task<bool> ReactiveUser(long id);
+        Task<bool> ExistByLogin(string login);
     }
 }

@@ -42,7 +42,7 @@ namespace DefaultAPI.Infra.Structure.IoC
             services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IAuditRepository, AuditRepository>();
 
-            //services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(typeof(IRepositoryDapper<>), typeof(RepositoryDapper<>));
 
             return services;

@@ -12,7 +12,7 @@ using System.Linq.Expressions;
 
 namespace DefaultAPI.Infra.Data.Repositories
 {
-    public abstract class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         protected readonly DefaultAPIContext _context;
         protected readonly DbSet<TEntity> DbSet;

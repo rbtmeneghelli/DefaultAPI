@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Controllers;
+using DefaultAPI.Domain;
 using DefaultAPI.Domain.Dto;
 using DefaultAPI.Domain.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DefaultAPI.V1.Controllers
@@ -13,9 +15,8 @@ namespace DefaultAPI.V1.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize("Bearer")]
-    [ApiExplorerSettings(GroupName = "1.0")]
     // [ApiExplorerSettings(IgnoreApi = true)] // Ignora completamente os endpoints da controller
-    public class LogController : BaseController
+    public sealed class LogController : BaseController
     {
         private readonly ILogService _logService;
 
@@ -27,22 +28,22 @@ namespace DefaultAPI.V1.Controllers
         [HttpGet("getById/{id:long}")]
         public async Task<IActionResult> GetById(long id)
         {
-            var record = _mapperService.Map<LogReturnedDto>(await _logService.GetById(id));
+            if (await _logService.ExistById(id) == false)
+                return CustomResponse();
 
-            if (record == null)
-            {
-                return NotFound();
-            }
+            var model = _mapperService.Map<UserReturnedDto>(await _logService.GetById(id));
 
-            return CustomResponse(record);
+            return CustomResponse(model, Constants.SuccessInGetId);
         }
 
-        [HttpPost("GetAllFilter")]
-        public async Task<IActionResult> GetAllFilter(LogFilter filter)
+        [HttpPost("GetAllPaginate")]
+        public async Task<IActionResult> GetAllPaginate(LogFilter filter)
         {
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-            return CustomResponse(await _logService.GetAllWithPaginate(filter));
+            var model = await _logService.GetAllPaginate(filter);
+
+            return CustomResponse(model, Constants.SuccessInGetAllPaginate);
         }
     }
 }

@@ -20,6 +20,7 @@ namespace DefaultAPI.Controllers
 
         protected long UserId { get; set; }
         protected string UserName { get; set; }
+        protected long ProfileId { get; set; }
 
         protected BaseController(IMapper mapperService, IGeneralService generalService, INotificationMessageService notificationService)
         {
@@ -27,10 +28,11 @@ namespace DefaultAPI.Controllers
             _generalService = generalService;
             _notificationService = notificationService;
 
-            if (generalService.IsAuthenticated())
+            if (_generalService.IsAuthenticated())
             {
                 UserId = _generalService.GetCurrentUserId();
                 UserName = _generalService.GetCurrentUserName();
+                ProfileId = _generalService.GetCurrentUserProfileId();
             }
         }
 

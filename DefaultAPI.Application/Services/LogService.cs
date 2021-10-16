@@ -1,5 +1,6 @@
 ﻿using DefaultAPI.Application.Factory;
 using DefaultAPI.Application.Interfaces;
+using DefaultAPI.Domain;
 using DefaultAPI.Domain.Dto;
 using DefaultAPI.Domain.Entities;
 using DefaultAPI.Domain.Filters;
@@ -14,11 +15,11 @@ using System.Threading.Tasks;
 
 namespace DefaultAPI.Application.Services
 {
-    public class LogService : ILogService
+    public class LogService : BaseService, ILogService
     {
         public readonly ILogRepository _logRepository;
 
-        public LogService(ILogRepository logRepository)
+        public LogService(ILogRepository logRepository, INotificationMessageService notificationMessageService): base(notificationMessageService)
         {
             _logRepository = logRepository;
         }
@@ -30,7 +31,7 @@ namespace DefaultAPI.Application.Services
 
         public async Task<List<Log>> GetAllWithLike(string parametro) => await _logRepository.GetAllWithLike(parametro);
 
-        public async Task<PagedResult<LogReturnedDto>> GetAllWithPaginate(LogFilter filter)
+        public async Task<PagedResult<LogReturnedDto>> GetAllPaginate(LogFilter filter)
         {
             try
             {
@@ -57,6 +58,28 @@ namespace DefaultAPI.Application.Services
             }
         }
 
+        public async Task<bool> ExistById(long id)
+        {
+            try
+            {
+                var result = _logRepository.Exist(x => x.Id == id);
+
+                if (result == false)
+                    Notify(Constants.ErrorInGetId);
+
+                return result;
+            }
+            catch
+            {
+                Notify(Constants.ErrorInGetId);
+                return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
+        }
+
         private async Task<IQueryable<Log>> GetAllWithFilter(LogFilter filter)
         {
             return await Task.FromResult(_logRepository.GetAll().Where(GetPredicate(filter)).AsQueryable());
@@ -70,7 +93,7 @@ namespace DefaultAPI.Application.Services
         private Expression<Func<Log, bool>> GetPredicate(LogFilter filter)
         {
             return p =>
-            (string.IsNullOrWhiteSpace(filter.Class) || p.Class.Trim().ToUpper().Contains(filter.Class.Trim().ToUpper()));
+            (string.IsNullOrWhiteSpace(filter.Class) || p.Class.Trim().ToUpper().StartsWith(filter.Class.Trim().ToUpper()));
         }
 
         public void Dispose()

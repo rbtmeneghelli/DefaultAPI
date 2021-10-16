@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Controllers;
+using DefaultAPI.Domain;
 using DefaultAPI.Domain.Dto;
 using DefaultAPI.Domain.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DefaultAPI.V1.Controllers
@@ -13,7 +15,7 @@ namespace DefaultAPI.V1.Controllers
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize("Bearer")]
-    public class AuditController : BaseController
+    public sealed class AuditController : BaseController
     {
         private readonly IAuditService _auditService;
 
@@ -25,21 +27,22 @@ namespace DefaultAPI.V1.Controllers
         [HttpGet("getById/{id:long}")]
         public async Task<IActionResult> GetById(long id)
         {
-            var record = _mapperService.Map<AuditReturnedDto>(await _auditService.GetById(id));
-            if (record == null)
-            {
-                return NotFound();
-            }
+            if (await _auditService.ExistById(id) == false)
+                return CustomResponse();
 
-            return CustomResponse(record);
+            var model = _mapperService.Map<AuditReturnedDto>(await _auditService.GetById(id));
+
+            return CustomResponse(model, Constants.SuccessInGetId);
         }
 
-        [HttpPost("GetAllFilter")]
-        public async Task<IActionResult> GetAllFilter(AuditFilter filter)
+        [HttpPost("GetAllPaginate")]
+        public async Task<IActionResult> GetAllPaginate(AuditFilter filter)
         {
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-            return CustomResponse(await _auditService.GetAllWithPaginate(filter));
+            var model = await _auditService.GetAllPaginate(filter);
+
+            return CustomResponse(model, Constants.SuccessInGetAllPaginate);
         }
     }
 }

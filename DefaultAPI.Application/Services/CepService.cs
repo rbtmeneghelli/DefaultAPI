@@ -123,7 +123,7 @@ namespace DefaultAPI.Application.Services
         private Expression<Func<Ceps, bool>> GetPredicate(CepFilter filter)
         {
             return p =>
-                   (string.IsNullOrWhiteSpace(filter.Cep) || p.Cep.Trim().ToUpper().Contains(filter.Cep.Trim().ToUpper()));
+                   (string.IsNullOrWhiteSpace(filter.Cep) || p.Cep.Trim().ToUpper().StartsWith(filter.Cep.Trim().ToUpper()));
         }
 
         public void Dispose()

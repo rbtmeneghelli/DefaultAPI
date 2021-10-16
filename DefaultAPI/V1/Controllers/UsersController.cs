@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Controllers;
 using System;
+using DefaultAPI.Domain;
+using System.Collections.Generic;
 
 namespace DefaultAPI.V1.Controllers
 {
@@ -17,7 +19,7 @@ namespace DefaultAPI.V1.Controllers
     [ApiVersion("2.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize("Bearer")]
-    public class UsersController : BaseController
+    public sealed class UsersController : BaseController
     {
         private readonly IUserService _userService;
 
@@ -29,7 +31,9 @@ namespace DefaultAPI.V1.Controllers
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll()
         {
-            return CustomResponse(await _userService.GetAll());
+            var model = _mapperService.Map<List<UserReturnedDto>>(await _userService.GetAll());
+
+            return CustomResponse(model, Constants.SuccessInGetAll);
         }
 
         [HttpPost("GetAllPaginate")]
@@ -37,25 +41,37 @@ namespace DefaultAPI.V1.Controllers
         {
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-            return CustomResponse(await _userService.GetAllPaginate(userFilter));
+            var model = await _userService.GetAllPaginate(userFilter);
+
+            return CustomResponse(model, Constants.SuccessInGetAllPaginate);
         }
 
         [HttpGet("GetById/{id:long}")]
         public async Task<IActionResult> GetById(long id)
         {
-            return CustomResponse(await _userService.GetById(id));
+            if (await _userService.ExistById(id) == false)
+                return CustomResponse();
+
+            var model = _mapperService.Map<UserReturnedDto>(await _userService.GetById(id));
+
+            return CustomResponse(model, Constants.SuccessInGetId);
         }
 
         [HttpGet("GetByLogin/{login}")]
         public async Task<IActionResult> GetByLogin(string login)
         {
-            return CustomResponse(await _userService.GetByLogin(login));
+            if (await _userService.ExistByLogin(login) == false)
+                return CustomResponse();
+
+            var model = _mapperService.Map<UserReturnedDto>(await _userService.GetByLogin(login));
+
+            return CustomResponse(model, Constants.SuccessInGetId);
         }
 
         [HttpGet("GetUsers")]
         public async Task<IActionResult> GetUsers()
         {
-            return CustomResponse(await _userService.GetUsers());
+            return CustomResponse(await _userService.GetUsers(), Constants.SuccessInDdl);
         }
 
         [HttpPost("Add")]
@@ -66,10 +82,10 @@ namespace DefaultAPI.V1.Controllers
             User user = _mapperService.Map<User>(userSendDto);
 
             var result = await _userService.Add(user);
+
             if (result)
                 return CreatedAtAction(nameof(Add), user);
 
-            throw new Exception("Ocorreu um erro no metodo de add");
             return CustomResponse();
         }
 
@@ -82,11 +98,12 @@ namespace DefaultAPI.V1.Controllers
 
             if (id != userSendDto.Id)
             {
-                NotificationError("O id informado não é o mesmo que foi passado na query");
+                NotificationError(Constants.ErrorInGetId);
                 return CustomResponse();
             }
 
             var result = await _userService.Update(id, user);
+
             if (result)
                 return NoContent();
 
@@ -96,11 +113,37 @@ namespace DefaultAPI.V1.Controllers
         [HttpDelete("Delete/{id:long}/{isDeletePhysical:bool}")]
         public async Task<IActionResult> Delete(int id, bool isDeletePhysical = false)
         {
-            var result = await _userService.Delete(id, isDeletePhysical);
-            if (result)
-                return CustomResponse();
+            try
+            {
+                if (isDeletePhysical)
+                {
+                    if (await _userService.CanDelete(id))
+                    {
+                        bool result = await _userService.DeletePhysical(id);
+                        if (result)
+                            NotificationError(Constants.ErrorInDeletePhysical);
+                    }
+                }
+                else
+                {
+                    bool result = await _userService.DeleteLogic(id);
+                    if (result)
+                        NotificationError(Constants.ErrorInDeleteLogic);
+                }
 
-            return CustomResponse();
+                return CustomResponse();
+            }
+            catch
+            {
+                if (isDeletePhysical && ProfileId == 1)
+                    NotificationError(Constants.ErrorInDeletePhysical);
+                else if (isDeletePhysical && ProfileId != 1)
+                    NotificationError(Constants.NoAuthorization);
+                else
+                    NotificationError(Constants.ErrorInDeleteLogic);
+
+                return CustomResponse();
+            }
         }
 
         [HttpPost("Export2Excel")]

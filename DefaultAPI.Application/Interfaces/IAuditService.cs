@@ -13,6 +13,7 @@ namespace DefaultAPI.Application.Interfaces
     {
         Task<Audit> GetById(long id);
         Task<List<Audit>> GetAllWithLike(string parametro);
-        Task<PagedResult<AuditReturnedDto>> GetAllWithPaginate(AuditFilter filter);
+        Task<PagedResult<AuditReturnedDto>> GetAllPaginate(AuditFilter filter);
+        Task<bool> ExistById(long id);
     }
 }

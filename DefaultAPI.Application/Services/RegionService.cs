@@ -133,7 +133,7 @@ namespace DefaultAPI.Application.Services
         private Expression<Func<Region, bool>> GetPredicate(RegionFilter filter)
         {
             return p =>
-                   (string.IsNullOrWhiteSpace(filter.Nome) || p.Nome.Trim().ToUpper().Contains(filter.Nome.Trim().ToUpper()));
+                   (string.IsNullOrWhiteSpace(filter.Nome) || p.Nome.Trim().ToUpper().StartsWith(filter.Nome.Trim().ToUpper()));
         }
 
         public void Dispose()

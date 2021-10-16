@@ -23,5 +23,6 @@ namespace DefaultAPI.Application.Interfaces
         Task<MemoryStream> Export2Zip(string directory, int typeFile = 2);
         Task<bool> SendPushNotification(PushNotification notification, string tokenUser);
         bool IsAuthenticated();
+        long GetCurrentUserProfileId();
     }
 }

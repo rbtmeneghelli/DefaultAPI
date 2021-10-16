@@ -14,7 +14,7 @@ namespace DefaultAPI.V1.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("1.0")]
     [AllowAnonymous]
-    public class AccountController : BaseController
+    public sealed class AccountController : BaseController
     {
         private IAccountService _accountService;
 

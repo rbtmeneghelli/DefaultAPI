@@ -27,20 +27,32 @@ namespace DefaultAPI.Application.Services
 
         public async Task<List<UserReturnedDto>> GetAll()
         {
-            return await (from p in _userRepository.GetAll().Include(x => x.Profile)
-                          orderby p.Login ascending
-                          select new UserReturnedDto()
-                          {
-                              Id = p.Id,
-                              Login = p.Login,
-                              IsAuthenticated = p.IsAuthenticated,
-                              IsActive = p.IsActive,
-                              Password = "-",
-                              LastPassword = "-",
-                              Profile = p.Profile.ProfileType.GetDisplayName(),
-                              IdProfile = p.Profile.Id.Value,
-                              Status = p.IsActive ? "Ativo" : "Inativo"
-                          }).ToListAsync();
+            try
+            {
+                return await (from p in _userRepository.GetAll().Include(x => x.Profile)
+                              orderby p.Login ascending
+                              select new UserReturnedDto()
+                              {
+                                  Id = p.Id,
+                                  Login = p.Login,
+                                  IsAuthenticated = p.IsAuthenticated,
+                                  IsActive = p.IsActive,
+                                  Password = "-",
+                                  LastPassword = "-",
+                                  Profile = p.Profile.ProfileType.GetDisplayName(),
+                                  IdProfile = p.Profile.Id.Value,
+                                  Status = p.IsActive ? "Ativo" : "Inativo"
+                              }).ToListAsync();
+            }
+            catch
+            {
+                Notify(Constants.ErrorInGetAll);
+                return new List<UserReturnedDto>();
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<PagedResult<UserReturnedDto>> GetAllPaginate(UserFilter filter)
@@ -65,9 +77,10 @@ namespace DefaultAPI.Application.Services
 
                 return PagedFactory.GetPaged(queryResult, filter.pageIndex, filter.pageSize);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw new Exception(ex.Message, ex.InnerException);
+                Notify(Constants.ErrorInGetAll);
+                return null;
             }
             finally
             {
@@ -77,23 +90,35 @@ namespace DefaultAPI.Application.Services
 
         public async Task<UserReturnedDto> GetById(long id)
         {
-            return await (from p in _userRepository.FindBy(x => x.Id == id).AsQueryable()
-                          orderby p.Login ascending
-                          select new UserReturnedDto
-                          {
-                              Id = p.Id,
-                              Login = p.Login,
-                              IsAuthenticated = p.IsAuthenticated,
-                              IsActive = p.IsActive,
-                              Password = "-",
-                              LastPassword = "-",
-                              Status = p.IsActive ? "Ativo" : "Inativo"
-                          }).FirstOrDefaultAsync();
+            try
+            {
+                return await (from p in _userRepository.FindBy(x => x.Id == id).AsQueryable()
+                              orderby p.Login ascending
+                              select new UserReturnedDto
+                              {
+                                  Id = p.Id,
+                                  Login = p.Login,
+                                  IsAuthenticated = p.IsAuthenticated,
+                                  IsActive = p.IsActive,
+                                  Password = "-",
+                                  LastPassword = "-",
+                                  Status = p.IsActive ? "Ativo" : "Inativo"
+                              }).FirstOrDefaultAsync();
+            }
+            catch
+            {
+                Notify(Constants.ErrorInGetId);
+                return new UserReturnedDto();
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<UserReturnedDto> GetByLogin(string login)
         {
-            if (!string.IsNullOrEmpty(login))
+            try
             {
                 return await (from p in _userRepository.FindBy(x => x.Login.ToUpper().Trim() == login.ToUpper().Trim()).AsQueryable()
                               orderby p.Login ascending
@@ -109,28 +134,88 @@ namespace DefaultAPI.Application.Services
                                   Status = p.IsActive ? "Ativo" : "Inativo"
                               }).FirstOrDefaultAsync();
             }
+            catch
+            {
+                Notify("Ocorreu um erro ao efetuar a pesquisa a partir do login. Entre em contato com o administrador");
+                return new UserReturnedDto();
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
 
             return null;
         }
 
         public async Task<List<DropDownList>> GetUsers()
         {
-            return await _userRepository.FindBy(x => x.IsActive == true && x.IsAuthenticated == true)
-                   .Select(x => new DropDownList()
-                   {
-                       Id = x.Id.Value,
-                       Description = x.Login
-                   }).ToListAsync();
+            try
+            {
+                return await _userRepository.FindBy(x => x.IsActive == true && x.IsAuthenticated == true)
+                             .Select(x => new DropDownList()
+                             {
+                                 Id = x.Id.Value,
+                                 Description = x.Login
+                             }).ToListAsync();
+            }
+            catch
+            {
+                Notify(Constants.ErrorInGetDdl);
+                return new List<DropDownList>();
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
-        public bool ExistById(int id)
+        public async Task<bool> ExistById(long id)
         {
-            return _userRepository.Exist(x => x.IsActive == true && x.Id == id);
+            try
+            {
+                var result = _userRepository.Exist(x => x.IsActive == true && x.Id == id);
+
+                if (result == false)
+                    Notify(Constants.ErrorInGetId);
+
+                return result;
+            }
+            catch
+            {
+                Notify(Constants.ErrorInGetId);
+                return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
-        public bool ExistByLogin(string Login)
+        public async Task<bool> ExistByLogin(string login)
         {
-            return _userRepository.Exist(x => x.IsActive == true && x.Login == Login.ToUpper().Trim());
+            try
+            {
+                if (string.IsNullOrEmpty(login)) { 
+                    Notify("O campo login está em branco, por favor preencha!");
+                    return false;
+                }
+
+                var result = _userRepository.Exist(x => x.IsActive == true && x.Login == login.ToUpper().Trim());
+
+                if (result == false)
+                    Notify("Ocorreu um erro para pesquisar o registro do login solicitado. Entre em contato com o Administrador");
+
+                return result;
+            }
+            catch
+            {
+                Notify("Ocorreu um erro para pesquisar o registro do login solicitado. Entre em contato com o Administrador");
+                return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
         }
 
         public async Task<bool> Add(User user)
@@ -143,7 +228,7 @@ namespace DefaultAPI.Application.Services
                     return false;
                 }
 
-                else if (!ExistByLogin(user.Login))
+                else if (_userRepository.Exist(x => x.IsActive == true && x.Login == user.Login.ToUpper().Trim()) == false)
                 {
                     user.Password = new HashingManager().HashToString(user.Password);
                     user.CreatedTime = DateTime.Now;
@@ -195,29 +280,102 @@ namespace DefaultAPI.Application.Services
             }
         }
 
-        public async Task<bool> Delete(long id, bool isDeletePhysical = false)
+        public async Task<bool> DeletePhysical(long id)
         {
             try
             {
                 User user = _userRepository.GetById(id);
 
-                if (isDeletePhysical && user is not null)
+                if (user is not null)
+                {
                     _userRepository.Remove(user);
+                    return true;
+                }
+                else
+                {
+                    Notify(Constants.ErrorInDeletePhysical);
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                Notify(Constants.ErrorInDeletePhysical);
+                return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
+        }
 
-                else if (!isDeletePhysical && user is not null)
+        public async Task<bool> DeleteLogic(long id)
+        {
+            try
+            {
+                User user = _userRepository.GetById(id);
+
+                if (user is not null)
                 {
                     user.UpdateTime = DateTime.Now;
-                    user.IsActive = user.IsActive ? false : true;
+                    user.IsActive = false;
+                    _userRepository.Update(user);
+                    _userRepository.SaveChanges();
+                    return true;
+                }
+                else
+                {
+                    Notify(Constants.ErrorInDeleteLogic);
+                    return false;
+                }
+            }
+            catch (Exception)
+            {
+                Notify(Constants.ErrorInDeleteLogic);
+                return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
+        }
+
+        public async Task<bool> CanDelete(long id)
+        {
+            try
+            {
+                return await _userRepository.CanDelete(id);
+            }
+            catch
+            {
+                Notify(Constants.ErrorInDeletePhysical);
+                return false;
+            }
+            finally
+            {
+                await Task.CompletedTask;
+            }
+        }
+
+        public async Task<bool> ReactiveUser(long id)
+        {
+            try
+            {
+                User user = _userRepository.GetById(id);
+
+                if (user is not null)
+                {
+                    user.UpdateTime = DateTime.Now;
+                    user.IsActive = true;
                     _userRepository.Update(user);
                     _userRepository.SaveChanges();
                     return true;
                 }
 
-                return true;
+                return false;
             }
             catch (Exception)
             {
-                Notify(Constants.ErrorInDelete);
+                Notify(Constants.ErrorInActiveRecord);
                 return false;
             }
             finally
@@ -237,7 +395,7 @@ namespace DefaultAPI.Application.Services
         private Expression<Func<User, bool>> GetPredicate(UserFilter filter)
         {
             return p =>
-                   (string.IsNullOrWhiteSpace(filter.Login) || p.Login.Trim().ToUpper().Contains(filter.Login.Trim().ToUpper()))
+                   (string.IsNullOrWhiteSpace(filter.Login) || p.Login.Trim().ToUpper().StartsWith(filter.Login.Trim().ToUpper()))
                    &&
                    (!filter.IsAuthenticated.HasValue || filter.IsAuthenticated == p.IsAuthenticated)
                    &&
