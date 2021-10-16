@@ -7,39 +7,39 @@ namespace DefaultAPI.Infra.CrossCutting
 {
     public class CryptographyHash
     {
-        private HashAlgorithm _algoritmo;
+        private HashAlgorithm _algoritm;
 
-        public CryptographyHash(HashAlgorithm algoritmo)
+        public CryptographyHash(HashAlgorithm algoritm)
         {
-            _algoritmo = algoritmo;
+            _algoritm = algoritm;
         }
 
-        public string CriptografarSenha(string senha)
+        public string EncryptPassword(string password)
         {
-            var encodedValue = Encoding.UTF8.GetBytes(senha);
-            var encryptedPassword = _algoritmo.ComputeHash(encodedValue);
+            var encodedValue = Encoding.UTF8.GetBytes(password);
+            var encryptedPassword = _algoritm.ComputeHash(encodedValue);
 
             var sb = new StringBuilder();
-            foreach (var caracter in encryptedPassword)
-                sb.Append(caracter.ToString("X2"));
+            foreach (var character in encryptedPassword)
+                sb.Append(character.ToString("X2"));
 
             return sb.ToString();
         }
 
-        public bool VerificarSenha(string senhaDigitada, string senhaCadastrada)
+        public bool CheckPassword(string passwordInputed, string passwordInDb)
         {
-            if (string.IsNullOrEmpty(senhaCadastrada))
+            if (string.IsNullOrEmpty(passwordInDb))
                 throw new NullReferenceException("Cadastre uma senha.");
 
-            var encryptedPassword = _algoritmo.ComputeHash(Encoding.UTF8.GetBytes(senhaDigitada));
+            var encryptedPassword = _algoritm.ComputeHash(Encoding.UTF8.GetBytes(passwordInputed));
 
             var sb = new StringBuilder();
-            foreach (var caractere in encryptedPassword)
+            foreach (var character in encryptedPassword)
             {
-                sb.Append(caractere.ToString("X2"));
+                sb.Append(character.ToString("X2"));
             }
 
-            return sb.ToString() == senhaCadastrada;
+            return sb.ToString() == passwordInDb;
         }
     }
 }
