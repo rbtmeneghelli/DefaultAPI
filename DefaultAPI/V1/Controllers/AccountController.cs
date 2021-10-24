@@ -33,8 +33,7 @@ namespace DefaultAPI.V1.Controllers
             if (result)
             {
                 Credentials credentials = await _accountService.GetUserCredentials(loginUser.Login);
-                credentials.Token = _generalService.CreateJwtToken(credentials);
-                return CustomResponse(credentials);
+                return CustomResponse(_generalService.CreateJwtToken(credentials));
             }
             else
             {

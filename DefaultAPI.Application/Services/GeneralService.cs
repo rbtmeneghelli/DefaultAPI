@@ -54,7 +54,8 @@ namespace DefaultAPI.Application.Services
 
         public string GetCurrentUserName()
         {
-            return _accessor.HttpContext.User.FindFirst(x => x.Type == "Login")?.Value ?? string.Empty;
+            return _accessor.HttpContext.User.Identity.Name ?? string.Empty;
+            //return _accessor.HttpContext.User.FindFirst(x => x.Type == "Login")?.Value ?? string.Empty;
         }
 
         public string CreateJwtToken(Credentials credentials)
@@ -69,8 +70,8 @@ namespace DefaultAPI.Application.Services
                 {
                         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                         new Claim("Id",credentials.Id.ToString()),
-                        new Claim("Login", credentials.Login.ToString()),
-                        new Claim("Roles", string.Join(",",credentials.Roles))
+                        new Claim(ClaimTypes.Name, credentials.Login.ToString()),
+                        new Claim(ClaimTypes.Role, string.Join(",",credentials.Roles)) // são as permissões do usuario, onde podemos restringir os endpoints a partir da tag >>  No Authorize(Roles = "ROLE_AUDIT") por exemplo
                 }),
                 Expires = DateTime.UtcNow.AddSeconds(_tokenConfiguration.Seconds),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

@@ -194,3 +194,8 @@ https://medium.com/@erikthiago/gerador-de-pdf-no-asp-net-core-e494650eb3c9 (Rota
 NET CORE 2.1 ou 3.1 >> https://entityframeworkcore.com/knowledge-base/50993914/implementing-encryption-in-entity-framework-model-classes
 NET CORE 5.0 ou superior >> https://sd.blackball.lv/articles/read/18805
 NET CORE 5.0 ou superior >> https://emrekizildas.medium.com/encrypt-your-database-columns-with-entityframework-1f129b19bdf8
+
+>> A PARTIR DO EF CORE 5.0 E POSSIVEL FAZER O MAPEAMENTO DE UMA VIEW PARA DENTRO DE UMA ENTIDADE C#
+exemplo: Dentro do metodo override OnModelCreating, fazemos o codigo abaixo:
+modelBuilder.Entity<Classe>(x => { x.ToSqlQuery("SELECT * FROM VWTESTE")})
+
