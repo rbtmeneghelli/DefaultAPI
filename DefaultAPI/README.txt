@@ -199,3 +199,10 @@ NET CORE 5.0 ou superior >> https://emrekizildas.medium.com/encrypt-your-databas
 exemplo: Dentro do metodo override OnModelCreating, fazemos o codigo abaixo:
 modelBuilder.Entity<Classe>(x => { x.ToSqlQuery("SELECT * FROM VWTESTE")})
 
+-- Passo para criação de um chat ou envio de notificações a aplicação com SignalR
+>> https://www.c-sharpcorner.com/article/real-time-angular-11-application-with-signalr-and-net-5/
+
+-- Gerar diagrama de classe 
+>> Verificar se o pacote class designer está instalado, caso não esteja efetuar o passo abaixo:
+    >> Menu Tools >> Get Tools and Features
+    >> Na opção menu Individual components >> Selecionar a opção class designer
