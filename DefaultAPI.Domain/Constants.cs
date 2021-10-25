@@ -39,6 +39,7 @@ namespace DefaultAPI.Domain
         public const string ErrorInBackup = "Ocorreu um erro para efetuar a execução do backup. Entre em contato com o Administrador";
         public const string ErrorInProcedure = "Ocorreu um erro para efetuar a execução da procedure {0}. Entre em contato com o Administrador";
         public const string ErrorInAddCity = "Ocorreu um erro para adicionar as cidades na base de dados. Entre em contato com o Administrador";
+        public const string ErrorInRefreshToken = "Token Invalido";
 
         public const string SuccessInLogin = "A autenticação foi efetuada com sucesso";
         public const string SuccessInAdd = "O registro foi adicionado com sucesso";

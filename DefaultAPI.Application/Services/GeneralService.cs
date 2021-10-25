@@ -24,6 +24,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,6 +33,7 @@ namespace DefaultAPI.Application.Services
     public sealed class GeneralService : BaseService, IGeneralService
     {
         private readonly IHttpContextAccessor _accessor;
+        private List<RefreshTokens> _refreshTokens = new List<RefreshTokens>();
 
         TokenConfiguration _tokenConfiguration { get; }
         EmailSettings _emailSettings { get; }
@@ -398,6 +400,69 @@ namespace DefaultAPI.Application.Services
         {
             string profileId = _accessor.HttpContext.User.FindFirst(x => x.Type == "ProfileId")?.Value;
             return long.TryParse(profileId, out _) ? long.Parse(profileId) : 0;
+        }
+
+        public string GenerateToken(IEnumerable<Claim> claims)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_tokenConfiguration.Key);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.UtcNow.AddHours(2),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        {
+            var key = Encoding.ASCII.GetBytes(_tokenConfiguration.Key);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateLifetime = false
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+            if (!(securityToken is JwtSecurityToken jwtSecurityToken))
+                throw new SecurityTokenException(Constants.ErrorInRefreshToken);
+            else if (!jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
+                    StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException(Constants.ErrorInRefreshToken);
+
+            return principal;
+        }
+
+        public void SaveRefreshToken(string username, string refreshToken)
+        {
+            _refreshTokens.Add(new RefreshTokens(username, refreshToken));
+        }
+
+        public string GetRefreshToken(string username)
+        {
+            return _refreshTokens.FirstOrDefault(x => x.Username == username).RefreshToken;
+        }
+
+        public void DeleteRefreshToken(string username, string refreshToken)
+        {
+            var item = _refreshTokens.FirstOrDefault(x => x.Username == username && x.RefreshToken == refreshToken);
+            _refreshTokens.Remove(item);
         }
     }
 }

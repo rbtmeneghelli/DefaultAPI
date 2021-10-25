@@ -4,6 +4,7 @@ using ServiceTria.Framework.DTO;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,5 +25,11 @@ namespace DefaultAPI.Application.Interfaces
         Task<bool> SendPushNotification(PushNotification notification, string tokenUser);
         bool IsAuthenticated();
         long GetCurrentUserProfileId();
+        string GenerateToken(IEnumerable<Claim> claims);
+        string GenerateRefreshToken();
+        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+        void SaveRefreshToken(string username, string refreshToken);
+        string GetRefreshToken(string username);
+        void DeleteRefreshToken(string username, string refreshToken);
     }
 }
