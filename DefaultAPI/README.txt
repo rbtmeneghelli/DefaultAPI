@@ -206,3 +206,13 @@ modelBuilder.Entity<Classe>(x => { x.ToSqlQuery("SELECT * FROM VWTESTE")})
 >> Verificar se o pacote class designer está instalado, caso não esteja efetuar o passo abaixo:
     >> Menu Tools >> Get Tools and Features
     >> Na opção menu Individual components >> Selecionar a opção class designer
+
+-- Novidades do NET 6 para trabalhar com lista
+>> lista.firstordefault(x => x == 1, "0"); first ou single or default e possivel passar um valor padrao apos a query
+>> Antes era assim...lista.firstordefault(x => x == 1) ?? 0;
+>> MinBy => Pega o menor valor da lista
+>> MaxBy => Pega o maior valor da lista
+>> Chunk => Reparte a lista em varias sublistas conforme o numero de itens solicitado
+>> Enumerable.range(1,500) => Cria uma lista de 1 ate 500
+>> Zip => Voce compacta 1 ou mais listas em uma unica, fazendo uma unica execução
+>> Take => Conseguimos passar uma margem de elementos take(25..50) ou pegar um valor especifico take(25)
