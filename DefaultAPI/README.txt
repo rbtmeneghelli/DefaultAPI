@@ -216,3 +216,25 @@ modelBuilder.Entity<Classe>(x => { x.ToSqlQuery("SELECT * FROM VWTESTE")})
 >> Enumerable.range(1,500) => Cria uma lista de 1 ate 500
 >> Zip => Voce compacta 1 ou mais listas em uma unica, fazendo uma unica execução
 >> Take => Conseguimos passar uma margem de elementos take(25..50) ou pegar um valor especifico take(25)
+
+-- Realizando Globalização e Localização de idioma
+>> Adicionar o serviço abaixo na classe startup
+services.AddLocalization()
+>> Adicionar a aplicação abaixo na classe startup
+var supportedCultures = new [] {"pt-BR", "en-US", "it"};
+var localizationOptions = new RequestLocalizationOptions()
+.SetDefaultCulture(supportedCultures[0])
+.AddSupportedCultures(supportedCultures)
+.AddSupportedUICultures(supportedCultures);
+app.UseRequestLocalization(localizationOptions);
+
+>> Aplicando a funcionalidade na controller
+Utilizar o data annotation [FromServices] IStringLocalizer<Messages> localizer
+Para pegar o valor, basta utilizar o comando localizer[""].Value
+
+>> Criar o Resource para que o StringLocalizer possa pegar o valor do idioma definido
+Exemplo de nome de arquivo: Nomedoarquivo.idioma.resx (Criar um arquivo padrao sem o idioma especificado, somente Nomedoarquivo.resx)
+Obs:
+Configurar na propriedade do arquivo .resx
+Custom Tool >> PublicResXFileCodeGenerator
+
