@@ -1201,5 +1201,10 @@ namespace DefaultAPI.Infra.CrossCutting
 
             return true;
         }
+
+        public Dictionary<long, string> ConvertListToDictionary(List<DropDownList> list)
+        {
+            return list.ToDictionary(item => item.Id, item => item.Description);
+        }
     }
 }

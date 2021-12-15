@@ -238,3 +238,5 @@ Obs:
 Configurar na propriedade do arquivo .resx
 Custom Tool >> PublicResXFileCodeGenerator
 
+>> Gerar excel EPPLUS ou NPOI
+http://www.macoratti.net/21/03/c_xlsplus1.htm
