@@ -1206,5 +1206,16 @@ namespace DefaultAPI.Infra.CrossCutting
         {
             return list.ToDictionary(item => item.Id, item => item.Description);
         }
+
+        public int MethodWithTwoResults(int value, out bool IsOk)
+        {
+            // Vai retornar o valor armazenado na variavel value, e podemos pegar o valor da variavel IsOk e
+            // manipular como se fosse uma variavel local e não so um parametro
+            IsOk = value > 0 ? true : false;
+            if (value > 0 && value % 2 == 0) value = value * 2;
+            else if (value > 0 && value % 3 == 0) value = value * 3;
+            else value = 0;
+            return value;
+        }
     }
 }
