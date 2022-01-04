@@ -1,9 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Dynamic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace DefaultAPI.Infra.Data.Context
@@ -43,6 +46,23 @@ namespace DefaultAPI.Infra.Data.Context
             for (var fieldCount = 0; fieldCount < dataReader.FieldCount; fieldCount++)
                 dataRow.Add(dataReader.GetName(fieldCount), dataReader[fieldCount]);
             return dataRow;
+        }
+
+        public static void ApplyGlobalFilters<TInterface>(this ModelBuilder modelBuilder, Expression<Func<TInterface, bool>> expression)
+        {
+            var entities = modelBuilder.Model
+                .GetEntityTypes()
+                .Select(e => e.ClrType);
+
+            foreach (Type entity in entities)
+            {
+                if (entity.IsSubclassOf(typeof(TInterface)))
+                {
+                    var newParam = Expression.Parameter(entity);
+                    var newbody = ReplacingExpressionVisitor.Replace(expression.Parameters.Single(), newParam, expression.Body);
+                    modelBuilder.Entity(entity).HasQueryFilter(Expression.Lambda(newbody, newParam));
+                }
+            }
         }
     }
 }

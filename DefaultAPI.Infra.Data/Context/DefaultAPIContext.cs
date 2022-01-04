@@ -36,6 +36,8 @@ namespace DefaultAPI.Infra.Data.Context
             modelBuilder.ApplyConfiguration(new LogMapping());
             modelBuilder.ApplyConfiguration(new OperationMapping());
             foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) relationship.DeleteBehavior = DeleteBehavior.ClientSetNull;
+            // Com o comando abaixo podemos fazer o EF Core carregar apenas os dados de cada uma das entidades que estejam com o campo Ativo == null
+            //builder.ApplyGlobalFilters<Base>(x => x.Ativo == null);
             modelBuilder.ExecuteSeed();
             base.OnModelCreating(modelBuilder);
         }
