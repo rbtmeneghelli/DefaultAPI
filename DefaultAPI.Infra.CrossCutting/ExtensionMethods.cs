@@ -1217,5 +1217,21 @@ namespace DefaultAPI.Infra.CrossCutting
             else value = 0;
             return value;
         }
+
+        public string Truncate(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value)) return value;
+            return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+        }
+
+        public string FormatCnpj(string texto)
+        {
+            return Convert.ToUInt64(texto).ToString(@"00\.000\.000\/0000\-00");
+        }
+
+        public string FormatCpf(string texto)
+        {
+            return Convert.ToUInt64(texto).ToString(@"000\.000\.000\-00");
+        }
     }
 }
