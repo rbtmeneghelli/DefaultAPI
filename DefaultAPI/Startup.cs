@@ -79,6 +79,9 @@ namespace DefaultAPI
             }
             else
             {
+                // Middleware para tratamento de exceção sem exibir o erro da aplicação para o cliente...
+                // E necessario criar um metodo na controller principal para que todos possam utilizar
+                app.UseExceptionHandler("/errors");
                 app.UseHsts();
             }
 

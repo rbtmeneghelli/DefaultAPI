@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using DefaultAPI.Application.Interfaces;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -79,6 +81,21 @@ namespace DefaultAPI.Controllers
         protected void NotificationError(string mensagem)
         {
             _notificationService.Handle(new Domain.Models.NotificationMessage(mensagem));
+        }
+
+        [HttpGet]
+        [Route("/errors")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        protected IActionResult HandleErrors()
+        {
+            var contextException = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            var responseStatusCode = contextException.Error.GetType().Name
+            switch
+            {
+                "NullReferenceException" => HttpStatusCode.BadRequest,
+                _ => HttpStatusCode.ServiceUnavailable
+            };
+            return Problem(detail: $"Ocorreu um erro interno - {contextException.Error.Message}, Entre em contato com o administrador.", statusCode: (int)responseStatusCode);
         }
     }
 }
