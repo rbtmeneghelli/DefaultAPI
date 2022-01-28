@@ -246,3 +246,5 @@ https://github.com/rsantosdev/aspnetcore-report-export-samples
 
 -- Tratamento de erros com UseExceptionHandler
 http://www.macoratti.net/21/04/aspc_errglobl1.htm
+
+-- Se precisar trabalhar com variaveis de ambiente, seguir modelo do Webnotes

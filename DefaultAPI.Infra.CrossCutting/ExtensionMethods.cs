@@ -1233,5 +1233,20 @@ namespace DefaultAPI.Infra.CrossCutting
         {
             return Convert.ToUInt64(texto).ToString(@"000\.000\.000\-00");
         }
+
+        public string GenerateTokenNumbers()
+        {
+            Random random = new Random();
+            int count = 0;
+            string token = string.Empty;
+
+            while (count < 8)
+            {
+                int number = random.Next(0, 9);
+                token = string.Concat(token, number.ToString());
+            }
+
+            return token.Trim();
+        }
     }
 }
