@@ -1001,7 +1001,7 @@ namespace DefaultAPI.Infra.CrossCutting
             return string.Empty;
         }
 
-        public DateTime FirstDayCurrentMonth()
+        public static DateTime FirstDayCurrentMonth()
         {
             return DateTime.Parse(string.Format("{0}/{1}/{2}", "01", DateTime.Now.Month, DateTime.Now.Year));
         }
@@ -1247,6 +1247,33 @@ namespace DefaultAPI.Infra.CrossCutting
             }
 
             return token.Trim();
+        }
+
+        public static DateTime GetNextUtilDay(DateTime dateTime)
+        {
+            try
+            {
+                while (true)
+                {
+                    if (dateTime.DayOfWeek == DayOfWeek.Saturday)
+                        dateTime = dateTime.AddDays(2);
+                    else if (dateTime.DayOfWeek == DayOfWeek.Sunday)
+                        dateTime = dateTime.AddDays(1);
+
+                    // Caso tenha feriado nacional ou internacional, fazer uma consulta no BD pra isso...depois um IF para validar e somar 1 dia...
+
+                    return dateTime;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message, ex.InnerException);
+            }
+        }
+
+        public static DateTime GetCurrentUtilDay()
+        {
+            return GetNextUtilDay(FirstDayCurrentMonth().AddDays(5));
         }
     }
 }
