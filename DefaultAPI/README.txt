@@ -187,7 +187,6 @@ https://medium.com/@erikthiago/gerador-de-pdf-no-asp-net-core-e494650eb3c9 (Rota
 >> Classe sealed pode herdar outras classes, mas ninguem pode herdar a classe sealed
 
 -- Autenticação e Autorização Bearer JWT
-
 >> balta.io/artigos/aspnet-5-autenticacao-autorizacao-bearer-jwt
 
 -- Implementando criptografia dos dados na base de dados, devido ao padrão LGPD
@@ -247,4 +246,8 @@ https://github.com/rsantosdev/aspnetcore-report-export-samples
 -- Tratamento de erros com UseExceptionHandler
 http://www.macoratti.net/21/04/aspc_errglobl1.htm
 
--- Se precisar trabalhar com variaveis de ambiente, seguir modelo do Webnotes
+-- Trabalhando com SeriLog e Seq (Exibindo Log de erro em aplicação externa)
+https://rafaelcruz.azurewebsites.net/2016/11/08/criando-log-estruturados-com-seq-e-serilog/
+https://balta.io/blog/aspnet-serilog?utm_source=LinkedIn&utm_campaign=social-to-blog&utm_content=aspnet-serilog&utm_medium=social
+
+-- Se precisar trabalhar com variaveis de ambiente ou Serilog, seguir modelo do Webnotes
