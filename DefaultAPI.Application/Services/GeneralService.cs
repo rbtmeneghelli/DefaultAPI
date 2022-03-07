@@ -1,6 +1,7 @@
 ﻿using DefaultAPI.Application.Interfaces;
 using DefaultAPI.Domain;
 using DefaultAPI.Domain.Enums;
+using DefaultAPI.Domain.Exceptions;
 using DefaultAPI.Domain.Models;
 using DefaultAPI.Infra.CrossCutting;
 using MailKit.Security;
@@ -99,7 +100,7 @@ namespace DefaultAPI.Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception(Constants.ExceptionExcel, ex.InnerException);
+                throw new ExceptionExcel();
             }
         }
 
