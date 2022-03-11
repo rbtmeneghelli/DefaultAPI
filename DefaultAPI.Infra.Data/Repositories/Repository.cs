@@ -236,6 +236,11 @@ namespace DefaultAPI.Infra.Data.Repositories
             return null;
         }
 
+        public void BulkInsert(IEnumerable<TEntity> lista)
+        {
+            _context.BulkInsert(lista);
+        }
+
         #region Private Methods
 
         private string[] GetValuesFromEntity(IEnumerable<TEntity> entity)

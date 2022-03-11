@@ -251,3 +251,6 @@ https://rafaelcruz.azurewebsites.net/2016/11/08/criando-log-estruturados-com-seq
 https://balta.io/blog/aspnet-serilog?utm_source=LinkedIn&utm_campaign=social-to-blog&utm_content=aspnet-serilog&utm_medium=social
 
 -- Se precisar trabalhar com variaveis de ambiente ou Serilog, seguir modelo do Webnotes
+
+-- Realizando BulkInsert para adicionar 1000 ou mais registros de forma mais otimizada do que com AddRange
+https://macoratti.net.br/21/05/ef_bulkinsert1.htm

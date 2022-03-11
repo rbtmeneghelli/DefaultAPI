@@ -25,5 +25,6 @@ namespace DefaultAPI.Application
         void SetCommandTimeout(int timeout);
         bool ExecuteProcedureSql(string sql);
         bool Exist(Expression<Func<TEntity, bool>> predicate);
+        void BulkInsert(IEnumerable<TEntity> lista);
     }
 }
