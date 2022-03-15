@@ -254,3 +254,6 @@ https://balta.io/blog/aspnet-serilog?utm_source=LinkedIn&utm_campaign=social-to-
 
 -- Realizando BulkInsert para adicionar 1000 ou mais registros de forma mais otimizada do que com AddRange
 https://macoratti.net.br/21/05/ef_bulkinsert1.htm
+
+-- Criptografar parametros da URL como ID e outros campos...
+http://www.macoratti.net/21/05/aspnc_urlprot1.htm
