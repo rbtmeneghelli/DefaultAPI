@@ -257,3 +257,10 @@ https://macoratti.net.br/21/05/ef_bulkinsert1.htm
 
 -- Criptografar parametros da URL como ID e outros campos...
 http://www.macoratti.net/21/05/aspnc_urlprot1.htm
+
+-- Implementando Rate Limiting (Limitador de requisições) aos endpoints numa API
+https://www.c-sharpcorner.com/article/implement-rate-limiting-in-asp-net-core-web-api/
+https://github.com/stefanprodan/AspNetCoreRateLimit/wiki
+
+-- Fazendo MultiThreads de requests serem processadas uma por vez
+>> Utilizar o comando Lock para que seja efetuada tal ação (http://www.macoratti.net/10/09/c_thd1.htm)
