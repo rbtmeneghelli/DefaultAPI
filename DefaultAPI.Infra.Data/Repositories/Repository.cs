@@ -156,6 +156,7 @@ namespace DefaultAPI.Infra.Data.Repositories
         public void Dispose()
         {
             _context?.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         public virtual bool ExecuteSql(string sql, params object[] parameters)

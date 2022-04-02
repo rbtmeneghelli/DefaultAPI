@@ -68,7 +68,8 @@ namespace DefaultAPI.Infra.Data.Repositories
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _context?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

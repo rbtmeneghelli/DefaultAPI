@@ -264,3 +264,7 @@ https://github.com/stefanprodan/AspNetCoreRateLimit/wiki
 
 -- Fazendo MultiThreads de requests serem processadas uma por vez
 >> Utilizar o comando Lock para que seja efetuada tal ação (http://www.macoratti.net/10/09/c_thd1.htm)
+
+-- Utilizando o banco não relacional REDIS com C#
+>> https://renatogroffe.medium.com/net-core-3-1-redis-do-cache-distribu%C3%ADdo-ao-uso-como-banco-nosql-a88d6da39e0
+>> SGDB (Redis Desktop Manager ou Redis Manager)

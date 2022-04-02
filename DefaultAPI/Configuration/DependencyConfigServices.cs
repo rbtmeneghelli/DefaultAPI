@@ -110,6 +110,15 @@ namespace DefaultAPI.Configuration
             //services.AddHangfireServer();
             //return services;
         }
+
+        internal static void RegisterRedisConfig(this IServiceCollection services, IConfiguration Configuration)
+        {
+            //services.AddDistributedRedisCache(options =>
+            //{
+            //    options.Configuration = "localhost:6379";
+            //    options.InstanceName = "HUBDATABASE - ";
+            //});
+        }
     }
 
     public class DefaultAPIContextFactory : IDesignTimeDbContextFactory<DefaultAPIContext>
