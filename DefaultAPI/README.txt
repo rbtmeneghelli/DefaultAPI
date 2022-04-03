@@ -267,4 +267,5 @@ https://github.com/stefanprodan/AspNetCoreRateLimit/wiki
 
 -- Utilizando o banco não relacional REDIS com C#
 >> https://renatogroffe.medium.com/net-core-3-1-redis-do-cache-distribu%C3%ADdo-ao-uso-como-banco-nosql-a88d6da39e0
+>> https://tutexchange.com/using-distributed-redis-cache-with-asp-net-core-3-1/
 >> SGDB (Redis Desktop Manager ou Redis Manager)
