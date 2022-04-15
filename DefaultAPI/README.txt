@@ -269,3 +269,12 @@ https://github.com/stefanprodan/AspNetCoreRateLimit/wiki
 >> https://renatogroffe.medium.com/net-core-3-1-redis-do-cache-distribu%C3%ADdo-ao-uso-como-banco-nosql-a88d6da39e0
 >> https://tutexchange.com/using-distributed-redis-cache-with-asp-net-core-3-1/
 >> SGDB (Redis Desktop Manager ou Redis Manager)
+
+-- Trabalhando com Cache nos Endpoints de WEBAPIS
+>> Configurar na classe startup as duas funcionalidades abaixo:
+>> services.AddResponseCaching();
+>> app.UseResponseCaching();
+
+-- Problemas ao gravar dados com caracteres especiais (%,^)
+>> Isso ocorre porque o firewall entende como uma ameaça.
+>> Nesse caso devemos torna-lo como byte e grava-lo, depois converte-lo ao normal ao resgatarmos a informação.
