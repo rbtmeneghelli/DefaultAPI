@@ -1276,8 +1276,13 @@ namespace DefaultAPI.Infra.CrossCutting
             return GetNextUtilDay(FirstDayCurrentMonth().AddDays(5));
         }
 
-        public static double MilhasParaKm(double milhas) => Math.Round(milhas * 1.609, 3);
+        public static double MilesToKm(double miles) => Math.Round(miles * 1.609, 3);
 
-        public static double KmParaMilhas(double km) => Math.Round(km / 1.609, 3);
+        public static double KmToMiles(double km) => Math.Round(km / 1.609, 3);
+
+        public static string FormatStringBase64ToString(string text)
+        {
+            return Encoding.UTF8.GetString(Convert.FromBase64String(text));
+        }
     }
 }
