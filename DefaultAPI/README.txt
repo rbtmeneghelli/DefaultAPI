@@ -278,3 +278,8 @@ https://github.com/stefanprodan/AspNetCoreRateLimit/wiki
 -- Problemas ao gravar dados com caracteres especiais (%,^)
 >> Isso ocorre porque o firewall entende como uma ameaça.
 >> Nesse caso devemos torna-lo como byte e grava-lo, depois converte-lo ao normal ao resgatarmos a informação.
+
+-- Implementação de HealthCheck
+>> O projeto WebNotes tem um modelo pratico disso!
+>> https://balta.io/blog/aspnet-health-check
+>> https://dotnetthoughts.net/implementing-health-check-aspnetcore/
