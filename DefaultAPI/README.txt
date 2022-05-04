@@ -283,3 +283,11 @@ https://github.com/stefanprodan/AspNetCoreRateLimit/wiki
 >> O projeto WebNotes tem um modelo pratico disso!
 >> https://balta.io/blog/aspnet-health-check
 >> https://dotnetthoughts.net/implementing-health-check-aspnetcore/
+
+
+-- Implementando UnitOfWork com padrão Repository e DDD
+>> https://macoratti.net/21/06/aspnc_repuow1.htm
+>> Tem no projeto DefaultWebAPI
+
+-- Implementando SignalR com front e back
+>> Tem no projeto WebNotes
