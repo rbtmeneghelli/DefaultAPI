@@ -14,6 +14,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
@@ -1283,6 +1284,42 @@ namespace DefaultAPI.Infra.CrossCutting
         public static string FormatStringBase64ToString(string text)
         {
             return Encoding.UTF8.GetString(Convert.FromBase64String(text));
+        }
+
+        public static string ConvertModelObjectToXml<T>(T modelObject)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+
+            using (StringWriter textWriter = new StringWriter())
+            {
+                xmlSerializer.Serialize(textWriter, modelObject);
+                return textWriter.ToString();
+            }
+        }
+
+        public static string ConvertXmlToJson<T>(string xmlData)
+        {
+            T modelObject;
+
+            XmlSerializer xmlSerializer = new XmlSerializer(typeof(T));
+
+            using (StringReader textReader = new StringReader(xmlData))
+            {
+                modelObject = (T)xmlSerializer.Deserialize(textReader);
+            }
+            return JsonConvert.SerializeObject(modelObject);
+        }
+
+        public static string ConvertJsonToXml<T>(string jsonData)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            T modelObject = System.Text.Json.JsonSerializer.Deserialize<T>(jsonData, options);
+
+            return ConvertModelObjectToXml<T>(modelObject);
         }
     }
 }
