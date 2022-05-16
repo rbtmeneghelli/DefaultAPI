@@ -291,3 +291,7 @@ https://github.com/stefanprodan/AspNetCoreRateLimit/wiki
 
 -- Implementando SignalR com front e back
 >> Tem no projeto WebNotes
+
+-- Implementando simple factory
+https://macoratti.net/21/06/c_simpfact1.htm
+>> Tem no projeto DefaultWebApi, so procurar o comentario!
