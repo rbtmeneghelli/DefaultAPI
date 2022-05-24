@@ -295,3 +295,6 @@ https://github.com/stefanprodan/AspNetCoreRateLimit/wiki
 -- Implementando simple factory
 https://macoratti.net/21/06/c_simpfact1.htm
 >> Tem no projeto DefaultWebApi, so procurar o comentario!
+
+-- O IHTTPCLIENTFACTORY E MELHOR SER UTILIZADO DO QUE O HTTPCLIENT, POIS O HTTPCLIENT DA PROBLEMAS DE MEMORIA...
+>> Tem um exemplo no projeto WebNotes
