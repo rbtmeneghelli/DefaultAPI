@@ -9,6 +9,7 @@ using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -1321,5 +1322,36 @@ namespace DefaultAPI.Infra.CrossCutting
 
             return ConvertModelObjectToXml<T>(modelObject);
         }
+
+        #region "Metodos auxiliares para diminuir o tamanho de arquivos muito extensos, para arquivos compactos"
+
+        public static byte[] CompressStream(byte[] originalSource)
+        {
+            using (var outStream = new MemoryStream())
+            {
+                using (var gzip = new GZipStream(outStream, CompressionMode.Compress))
+                {
+                    gzip.Write(originalSource, 0, originalSource.Length);
+                }
+                return outStream.ToArray();
+            }
+        }
+
+        public static byte[] DecompressStream(byte[] originalSource)
+        {
+            using (var sourceStream = new MemoryStream(originalSource))
+            {
+                using (var outStream = new MemoryStream())
+                {
+                    using (var gzip = new GZipStream(sourceStream, CompressionMode.Decompress))
+                    {
+                        gzip.CopyTo(outStream);
+                    }
+                    return outStream.ToArray();
+                }
+            }
+        }
+
+        #endregion
     }
 }
