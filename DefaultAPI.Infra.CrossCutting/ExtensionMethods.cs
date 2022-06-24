@@ -1,4 +1,5 @@
-﻿using DefaultAPI.Domain.Enums;
+﻿using DefaultAPI.Domain;
+using DefaultAPI.Domain.Enums;
 using DefaultAPI.Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -1353,5 +1354,10 @@ namespace DefaultAPI.Infra.CrossCutting
         }
 
         #endregion
+
+        public static string RetornarTextoComAspas(string textStart, string word, string textEnd)
+        {
+            return string.Format("{0}{1}{2}{3}{4}", textStart, Constants.quote, word, Constants.quote, textEnd);
+        }
     }
 }

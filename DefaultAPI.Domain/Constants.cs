@@ -60,5 +60,7 @@ namespace DefaultAPI.Domain
         public const string SuccessInDdl = "Os dados de dropdownlist foram retornados com sucesso";
 
         public const string NoAuthorization = "Caro usuário você não tem permissão para efetuar tal ação. Entre em contato com o Administrador";
+
+        public const string quote = "\"";
     }
 }
