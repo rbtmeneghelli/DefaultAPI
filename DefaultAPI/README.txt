@@ -300,3 +300,6 @@ https://macoratti.net/21/07/c_factory2.htm
 
 -- O IHTTPCLIENTFACTORY E MELHOR SER UTILIZADO DO QUE O HTTPCLIENT, POIS O HTTPCLIENT DA PROBLEMAS DE MEMORIA...
 >> Tem um exemplo no projeto WebNotes
+
+-- CLIENT: 535-5.7.8 Username and Password not accepted. Learn more at
+>> Tem que ativar a segurança em duas etapas, gerar uma senha de APP e utiliza-la, ao invés da senha do email
