@@ -2,19 +2,22 @@
 
 - Para executar a migration pela library Data é necessario instalar os seguintes pacotes:
 1 - Microsoft.EntityFrameworkCore
-2 - Microsoft.EntityFrameworkCore.SqlServer ou Npgsql.EntityFrameworkCore.PostgreSQL
+2 - Microsoft.EntityFrameworkCore.SqlServer ou Npgsql.EntityFrameworkCore.PostgreSQL ou Pomelo.EntityFrameworkCore.MySql
 3 - Microsoft.EntityFrameworkCore.Tools
 
-Comandos basicos de migration:
+Comandos basicos do migration via package manager console:
 1 - Abrir a janela do Package Manager Console
 2 - Apontar para a library Data
 3 - Criando banco de dados -> Add-Migration Initial ou Add-Migration Initial -Context ApplicationDbContext ou EntityFrameworkCore\Add-Migration InitialDb -Context WebsrvApiContext
 4 - Aplicar o comando de atualização -> Update-Database ou Update-Database -Context ApplicationDbContext
 5 - Remover Migration -> Remove-Migration ou Remove-Migration -Context ApplicationDbContext
 
-Comandos extras de migration:
-1 - Comando para adicionar a migration (Add-Migration CamposNovosTabelaMeta)
-2 - Comando para atualizar o banco (Update-Database -v)
+Comandos do migration via terminal:
+1 - Instalar o pacote (dotnet tool install --global dotnet-ef)
+2 - Atualizar o pacote (dotnet tool update --global dotnet-ef)
+3 - Verificar se o pacote esta instalado (dotnet ef)
+4 - dotnet ef migrations add "mensagem"
+5 - dotnet ef database update
 
 DataAnnotation Importante!
 [NotMapped] -> Serve para não criar a propriedade da classe como campo no bd ao efetuar migration!
