@@ -306,3 +306,6 @@ https://macoratti.net/21/07/c_factory2.htm
 
 -- CLIENT: 535-5.7.8 Username and Password not accepted. Learn more at
 >> Tem que ativar a segurança em duas etapas, gerar uma senha de APP e utiliza-la, ao invés da senha do email
+
+-- Feito funcionalidade para interceptar dados base64 para string, devido a bloqueio de firewall quando string tem caractere especial
+>> Tem a interface e o service chamado ReadPropertyValue (Projeto DefaultWebAPI tem exemplo)

@@ -1359,5 +1359,21 @@ namespace DefaultAPI.Infra.CrossCutting
         {
             return string.Format("{0}{1}{2}{3}{4}", textStart, Constants.quote, word, Constants.quote, textEnd);
         }
+
+        #region "Metodo para pegar o base64 do front (btoa ou atob) e faz o processo de conversão"
+
+        public static string EncodingString(string toEncode)
+        {
+            byte[] bytes = Encoding.GetEncoding("UTF-8").GetBytes(toEncode);
+            return Convert.ToBase64String(bytes);
+        }
+
+        public static string DecodingString(string toDecode)
+        {
+            byte[] bytes = Convert.FromBase64String(toDecode);
+            return ASCIIEncoding.ASCII.GetString(bytes);
+        }
+
+        #endregion
     }
 }
