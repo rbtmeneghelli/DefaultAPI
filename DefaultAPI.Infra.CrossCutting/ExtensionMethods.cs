@@ -1375,5 +1375,30 @@ namespace DefaultAPI.Infra.CrossCutting
         }
 
         #endregion
+
+        public string GetBytesFromBinaryString(string binary)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (!string.IsNullOrWhiteSpace(binary))
+            {
+                string[] binarySplited = binary.Split(' ');
+
+                foreach (var item in binarySplited)
+                {
+                    string binaryContent = item.Trim();
+
+                    if (IsBinaryString(binaryContent) && !string.IsNullOrWhiteSpace(binaryContent))
+                        sb.Append((char)Convert.ToInt32(binaryContent, 2));
+
+                    else if (!string.IsNullOrWhiteSpace(binaryContent))
+                        sb.Append(binaryContent);
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private bool IsBinaryString(string binaryContent) => Regex.IsMatch(binaryContent, "^[01]+$");
     }
 }
