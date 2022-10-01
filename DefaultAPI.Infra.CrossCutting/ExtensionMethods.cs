@@ -2,6 +2,7 @@
 using DefaultAPI.Domain.Enums;
 using DefaultAPI.Domain.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -1400,5 +1401,27 @@ namespace DefaultAPI.Infra.CrossCutting
         }
 
         private bool IsBinaryString(string binaryContent) => Regex.IsMatch(binaryContent, "^[01]+$");
+
+        #region Metodos utilizando os novos operadores condicionais do C#9
+
+        public bool IsValidNumber(int number) => number is >= 0 and <= 100;
+
+        public bool IsZeroOrOne(int number) => number is 0 or 1;
+
+        public bool IsvalidObject(object obj) => obj is not null;
+
+        public bool IsValidSeparator(char c) => c is (>= 'a' and <= 'z') or (>= 'A' and <= 'Z') or '.' or ',';
+
+        #endregion
+
+        #region "Retorna a lista preenchida ou vazia"
+
+        public List<T> ReturnListOrEmptyList<T>(List<T> source)
+        {
+            return source is null ?
+                   source : Enumerable.Empty<T>().ToList();
+        }
+
+        #endregion
     }
 }
