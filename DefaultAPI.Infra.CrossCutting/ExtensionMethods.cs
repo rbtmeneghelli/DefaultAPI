@@ -1423,5 +1423,17 @@ namespace DefaultAPI.Infra.CrossCutting
         }
 
         #endregion
+
+        #region "Torna os ultimos itens os primeiros do array ou lista"
+
+        public T[] GetReverseArray<T>(T[] array)
+        {
+            Array.Reverse(array);
+            return array;
+        }
+
+        public List<T> GetReverseList<T>(List<T> list) => Enumerable.Reverse(list).ToList();
+
+        #endregion
     }
 }
