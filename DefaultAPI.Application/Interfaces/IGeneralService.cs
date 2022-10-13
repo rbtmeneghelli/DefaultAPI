@@ -31,5 +31,6 @@ namespace DefaultAPI.Application.Interfaces
         void SaveRefreshToken(string username, string refreshToken);
         string GetRefreshToken(string username);
         void DeleteRefreshToken(string username, string refreshToken);
+        string ExtractObjectInformationsByReflection(object obj);
     }
 }

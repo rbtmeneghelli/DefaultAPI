@@ -465,5 +465,29 @@ namespace DefaultAPI.Application.Services
             var item = _refreshTokens.FirstOrDefault(x => x.Username == username && x.RefreshToken == refreshToken);
             _refreshTokens.Remove(item);
         }
+
+        public string ExtractObjectInformationsByReflection(object obj)
+        {
+            //obtem o tipo do objeto
+            //esse tipo não tem relação com a instância de obj
+            var tipo = obj.GetType();
+
+            StringBuilder builder = new StringBuilder();
+            //obtem o nome do tipo
+            builder.AppendLine("Log do " + tipo.Name);
+            builder.AppendLine("Data: " + DateTime.Now);
+
+            //Vamos obter agora todas as propriedades do tipo
+            //Usamos o método GetProperties para obter
+            //o nome das propriedades do tipo
+            foreach (var prop in tipo.GetProperties())
+            {
+                //usa a propriedade Name para obter o nome da propriedade
+                //e o método GetValue() para obter o valor da instância desse tipo
+                builder.AppendLine(prop.Name + ": " + prop.GetValue(obj));
+            }
+
+            return builder.ToString();
+        }
     }
 }
