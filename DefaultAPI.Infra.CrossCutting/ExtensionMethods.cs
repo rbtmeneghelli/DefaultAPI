@@ -1435,5 +1435,34 @@ namespace DefaultAPI.Infra.CrossCutting
         public List<T> GetReverseList<T>(List<T> list) => Enumerable.Reverse(list).ToList();
 
         #endregion
+
+
+        #region "Função de agregação do LINQ"
+
+        public string AgregateStrings(List<string> source)
+        {
+            return source.Aggregate((item, itemNext) => item + "," + itemNext);
+        }
+
+        public string JoinStrings(List<string> source)
+        {
+            return string.Join(",", source);
+        }
+
+        public int AgregateSum(List<int> source)
+        {
+            return source.Aggregate((item, itemNext) => item + itemNext);
+        }
+
+        public decimal AgregateAverage(List<int> source)
+        {
+            return source.Aggregate(
+                seed: 0,
+                func: (result, item) => result + item,
+                resultSelector: result => (decimal)(result / source.Count)
+            );
+        }
+
+        #endregion
     }
 }
