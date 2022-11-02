@@ -1325,7 +1325,7 @@ namespace DefaultAPI.Infra.CrossCutting
             return ConvertModelObjectToXml<T>(modelObject);
         }
 
-        #region "Metodos auxiliares para diminuir o tamanho de arquivos muito extensos, para arquivos compactos"
+        #region Metodos auxiliares para diminuir o tamanho de arquivos muito extensos, para arquivos compactos
 
         public static byte[] CompressStream(byte[] originalSource)
         {
@@ -1361,7 +1361,7 @@ namespace DefaultAPI.Infra.CrossCutting
             return string.Format("{0}{1}{2}{3}{4}", textStart, Constants.quote, word, Constants.quote, textEnd);
         }
 
-        #region "Metodo para pegar o base64 do front (btoa ou atob) e faz o processo de conversão"
+        #region Metodo para pegar o base64 do front (btoa ou atob) e faz o processo de conversão
 
         public static string EncodingString(string toEncode)
         {
@@ -1414,7 +1414,7 @@ namespace DefaultAPI.Infra.CrossCutting
 
         #endregion
 
-        #region "Retorna a lista preenchida ou vazia"
+        #region Retorna a lista preenchida ou vazia
 
         public List<T> ReturnListOrEmptyList<T>(List<T> source)
         {
@@ -1424,7 +1424,7 @@ namespace DefaultAPI.Infra.CrossCutting
 
         #endregion
 
-        #region "Torna os ultimos itens os primeiros do array ou lista"
+        #region Torna os ultimos itens os primeiros do array ou lista
 
         public T[] GetReverseArray<T>(T[] array)
         {
@@ -1437,7 +1437,7 @@ namespace DefaultAPI.Infra.CrossCutting
         #endregion
 
 
-        #region "Função de agregação do LINQ"
+        #region Função de agregação do LINQ
 
         public string AgregateStrings(List<string> source)
         {
@@ -1461,6 +1461,22 @@ namespace DefaultAPI.Infra.CrossCutting
                 func: (result, item) => result + item,
                 resultSelector: result => (decimal)(result / source.Count)
             );
+        }
+
+        #endregion
+
+        #region Funções de Quantificadores 
+
+        public bool ValidateAllElements<T>(List<T> source, Func<T,bool> predicate)
+        {
+            // Se todos os Elementos Atender a condição predicate, será retornado TRUE. Senão FALSE
+            return source.All(predicate); // predicate => x => x % 2 == 0
+        }
+
+        public bool ExistAnyElements<T>(List<T> source, Func<T, bool> predicate)
+        {
+            // Se existir um Elemento que Atenda a condição predicate, será retornado TRUE. Senão FALSE
+            return source.Any(predicate); // predicate => x => x % 2 == 0
         }
 
         #endregion
