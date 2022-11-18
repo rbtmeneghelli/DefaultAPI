@@ -309,3 +309,6 @@ https://macoratti.net/21/07/c_factory2.htm
 
 -- Feito funcionalidade para interceptar dados base64 para string, devido a bloqueio de firewall quando string tem caractere especial
 >> Tem a interface e o service chamado ReadPropertyValue (Projeto DefaultWebAPI tem exemplo)
+
+-- Operações de junções da LINQ (JOIN, LEFT JOIN, RIGHT JOIN, FULL JOIN)
+>> Exemplo tem no projeto DefaultWebAPI, na classe UserRepository
