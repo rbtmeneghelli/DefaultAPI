@@ -751,17 +751,6 @@ namespace DefaultAPI.Infra.CrossCutting
             return value.Equals(word, StringComparison.OrdinalIgnoreCase) ? true : false;
         }
 
-        public int getIndexPositionFromWord(string value, string valueToFind)
-        {
-            if (value.IndexOf(valueToFind) != -1)
-                return value.IndexOf(valueToFind);
-
-            else if (value.IndexOf(valueToFind) != -1)
-                return value.IndexOf(valueToFind, 10); // O 10 é o valor inicial do indice que vai começar a procurar a string
-
-            return -1;
-        }
-
         public string[] getLocalDriversFromMachine()
         {
             return Environment.GetLogicalDrives();
@@ -1206,11 +1195,6 @@ namespace DefaultAPI.Infra.CrossCutting
             return true;
         }
 
-        public Dictionary<long, string> ConvertListToDictionary(List<DropDownList> list)
-        {
-            return list.ToDictionary(item => item.Id, item => item.Description);
-        }
-
         public int MethodWithTwoResults(int value, out bool IsOk)
         {
             // Vai retornar o valor armazenado na variavel value, e podemos pegar o valor da variavel IsOk e
@@ -1433,51 +1417,6 @@ namespace DefaultAPI.Infra.CrossCutting
         }
 
         public List<T> GetReverseList<T>(List<T> list) => Enumerable.Reverse(list).ToList();
-
-        #endregion
-
-
-        #region Função de agregação do LINQ
-
-        public string AgregateStrings(List<string> source)
-        {
-            return source.Aggregate((item, itemNext) => item + "," + itemNext);
-        }
-
-        public string JoinStrings(List<string> source)
-        {
-            return string.Join(",", source);
-        }
-
-        public int AgregateSum(List<int> source)
-        {
-            return source.Aggregate((item, itemNext) => item + itemNext);
-        }
-
-        public decimal AgregateAverage(List<int> source)
-        {
-            return source.Aggregate(
-                seed: 0,
-                func: (result, item) => result + item,
-                resultSelector: result => (decimal)(result / source.Count)
-            );
-        }
-
-        #endregion
-
-        #region Funções de Quantificadores 
-
-        public bool ValidateAllElements<T>(List<T> source, Func<T,bool> predicate)
-        {
-            // Se todos os Elementos Atender a condição predicate, será retornado TRUE. Senão FALSE
-            return source.All(predicate); // predicate => x => x % 2 == 0
-        }
-
-        public bool ExistAnyElements<T>(List<T> source, Func<T, bool> predicate)
-        {
-            // Se existir um Elemento que Atenda a condição predicate, será retornado TRUE. Senão FALSE
-            return source.Any(predicate); // predicate => x => x % 2 == 0
-        }
 
         #endregion
     }
