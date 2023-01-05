@@ -115,5 +115,24 @@ namespace DefaultAPI.Infra.CrossCutting
             list.RemoveAll(predicate);
             return list;
         }
+
+        public List<T> AddItemOnFirstPlaceOfList<T>(List<T> source, T item)
+        {
+            var newSource = source.Prepend<T>(item).ToList();
+            return newSource;
+        }
+
+        public List<T> AddItemOnLastPlaceOfList<T>(List<T> source, T item)
+        {
+            var newSource = source.Append<T>(item).ToList();
+            return newSource;
+        }
+
+        public List<string> ZipList(List<int> sourceId, List<string> sourceText)
+        {
+            // Se tiver a mesma quantidade de itens uma lista e a outra, vai combinar um resultado final numa nova lista
+            var newSource = sourceId.Zip(sourceText, (Id, Text) => Id + " - " + Text).ToList();
+            return newSource;
+        }
     }
 }
