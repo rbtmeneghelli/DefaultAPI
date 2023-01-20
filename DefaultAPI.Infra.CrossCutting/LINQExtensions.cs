@@ -134,5 +134,13 @@ namespace DefaultAPI.Infra.CrossCutting
             var newSource = sourceId.Zip(sourceText, (Id, Text) => Id + " - " + Text).ToList();
             return newSource;
         }
+
+        #region Lista do tipo IEnumerable é para somente leitura, onde não é possivel alterar os valores originais
+
+        public IEnumerable<T> ConvertArrInIEnumerable<T>(T[] array) => array.AsEnumerable();
+
+        public IEnumerable<T> ConvertListInIEnumerable<T>(List<T> list) => list.AsEnumerable();
+
+        #endregion
     }
 }
