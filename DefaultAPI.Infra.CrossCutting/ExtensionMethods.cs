@@ -1419,5 +1419,51 @@ namespace DefaultAPI.Infra.CrossCutting
         public List<T> GetReverseList<T>(List<T> list) => Enumerable.Reverse(list).ToList();
 
         #endregion
+
+        public int GetFibonacciFromNumber(int number)
+        {
+            if (number == 0 || number == 1) return number;
+
+            int a = 0;
+            int b = 1;
+            int c = 3;
+
+            for (int i = 2; i <= number; i++)
+            {
+                c = a + b;
+                a = b;
+                b = c;
+            }
+
+            return c;
+        }
+
+        public int GetRecursiveFibonnaciFromNumber(int number)
+        {
+            if (number == 0 || number == 1) return number;
+
+            return GetRecursiveFibonnaciFromNumber(number - 1) + GetRecursiveFibonnaciFromNumber(number - 2);
+        }
+
+        public int GetFatorialFromNumber(int number)
+        {
+            int fatorial = 1;
+
+            if (number == 0 || number == 1) return fatorial;
+
+            for (int i = number; i >= 1; i--)
+            {
+                fatorial = fatorial * i;
+            }
+
+            return fatorial;
+        }
+
+        public int GetRecursiveFatorialFromNumber(int number)
+        {
+            if (number == 0 || number == 1) return 1;
+
+            return number * GetRecursiveFatorialFromNumber(number - 1);
+        }
     }
 }
