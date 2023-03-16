@@ -1465,5 +1465,10 @@ namespace DefaultAPI.Infra.CrossCutting
 
             return number * GetRecursiveFatorialFromNumber(number - 1);
         }
+
+        public Queue<T> ConvertListToQueue<T>(IEnumerable<T> list)
+        {
+            return new Queue<T>(list);
+        }
     }
 }
