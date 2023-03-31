@@ -48,9 +48,17 @@ namespace DefaultAPI.Infra.Structure.IoC
             return services;
         }
 
+        /// <summary>
+        /// Essa funcionalidade faz que comandos de inserção/atualização/exclusão sejam agrupados em uma unica viagem de ida e volta ao banco de dados.
+        /// Funcionalidade suportada a partir do EF Core
+        /// Link de referencia >> https://macoratti.net/22/02/efcore_batind1.htm
+        /// </summary>
+        /// <param name="MinBatchSize">Valor 5 é recomendado</param>
+        /// <param name="MaxBatchSize">Valor entre 20 a 50 é recomendado</param>
+        /// <returns></returns>
         public static IServiceCollection RegisterDbConnection(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<DefaultAPIContext>(opts => opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly(typeof(DefaultAPIContext).Assembly.FullName)));
+            services.AddDbContext<DefaultAPIContext>(opts => opts.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MinBatchSize(5).MaxBatchSize(50).MigrationsAssembly(typeof(DefaultAPIContext).Assembly.FullName)));
             return services;
         }
 

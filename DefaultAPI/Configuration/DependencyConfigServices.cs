@@ -140,7 +140,7 @@ namespace DefaultAPI.Configuration
 
             var builder = new DbContextOptionsBuilder<DefaultAPIContext>();
             var connectionString = configuration.GetConnectionString("DefaultConnection");
-            builder.UseSqlServer(connectionString);
+            builder.UseSqlServer(connectionString, b => b.MinBatchSize(5).MaxBatchSize(50));
 
             return new DefaultAPIContext(builder.Options);
         }
