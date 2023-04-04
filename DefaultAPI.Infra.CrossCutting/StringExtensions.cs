@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace DefaultAPI.Infra.CrossCutting
@@ -45,6 +46,12 @@ namespace DefaultAPI.Infra.CrossCutting
                 return value.LastIndexOf(valueToFind, indexStart);
 
             return -1;
+        }
+
+        public static string TurnFirstWordFromLetterToUpperCase(this string text, string language = "pt-BR")
+        {
+            var textResult = CultureInfo.GetCultureInfo(language).TextInfo;
+            return textResult.ToTitleCase(text);
         }
     }
 }
