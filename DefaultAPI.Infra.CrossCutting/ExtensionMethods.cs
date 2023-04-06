@@ -41,10 +41,9 @@ namespace DefaultAPI.Infra.CrossCutting
         {
             const string valid = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
             StringBuilder res = new StringBuilder();
-            Random rnd = new Random();
             while (0 < length--)
             {
-                res.Append(valid[rnd.Next(valid.Length)]);
+                res.Append(valid[GetRandomNumber(valid.Length)]);
             }
             return res.ToString();
         }
@@ -339,9 +338,8 @@ namespace DefaultAPI.Infra.CrossCutting
 
         public string BuildPassword()
         {
-            Random numbers = new Random();
             string letters = "ABCDEFGHIJKLMNOPQRSTUVYWXZ";
-            return string.Format("{0}{1}{2}{3}{4}", letters.Substring(numbers.Next(0, 25), 1), numbers.Next(0, 9), letters.Substring(numbers.Next(0, 25), 1), numbers.Next(0, 9), letters.Substring(numbers.Next(0, 25), 1));
+            return $"{letters.Substring(GetRandomNumber(25, 0), 1)}{GetRandomNumber(9, 0)}{letters.Substring(GetRandomNumber(25, 0), 1)}{GetRandomNumber(9, 0)}{letters.Substring(GetRandomNumber(25, 0), 1)}";
         }
 
         public void ValidItensList()
@@ -405,12 +403,11 @@ namespace DefaultAPI.Infra.CrossCutting
 
         public string GetColorHex()
         {
-            Random random = new Random();
-            int r = random.Next(0, 255);
-            int g = random.Next(0, 255);
-            int b = random.Next(0, 255);
-            int a = random.Next(0, 255);
-            string cor = string.Format("#{0}", Color.FromArgb(a, r, g, b).Name.ToUpper().Substring(0, 6));
+            int r = GetRandomNumber(255, 0);
+            int g = GetRandomNumber(255, 0);
+            int b = GetRandomNumber(255, 0);
+            int a = GetRandomNumber(255, 0);
+            string cor = $"#{Color.FromArgb(a, r, g, b).Name.ApplyTrim().Substring(0, 6)}";
             return cor;
         }
 
@@ -429,8 +426,7 @@ namespace DefaultAPI.Infra.CrossCutting
 
         public Color GetColorRgb()
         {
-            Random rnd = new Random();
-            Color randomColor = Color.FromArgb(rnd.Next(256), rnd.Next(256), rnd.Next(256));
+            Color randomColor = Color.FromArgb(GetRandomNumber(256), GetRandomNumber(256), GetRandomNumber(256));
             return randomColor;
         }
 
@@ -837,8 +833,7 @@ namespace DefaultAPI.Infra.CrossCutting
             int[] mult1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
             int[] mult2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
 
-            Random rnd = new Random();
-            string result = rnd.Next(100000000, 999999999).ToString();
+            string result = GetRandomNumber(999999999, 100000000).ToString();
 
             for (int i = 0; i < 9; i++)
                 sum += int.Parse(result[i].ToString()) * mult1[i];
@@ -964,10 +959,9 @@ namespace DefaultAPI.Infra.CrossCutting
             const string special = "!@#$%ˆ&*(){}[];";
             var chars = includeSpecialChars ? (valid + special) : valid;
             var res = new StringBuilder();
-            var rnd = new Random();
             while (0 < numCharacters--)
-                res.Append(chars[rnd.Next(chars.Length)]);
-            return onlyUpperCase ? res.ToString().ToUpper() : res.ToString();
+                res.Append(chars[GetRandomNumber(chars.Length)]);
+            return onlyUpperCase ? res.ToString().ApplyTrim() : res.ToString().ApplyTrim();
         }
 
         public DropDownList ConvertObjectToClass(object obj)
@@ -1224,17 +1218,16 @@ namespace DefaultAPI.Infra.CrossCutting
 
         public string GenerateTokenNumbers()
         {
-            Random random = new Random();
             int count = 0;
             string token = string.Empty;
 
             while (count < 8)
             {
-                int number = random.Next(0, 9);
+                int number = GetRandomNumber(9, 0);
                 token = string.Concat(token, number.ToString());
             }
 
-            return token.Trim();
+            return token.ApplyTrim();
         }
 
         public static DateTime GetNextUtilDay(DateTime dateTime)
@@ -1469,6 +1462,21 @@ namespace DefaultAPI.Infra.CrossCutting
         public Queue<T> ConvertListToQueue<T>(IEnumerable<T> list)
         {
             return new Queue<T>(list);
+        }
+
+        /// <summary>
+        /// Antes do Net 6, é necessario instanciar a classe Random
+        /// A partir do Net 6 não é mais necessario instanciar, podemos utilizar a propriedade Shared direto da classe Random
+        /// </summary>
+        /// <returns></returns>
+        private int GetRandomNumber(int value, int? minValue = null)
+        {
+            Random rnd = new();
+
+            if (minValue.HasValue)
+                return rnd.Next(minValue.GetValueOrDefault(0), value);
+
+            return rnd.Next(value);
         }
     }
 }
