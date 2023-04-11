@@ -62,5 +62,18 @@ namespace DefaultAPI.Domain
         public const string NoAuthorization = "Caro usuário você não tem permissão para efetuar tal ação. Entre em contato com o Administrador";
 
         public const string quote = "\"";
+
+        /// <summary>
+        /// Primeiro irei Obter a data e hora atual em GMT,
+        /// Definir o fuso horário de São Paulo,
+        /// Converte a data e hora atual para o fuso horário de São Paulo
+        /// </summary>
+        /// <returns></returns>
+        public static DateTime GetDateTimeNowFromBrazil()
+        {
+            TimeZoneInfo tz = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+            DateTime dateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
+            return dateTime;
+        }
     }
 }
