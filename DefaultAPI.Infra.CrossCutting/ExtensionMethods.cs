@@ -473,12 +473,12 @@ namespace DefaultAPI.Infra.CrossCutting
                 {
                     Console.WriteLine($"Drive {drive.Name} esta pronto.");
                     Console.WriteLine($"Espaço disponível livre: {drive.AvailableFreeSpace} " +
-                     $"bytes ou { FormatBytes(drive.AvailableFreeSpace)}");
+                     $"bytes ou {FormatBytes(drive.AvailableFreeSpace)}");
                     Console.WriteLine($"Formato : {drive.DriveFormat}");
                     Console.WriteLine($"Tipo: {drive.DriveType}");
                     Console.WriteLine($"Nome: {drive.Name}");
                     Console.WriteLine("Nome Completo da Raiz : " + $"{drive.RootDirectory.FullName}");
-                    Console.WriteLine($"Espaço total Livre : {drive.TotalFreeSpace} bytes ou { FormatBytes(drive.TotalFreeSpace)}");
+                    Console.WriteLine($"Espaço total Livre : {drive.TotalFreeSpace} bytes ou {FormatBytes(drive.TotalFreeSpace)}");
                     Console.WriteLine($"Espaço Total : {drive.TotalSize} bytes ou {FormatBytes(drive.TotalSize)}");
                     Console.WriteLine($"Volume Label: {drive.VolumeLabel}");
                 }
@@ -526,7 +526,7 @@ namespace DefaultAPI.Infra.CrossCutting
         {
             Uri uri = new Uri(url);
             StringBuilder result = new StringBuilder();
-            result.Append($"AbsolutePath = {uri.AbsolutePath } || ");
+            result.Append($"AbsolutePath = {uri.AbsolutePath} || ");
             result.Append($"AbsoluteUri = {uri.AbsoluteUri} || ");
             result.Append($"Authority = {uri.Authority} || ");
             result.Append($"DnsSafeHost = {uri.DnsSafeHost} || ");
@@ -1462,6 +1462,25 @@ namespace DefaultAPI.Infra.CrossCutting
         public Queue<T> ConvertListToQueue<T>(IEnumerable<T> list)
         {
             return new Queue<T>(list);
+        }
+
+        public string ConvertNumberToRomanNumber(int number)
+        {
+            string result = string.Empty;
+
+            string[] arrRoman = { "I", "IV", "V", "IX", "X", "XL", "L", "XC", "C", "CD", "D", "CM", "M" };
+            int[] arrArabic = { 1, 4, 5, 9, 10, 40, 50, 90, 100, 400, 500, 900, 1000 };
+            
+            for(int count = 13; count >= 0; count--)
+            {
+                while(number >= arrArabic[count])
+                {
+                    number-= arrArabic[count];
+                    result += arrRoman[count];
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
