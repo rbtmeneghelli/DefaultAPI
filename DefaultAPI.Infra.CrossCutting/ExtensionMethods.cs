@@ -626,7 +626,7 @@ namespace DefaultAPI.Infra.CrossCutting
             }
         }
 
-        public DataTable ConvertTo<T>(IList<T> list)
+        public DataTable ConvertToDataTable<T>(List<T> list)
         {
             DataTable table = CreateTable<T>();
             Type entityType = typeof(T);
